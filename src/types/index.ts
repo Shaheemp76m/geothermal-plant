@@ -66,6 +66,7 @@ export interface NextGenTechEntry {
   subtitle: string;
   description: string;
   status: string;
+  footerLabel: string;
 }
 
 export interface ReferenceItem {

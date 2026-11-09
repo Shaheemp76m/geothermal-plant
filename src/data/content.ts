@@ -304,35 +304,39 @@ export const NEXT_GEN_SECTION = {
 export const NEXT_GEN_TECH: NextGenTechEntry[] = [
   {
     number: "01",
-    classification: "SUBSURFACE PERMEABILITY",
-    title: "Enhanced Geothermal Systems (EGS)",
+    classification: "SYSTEM / 01",
+    title: "Enhanced Geothermal Systems.",
     subtitle: "Unlocking heat in places once considered unreachable.",
     description: "Enhanced geothermal systems use engineered reservoirs to access heat in hot rock formations that lack sufficient natural permeability. Carefully managed stimulation creates pathways for fluid circulation and heat extraction.",
-    status: "FIELD DEMONSTRATION"
+    status: "FIELD DEMONSTRATION",
+    footerLabel: "EXPANDING GEOTHERMAL ACCESS"
   },
   {
     number: "02",
-    classification: "CLOSED-LOOP CONDUCTION",
-    title: "Closed-Loop Geothermal Systems",
+    classification: "SYSTEM / 02",
+    title: "Closed-Loop Geothermal.",
     subtitle: "Heat exchange without extracting reservoir fluid.",
     description: "Closed-loop systems circulate a working fluid through sealed underground pipes, transferring heat from surrounding rock without directly producing geothermal reservoir fluids.",
-    status: "DEVELOPING TECHNOLOGY"
+    status: "DEVELOPING TECHNOLOGY",
+    footerLabel: "REIMAGINING HEAT EXCHANGE"
   },
   {
     number: "03",
-    classification: "EXTREME ENTHALPY",
-    title: "Superhot Geothermal",
+    classification: "FRONTIER / 03",
+    title: "Superhot Geothermal.",
     subtitle: "Going deeper. Reaching hotter resources.",
     description: "Research into extremely high-temperature geothermal resources explores the potential to produce significantly more energy from individual wells. Accessing these conditions requires advanced materials, drilling methods, and engineering.",
-    status: "EMERGING RESEARCH"
+    status: "EMERGING RESEARCH",
+    footerLabel: "REACHING EXTREME TEMPERATURES"
   },
   {
     number: "04",
-    classification: "NON-MECHANICAL SPALLATION",
-    title: "Next-Generation Drilling",
+    classification: "FRONTIER / 04",
+    title: "Next-Generation Drilling.",
     subtitle: "Redefining how we reach Earth's heat.",
     description: "Experimental drilling approaches, including millimeter-wave and thermal spallation concepts, investigate alternatives to conventional mechanical drilling in extremely hard underground formations.",
-    status: "EXPERIMENTAL R&D"
+    status: "EXPERIMENTAL R&D",
+    footerLabel: "THE NEXT DRILLING FRONTIER"
   }
 ];
 

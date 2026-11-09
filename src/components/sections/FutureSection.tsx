@@ -1,243 +1,436 @@
-import React, { useRef } from 'react';
-import { motion, useScroll, useTransform, useReducedMotion, type Variants } from 'motion/react';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { motion, useScroll, useTransform, useMotionValueEvent, useReducedMotion } from 'motion/react';
+import { ArrowRight, Sparkles, ArrowDown } from 'lucide-react';
 import { NEXT_GEN_SECTION, NEXT_GEN_TECH } from '../../data/content';
-import { NextGenTechEntry } from '../../types';
 
 interface FutureSectionProps {
   onOpenReferences: () => void;
 }
 
-// Single Technology Story Entry Component
-const TechStoryEntry: React.FC<{
-  entry: NextGenTechEntry;
-  index: number;
-  isLast: boolean;
-}> = ({ entry, index, isLast }) => {
-  const shouldReduceMotion = useReducedMotion();
-
-  // Entrance variants
-  const containerVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: shouldReduceMotion ? 0 : 0.12,
-        delayChildren: shouldReduceMotion ? 0 : 0.04,
-      },
-    },
-  };
-
-  const itemVariants: Variants = {
-    hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 16 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: shouldReduceMotion ? 0.01 : 0.65,
-        ease: [0.16, 1, 0.3, 1] as const,
-      },
-    },
-  };
-
-  return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: '-10% 0px -10% 0px' }}
-      className={`relative py-10 sm:py-14 md:py-20 lg:py-24 ${
-        !isLast ? 'border-b border-earth-border/60' : ''
-      }`}
-    >
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 lg:gap-16 items-start">
-        {/* Left Column: Stage Number & Classification Lockup */}
-        <div className="lg:col-span-4">
-          <div className="flex items-center sm:items-baseline gap-3 sm:gap-4 lg:flex-col lg:items-start lg:gap-2">
-            {/* Monumental Number */}
-            <motion.div variants={itemVariants} className="select-none shrink-0">
-              <span className="font-editorial text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-light tracking-tighter text-earth-forest/25 block leading-none">
-                {entry.number}
-              </span>
-            </motion.div>
-
-            {/* Classification Label - Connected and aligned */}
-            <motion.div variants={itemVariants} className="flex flex-col justify-center lg:mt-3 min-w-0">
-              <span className="font-mono text-[9px] sm:text-[10px] tracking-[0.24em] text-earth-muted uppercase block leading-tight">
-                STAGE 0{index + 1}
-              </span>
-              <span className="font-mono text-[10px] sm:text-[11px] tracking-[0.18em] sm:tracking-[0.2em] text-earth-sage uppercase font-semibold block mt-0.5 leading-snug">
-                {entry.classification}
-              </span>
-            </motion.div>
-          </div>
-        </div>
-
-        {/* Right Column: Status Badge, Title, Subtitle, Description */}
-        <div className="lg:col-span-8 space-y-3.5 sm:space-y-4 md:space-y-5">
-          {/* Status Badge */}
-          <motion.div variants={itemVariants}>
-            <div className="inline-flex items-center space-x-2 px-2.5 sm:px-3 py-1 bg-earth-forest/5 border border-earth-forest/15 rounded-full">
-              <span className="w-1.5 h-1.5 rounded-full bg-earth-sage animate-pulse shrink-0" />
-              <span className="font-mono text-[9px] sm:text-[10px] tracking-[0.2em] text-earth-forest font-semibold uppercase">
-                {entry.status}
-              </span>
-            </div>
-          </motion.div>
-
-          {/* Title */}
-          <motion.h3
-            variants={itemVariants}
-            className="font-editorial text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-tight text-earth-forest leading-[1.14]"
-          >
-            {entry.title}
-          </motion.h3>
-
-          {/* Subtitle */}
-          <motion.p
-            variants={itemVariants}
-            className="font-editorial italic text-base sm:text-lg md:text-xl lg:text-2xl text-earth-forest/85 font-normal leading-relaxed"
-          >
-            "{entry.subtitle}"
-          </motion.p>
-
-          {/* Description */}
-          <motion.p
-            variants={itemVariants}
-            className="font-sans text-xs sm:text-sm md:text-base text-earth-black/75 max-w-2xl leading-relaxed"
-          >
-            {entry.description}
-          </motion.p>
-        </div>
-      </div>
-    </motion.div>
-  );
-};
-
 export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
+  const [currentStage, setCurrentStage] = useState(1);
 
-  // Scroll progress for vertical indicator line
+  // Measure vertical scroll through the pinned container
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ['start center', 'end center'],
+    offset: ['start start', 'end end'],
   });
 
-  const lineHeight = useTransform(scrollYProgress, [0, 1], ['0%', '100%']);
+  // Transform vertical scroll progress into horizontal translateX across 4 panels (0% to -75%)
+  const translateX = useTransform(scrollYProgress, [0, 1], ['0%', '-75%']);
+  const progressBarWidth = useTransform(scrollYProgress, [0, 1], ['0%', '100%']);
 
-  // Intro reveal variants
-  const introVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: shouldReduceMotion ? 0 : 0.14,
-      },
-    },
-  };
+  // Update active stage indicator smoothly as horizontal track advances
+  useMotionValueEvent(scrollYProgress, 'change', (latest) => {
+    if (latest < 0.28) {
+      setCurrentStage(1);
+    } else if (latest < 0.58) {
+      setCurrentStage(2);
+    } else if (latest < 0.88) {
+      setCurrentStage(3);
+    } else {
+      setCurrentStage(4);
+    }
+  });
 
-  const textItemVariants: Variants = {
-    hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 16 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: shouldReduceMotion ? 0.01 : 0.7,
-        ease: [0.16, 1, 0.3, 1] as const,
-      },
-    },
-  };
-
-  return (
-    <section
-      id="innovation"
-      className="bg-earth-ivory py-14 sm:py-20 md:py-28 border-b border-earth-border relative overflow-hidden scroll-mt-24"
-    >
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12">
-        {/* Section Introduction */}
-        <motion.div
-          variants={introVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-10% 0px -10% 0px' }}
-          className="max-w-3xl mb-12 sm:mb-16 md:mb-20"
-        >
-          {/* Eyebrow */}
-          <motion.div
-            variants={textItemVariants}
-            className="flex items-center space-x-2 text-[10px] sm:text-[11px] font-semibold tracking-[0.24em] sm:tracking-[0.28em] text-earth-forest uppercase mb-3"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-earth-sage shrink-0" />
-            <span className="truncate">{NEXT_GEN_SECTION.eyebrow}</span>
-          </motion.div>
-
-          {/* Main Heading */}
-          <motion.h2
-            variants={textItemVariants}
-            className="font-editorial text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight text-earth-forest mb-4 sm:mb-5 leading-[1.1]"
-          >
-            {NEXT_GEN_SECTION.headline}
-          </motion.h2>
-
-          {/* Supporting Description */}
-          <motion.p
-            variants={textItemVariants}
-            className="text-xs sm:text-sm md:text-base text-earth-black/80 font-sans leading-relaxed border-l-2 border-earth-forest/40 pl-4 sm:pl-6"
-          >
-            {NEXT_GEN_SECTION.description}
-          </motion.p>
-        </motion.div>
-
-        {/* Sequential Vertical Storytelling Experience */}
-        <div ref={containerRef} className="relative">
-          {/* Subtle Vertical Progress Indicator (Desktop only) */}
-          <div className="hidden lg:block absolute left-[-24px] xl:left-[-36px] top-4 bottom-4 w-[1px] bg-earth-border/40 select-none pointer-events-none">
-            <motion.div
-              style={{ height: lineHeight }}
-              className="w-full bg-earth-sage origin-top"
-            />
-          </div>
-
-          {/* The Four Technology Entries */}
-          <div>
-            {NEXT_GEN_TECH.map((tech, idx) => (
-              <TechStoryEntry
-                key={tech.number}
-                entry={tech}
-                index={idx}
-                isLast={idx === NEXT_GEN_TECH.length - 1}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* Section Footer / Research Roadmap Action */}
-        <motion.div
-          initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.65, delay: 0.08 }}
-          className="mt-12 sm:mt-16 pt-8 sm:pt-10 border-t border-earth-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-6"
-        >
-          <div className="max-w-2xl">
-            <span className="font-mono text-[9px] sm:text-[10px] tracking-widest text-earth-muted uppercase block mb-1">
-              SCIENTIFIC INTEGRITY & READINESS
-            </span>
-            <p className="text-xs sm:text-sm text-earth-black/75 font-sans leading-relaxed">
-              While conventional hydrothermal power is commercially operational globally, next-generation deep systems are advancing through field trials and regulated pilot facilities.
+  // Reduced motion accessible fallback (clean vertical layout)
+  if (shouldReduceMotion) {
+    return (
+      <section id="innovation" className="bg-earth-ivory py-16 sm:py-24 border-b border-earth-border scroll-mt-24">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12">
+          {/* Section Introduction */}
+          <div className="max-w-4xl mb-16">
+            <div className="flex items-center space-x-2 text-[10px] sm:text-[11px] font-semibold tracking-[0.28em] text-earth-forest uppercase mb-3">
+              <Sparkles className="w-3.5 h-3.5 text-earth-sage shrink-0" />
+              <span>{NEXT_GEN_SECTION.eyebrow}</span>
+            </div>
+            <h2 className="font-editorial text-4xl sm:text-5xl md:text-6xl font-medium tracking-tight text-earth-forest mb-6">
+              {NEXT_GEN_SECTION.headline}
+            </h2>
+            <p className="text-sm sm:text-base md:text-lg text-earth-black/80 font-sans leading-relaxed border-l-2 border-earth-forest/40 pl-4 sm:pl-6">
+              {NEXT_GEN_SECTION.description}
             </p>
           </div>
 
-          <button
-            onClick={onOpenReferences}
-            className="inline-flex items-center space-x-2.5 text-xs font-semibold tracking-[0.18em] sm:tracking-[0.2em] uppercase px-5 sm:px-7 py-3 sm:py-3.5 border border-earth-forest text-earth-forest hover:bg-earth-forest hover:text-earth-ivory transition-all duration-300 shadow-sm shrink-0"
+          {/* Vertical Stack for Reduced Motion */}
+          <div className="space-y-16">
+            {NEXT_GEN_TECH.map((tech) => (
+              <div key={tech.number} className="border-t border-earth-border/60 pt-8 space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="font-editorial text-5xl font-light text-earth-forest/30">
+                    {tech.number}
+                  </span>
+                  <span className="font-mono text-xs uppercase px-3 py-1 bg-earth-forest/5 border border-earth-forest/15 rounded-full text-earth-forest">
+                    {tech.status}
+                  </span>
+                </div>
+                <span className="font-mono text-xs text-earth-sage uppercase tracking-widest block">
+                  {tech.classification}
+                </span>
+                <h3 className="font-editorial text-3xl sm:text-4xl text-earth-forest font-medium">
+                  {tech.title}
+                </h3>
+                <p className="font-editorial italic text-lg sm:text-xl text-earth-forest/85">
+                  "{tech.subtitle}"
+                </p>
+                <p className="text-sm sm:text-base text-earth-black/75 max-w-2xl leading-relaxed">
+                  {tech.description}
+                </p>
+                <div className="pt-2">
+                  <span className="font-mono text-[10px] tracking-widest text-earth-muted uppercase">
+                    {tech.footerLabel}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-16 pt-8 border-t border-earth-border flex items-center justify-between">
+            <span className="text-xs text-earth-muted font-sans">Next-generation subterranean technology roadmap.</span>
+            <button
+              onClick={onOpenReferences}
+              className="text-xs font-semibold tracking-widest uppercase px-6 py-3 border border-earth-forest text-earth-forest hover:bg-earth-forest hover:text-earth-ivory transition-colors"
+            >
+              REVIEW DOE ROADMAP
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <div id="innovation" className="relative bg-earth-ivory scroll-mt-24">
+      {/* 1. SECTION INTRODUCTION (Displayed before the horizontal journey begins) */}
+      <section className="pt-20 sm:pt-28 md:pt-36 pb-16 sm:pb-20 md:pb-24 px-4 sm:px-6 lg:px-12 max-w-[1440px] mx-auto border-b border-earth-border/60">
+        <div className="max-w-5xl">
+          {/* Eyebrow */}
+          <div className="flex items-center space-x-2 text-[10px] sm:text-[11px] font-semibold tracking-[0.24em] sm:tracking-[0.28em] text-earth-forest uppercase mb-4 sm:mb-6">
+            <Sparkles className="w-3.5 h-3.5 text-earth-sage shrink-0" />
+            <span className="truncate">{NEXT_GEN_SECTION.eyebrow}</span>
+          </div>
+
+          {/* Main Heading with large editorial serif clamp */}
+          <h2 
+            className="font-editorial font-medium tracking-tight text-earth-forest leading-[1.05] mb-6 sm:mb-8"
+            style={{ fontSize: 'clamp(2.75rem, 7vw, 6.5rem)' }}
           >
-            <span>REVIEW DOE ROADMAP</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
-        </motion.div>
+            {NEXT_GEN_SECTION.headline}
+          </h2>
+
+          {/* Supporting Description */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-10 items-end">
+            <p 
+              className="lg:col-span-8 text-earth-black/80 font-sans leading-relaxed border-l-2 border-earth-forest/40 pl-4 sm:pl-6"
+              style={{ fontSize: 'clamp(1rem, 1.35vw, 1.25rem)' }}
+            >
+              {NEXT_GEN_SECTION.description}
+            </p>
+
+            <div className="lg:col-span-4 flex items-center space-x-3 text-xs font-mono tracking-widest text-earth-sage uppercase">
+              <span>CONTINUOUS HORIZONTAL JOURNEY</span>
+              <ArrowDown className="w-3.5 h-3.5 text-earth-forest animate-bounce" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 2. PINNED HORIZONTAL JOURNEY CONTAINER */}
+      {/* The outer container provides 420vh of normal vertical scrolling space */}
+      <div ref={containerRef} className="relative h-[420vh]">
+        {/* Sticky viewport pinned to screen while scrolling horizontally */}
+        <div className="sticky top-0 h-screen h-[100svh] w-full overflow-hidden flex flex-col justify-between bg-earth-ivory border-b border-earth-border z-20">
+          {/* Top Stage & Progress Header Bar (inside pinned viewport) */}
+          <div className="pt-20 sm:pt-24 px-4 sm:px-8 md:px-14 lg:px-20 flex items-center justify-between border-b border-earth-border/40 pb-3 sm:pb-4 shrink-0 bg-earth-ivory/90 backdrop-blur-sm">
+            {/* Left: Section Sub-eyebrow */}
+            <div className="flex items-center space-x-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-earth-sage animate-pulse" />
+              <span className="font-mono text-[9px] sm:text-[10px] tracking-[0.22em] text-earth-forest uppercase font-semibold">
+                THE NEXT GENERATION FRONTIER
+              </span>
+            </div>
+
+            {/* Right: Stage Counter & Horizontal Progress Bar */}
+            <div className="flex items-center space-x-3 sm:space-x-5">
+              {/* Counter: 01 / 04 */}
+              <div className="font-mono text-xs sm:text-sm font-semibold tracking-widest text-earth-forest">
+                0{currentStage} <span className="text-earth-muted font-normal">/ 04</span>
+              </div>
+
+              {/* Progress Line */}
+              <div className="w-20 sm:w-32 md:w-40 h-[2px] bg-earth-border/70 rounded-full overflow-hidden relative">
+                <motion.div
+                  style={{ width: progressBarWidth }}
+                  className="h-full bg-earth-forest rounded-full"
+                />
+              </div>
+
+              {/* 4 Stage Markers */}
+              <div className="flex items-center space-x-1 sm:space-x-1.5">
+                {[1, 2, 3, 4].map((stage) => (
+                  <span
+                    key={stage}
+                    className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                      stage === currentStage
+                        ? 'bg-earth-forest scale-125'
+                        : stage < currentStage
+                        ? 'bg-earth-sage'
+                        : 'bg-earth-border'
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Middle: Horizontal Scrolling Track containing all 4 Panels */}
+          <div className="flex-1 relative overflow-hidden flex items-center">
+            <motion.div
+              style={{ x: translateX }}
+              className="flex flex-row w-[400vw] h-full will-change-transform"
+            >
+              {/* ======================================================== */}
+              {/* PANEL 01 — ENHANCED GEOTHERMAL SYSTEMS                   */}
+              {/* ======================================================== */}
+              <section className="w-[100vw] h-full shrink-0 flex flex-col justify-center px-6 sm:px-12 md:px-20 lg:px-28 relative overflow-hidden">
+                {/* Large Subtle Background Number */}
+                <div 
+                  aria-hidden="true"
+                  className="absolute left-6 sm:left-12 lg:left-20 top-1/2 -translate-y-1/2 pointer-events-none select-none z-0"
+                >
+                  <span 
+                    className="font-editorial font-light text-earth-forest/[0.07] block leading-none"
+                    style={{ fontSize: 'clamp(9rem, 20vw, 22rem)' }}
+                  >
+                    01
+                  </span>
+                </div>
+
+                <div className="relative z-10 max-w-4xl space-y-4 sm:space-y-6">
+                  {/* Classification & Status Lockup */}
+                  <div className="flex flex-wrap items-center gap-3">
+                    <span className="font-mono text-[10px] sm:text-[11px] tracking-[0.25em] text-earth-sage uppercase font-semibold">
+                      {NEXT_GEN_TECH[0].classification}
+                    </span>
+                    <span className="inline-flex items-center space-x-1.5 px-3 py-1 bg-earth-forest/5 border border-earth-forest/15 rounded-full text-[9px] sm:text-[10px] font-mono tracking-widest text-earth-forest font-semibold uppercase">
+                      <span className="w-1.5 h-1.5 rounded-full bg-earth-sage animate-pulse" />
+                      <span>{NEXT_GEN_TECH[0].status}</span>
+                    </span>
+                  </div>
+
+                  {/* Heading */}
+                  <h3 
+                    className="font-editorial font-medium tracking-tight text-earth-forest leading-[1.08]"
+                    style={{ fontSize: 'clamp(2.5rem, 5.5vw, 5.5rem)' }}
+                  >
+                    {NEXT_GEN_TECH[0].title}
+                  </h3>
+
+                  {/* Secondary Statement */}
+                  <p className="font-editorial italic text-xl sm:text-2xl md:text-3xl text-earth-forest/85 leading-snug">
+                    "{NEXT_GEN_TECH[0].subtitle}"
+                  </p>
+
+                  {/* Description */}
+                  <p 
+                    className="font-sans text-earth-black/75 max-w-2xl leading-relaxed"
+                    style={{ fontSize: 'clamp(0.95rem, 1.2vw, 1.2rem)' }}
+                  >
+                    {NEXT_GEN_TECH[0].description}
+                  </p>
+                </div>
+              </section>
+
+              {/* ======================================================== */}
+              {/* PANEL 02 — CLOSED-LOOP GEOTHERMAL                        */}
+              {/* ======================================================== */}
+              <section className="w-[100vw] h-full shrink-0 flex flex-col justify-center px-6 sm:px-12 md:px-20 lg:px-28 relative overflow-hidden">
+                {/* Large Background Number 02 */}
+                <div 
+                  aria-hidden="true"
+                  className="absolute right-8 sm:right-16 lg:right-28 top-1/2 -translate-y-1/2 pointer-events-none select-none z-0"
+                >
+                  <span 
+                    className="font-editorial font-light text-earth-forest/[0.07] block leading-none"
+                    style={{ fontSize: 'clamp(9rem, 20vw, 22rem)' }}
+                  >
+                    02
+                  </span>
+                </div>
+
+                <div className="relative z-10 max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                  {/* Left Column: Heading & Status */}
+                  <div className="lg:col-span-7 space-y-4 sm:space-y-5">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <span className="font-mono text-[10px] sm:text-[11px] tracking-[0.25em] text-earth-sage uppercase font-semibold">
+                        {NEXT_GEN_TECH[1].classification}
+                      </span>
+                      <span className="inline-flex items-center space-x-1.5 px-3 py-1 bg-earth-forest/5 border border-earth-forest/15 rounded-full text-[9px] sm:text-[10px] font-mono tracking-widest text-earth-forest font-semibold uppercase">
+                        <span className="w-1.5 h-1.5 rounded-full bg-earth-sage animate-pulse" />
+                        <span>{NEXT_GEN_TECH[1].status}</span>
+                      </span>
+                    </div>
+
+                    <h3 
+                      className="font-editorial font-medium tracking-tight text-earth-forest leading-[1.08]"
+                      style={{ fontSize: 'clamp(2.5rem, 5.5vw, 5.5rem)' }}
+                    >
+                      {NEXT_GEN_TECH[1].title}
+                    </h3>
+                  </div>
+
+                  {/* Right Column: Statement & Description */}
+                  <div className="lg:col-span-5 space-y-4 border-l-2 border-earth-stone/70 pl-6 sm:pl-8">
+                    <p className="font-editorial italic text-lg sm:text-xl md:text-2xl text-earth-forest/85 leading-snug">
+                      "{NEXT_GEN_TECH[1].subtitle}"
+                    </p>
+                    <p 
+                      className="font-sans text-earth-black/75 leading-relaxed"
+                      style={{ fontSize: 'clamp(0.95rem, 1.2vw, 1.15rem)' }}
+                    >
+                      {NEXT_GEN_TECH[1].description}
+                    </p>
+                  </div>
+                </div>
+              </section>
+
+              {/* ======================================================== */}
+              {/* PANEL 03 — SUPERHOT GEOTHERMAL                           */}
+              {/* ======================================================== */}
+              <section className="w-[100vw] h-full shrink-0 flex flex-col justify-center px-6 sm:px-12 md:px-20 lg:px-28 relative overflow-hidden">
+                {/* Large Background Number 03 */}
+                <div 
+                  aria-hidden="true"
+                  className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 pointer-events-none select-none z-0"
+                >
+                  <span 
+                    className="font-editorial font-light text-earth-forest/[0.06] block leading-none"
+                    style={{ fontSize: 'clamp(9rem, 20vw, 22rem)' }}
+                  >
+                    03
+                  </span>
+                </div>
+
+                <div className="relative z-10 max-w-4xl space-y-4 sm:space-y-6">
+                  {/* Temperature-related typographic detail */}
+                  <div className="flex flex-wrap items-center gap-3">
+                    <span className="font-mono text-[10px] sm:text-[11px] tracking-[0.25em] text-earth-sage uppercase font-semibold">
+                      {NEXT_GEN_TECH[2].classification}
+                    </span>
+                    <span className="font-mono text-[9px] sm:text-[10px] tracking-[0.2em] text-earth-forest bg-earth-forest/10 px-2.5 py-1 border border-earth-forest/20 uppercase font-semibold">
+                      &gt;400°C CRITICAL ENTHALPY
+                    </span>
+                    <span className="inline-flex items-center space-x-1.5 px-3 py-1 bg-earth-forest/5 border border-earth-forest/15 rounded-full text-[9px] sm:text-[10px] font-mono tracking-widest text-earth-forest font-semibold uppercase">
+                      <span className="w-1.5 h-1.5 rounded-full bg-earth-sage animate-pulse" />
+                      <span>{NEXT_GEN_TECH[2].status}</span>
+                    </span>
+                  </div>
+
+                  {/* Heading */}
+                  <h3 
+                    className="font-editorial font-medium tracking-tight text-earth-forest leading-[1.08]"
+                    style={{ fontSize: 'clamp(2.5rem, 5.5vw, 5.5rem)' }}
+                  >
+                    {NEXT_GEN_TECH[2].title}
+                  </h3>
+
+                  {/* Secondary Statement */}
+                  <p className="font-editorial italic text-xl sm:text-2xl md:text-3xl text-earth-forest/85 leading-snug">
+                    "{NEXT_GEN_TECH[2].subtitle}"
+                  </p>
+
+                  {/* Description */}
+                  <p 
+                    className="font-sans text-earth-black/75 max-w-2xl leading-relaxed"
+                    style={{ fontSize: 'clamp(0.95rem, 1.2vw, 1.2rem)' }}
+                  >
+                    {NEXT_GEN_TECH[2].description}
+                  </p>
+                </div>
+              </section>
+
+              {/* ======================================================== */}
+              {/* PANEL 04 — NEXT-GENERATION DRILLING                      */}
+              {/* ======================================================== */}
+              <section className="w-[100vw] h-full shrink-0 flex flex-col justify-center px-6 sm:px-12 md:px-20 lg:px-28 relative overflow-hidden">
+                {/* Large Background Number 04 */}
+                <div 
+                  aria-hidden="true"
+                  className="absolute right-6 sm:right-12 lg:right-20 bottom-16 pointer-events-none select-none z-0"
+                >
+                  <span 
+                    className="font-editorial font-light text-earth-forest/[0.07] block leading-none"
+                    style={{ fontSize: 'clamp(9rem, 20vw, 22rem)' }}
+                  >
+                    04
+                  </span>
+                </div>
+
+                <div className="relative z-10 max-w-5xl space-y-4 sm:space-y-6">
+                  {/* Classification & Status */}
+                  <div className="flex flex-wrap items-center gap-3">
+                    <span className="font-mono text-[10px] sm:text-[11px] tracking-[0.25em] text-earth-sage uppercase font-semibold">
+                      {NEXT_GEN_TECH[3].classification}
+                    </span>
+                    <span className="inline-flex items-center space-x-1.5 px-3 py-1 bg-earth-forest/5 border border-earth-forest/15 rounded-full text-[9px] sm:text-[10px] font-mono tracking-widest text-earth-forest font-semibold uppercase">
+                      <span className="w-1.5 h-1.5 rounded-full bg-earth-sage animate-pulse" />
+                      <span>{NEXT_GEN_TECH[3].status}</span>
+                    </span>
+                  </div>
+
+                  {/* Heading */}
+                  <h3 
+                    className="font-editorial font-medium tracking-tight text-earth-forest leading-[1.08]"
+                    style={{ fontSize: 'clamp(2.5rem, 5.5vw, 5.5rem)' }}
+                  >
+                    {NEXT_GEN_TECH[3].title}
+                  </h3>
+
+                  {/* Secondary Statement */}
+                  <p className="font-editorial italic text-xl sm:text-2xl md:text-3xl text-earth-forest/85 leading-snug">
+                    "{NEXT_GEN_TECH[3].subtitle}"
+                  </p>
+
+                  {/* Description */}
+                  <p 
+                    className="font-sans text-earth-black/75 max-w-2xl leading-relaxed"
+                    style={{ fontSize: 'clamp(0.95rem, 1.2vw, 1.2rem)' }}
+                  >
+                    {NEXT_GEN_TECH[3].description}
+                  </p>
+
+                  {/* Action Link to Research / DOE Roadmap */}
+                  <div className="pt-2 sm:pt-4">
+                    <button
+                      onClick={onOpenReferences}
+                      className="inline-flex items-center space-x-2.5 px-6 sm:px-8 py-3 sm:py-3.5 border border-earth-forest text-earth-forest hover:bg-earth-forest hover:text-earth-ivory text-xs font-semibold tracking-[0.2em] uppercase transition-all duration-300 shadow-sm"
+                    >
+                      <span>REVIEW DOE ROADMAP & REFERENCES</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              </section>
+            </motion.div>
+          </div>
+
+          {/* Bottom Stage Footer Bar (inside pinned viewport) */}
+          <div className="pb-4 sm:pb-6 px-4 sm:px-8 md:px-14 lg:px-20 flex items-center justify-between border-t border-earth-border/40 pt-3 sm:pt-4 shrink-0 bg-earth-ivory/90 backdrop-blur-sm">
+            {/* Left: Dynamic Footer Label based on Active Stage */}
+            <span className="font-mono text-[9px] sm:text-[10px] tracking-[0.24em] text-earth-muted uppercase truncate mr-4">
+              {NEXT_GEN_TECH[currentStage - 1]?.footerLabel || 'THE FUTURE OF SUBSURFACE ENERGY'}
+            </span>
+
+            {/* Right: Dynamic Directional Prompt */}
+            <div className="flex items-center space-x-2 text-[9px] sm:text-[10px] font-mono tracking-widest text-earth-muted shrink-0">
+              <span>{currentStage < 4 ? 'SCROLL DOWN TO ADVANCE' : 'SCROLL DOWN TO CONTINUE'}</span>
+              <ArrowDown className="w-3 h-3 text-earth-sage animate-bounce" />
+            </div>
+          </div>
+        </div>
       </div>
-    </section>
+    </div>
   );
 };
