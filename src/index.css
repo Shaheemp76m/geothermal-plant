@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: #11110F;
+    background-color: #F3F0E6;
+  }
+
+  ::selection {
+    background-color: #748A70;
+    color: #FFFFFF;
+  }
+}
+
+/* Custom editorial styling */
+.font-editorial {
+  font-family: 'Playfair Display', Didot, 'Cormorant Garamond', Georgia, serif;
+}
+
+.font-sans-clean {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Subtle image zoom on hover */
+.img-editorial-zoom {
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.group:hover .img-editorial-zoom {
+  transform: scale(1.03);
+}
+
+/* Thin hairline dividers */
+.border-hairline {
+  border-width: 0.5px;
+}
