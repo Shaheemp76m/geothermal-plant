@@ -8,6 +8,15 @@
     color: #11110F;
     background-color: #F3F0E6;
     scroll-behavior: smooth;
+    overflow-x: hidden;
+    width: 100%;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    overflow-x: hidden;
+    width: 100%;
+    min-height: 100vh;
   }
 
   ::selection {

@@ -50,7 +50,7 @@ export const Navbar: React.FC = () => {
             : 'bg-earth-ivory border-b border-earth-border/70'
         }`}
       >
-        <div className="max-w-[1440px] mx-auto px-6 md:px-12 h-20 flex items-center justify-between">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12 h-16 sm:h-20 flex items-center justify-between">
           {/* Left: Navigation Links (Desktop) */}
           <nav className="hidden lg:flex items-center space-x-7 xl:space-x-9 text-[11px] font-semibold tracking-[0.2em] text-earth-black/75">
             {NAV_LINKS.map((link) => (
@@ -66,27 +66,27 @@ export const Navbar: React.FC = () => {
           </nav>
 
           {/* Center: Brand Wordmark */}
-          <div className="flex-1 lg:flex-none text-left lg:text-center">
+          <div className="flex-1 lg:flex-none text-left lg:text-center min-w-0 pr-2 sm:pr-0">
             <a
               href="#top"
               onClick={(e) => handleNavClick(e, '#top')}
-              className="inline-block group"
+              className="inline-block group max-w-full"
             >
-              <span className="font-editorial text-[22px] md:text-[26px] font-bold tracking-[0.22em] text-earth-forest uppercase block leading-none group-hover:text-earth-black transition-colors">
+              <span className="font-editorial text-[18px] sm:text-[22px] md:text-[26px] font-bold tracking-[0.18em] sm:tracking-[0.22em] text-earth-forest uppercase block leading-tight truncate group-hover:text-earth-black transition-colors">
                 GEOTHERMAL GREEN
               </span>
-              <span className="block text-[8px] md:text-[9px] tracking-[0.35em] text-earth-muted uppercase mt-1 font-sans font-medium text-left lg:text-center">
+              <span className="block text-[8px] sm:text-[9px] tracking-[0.28em] sm:tracking-[0.35em] text-earth-muted uppercase mt-0.5 sm:mt-1 font-sans font-medium text-left lg:text-center truncate">
                 Earth's Baseload Power
               </span>
             </a>
           </div>
 
           {/* Right: Action & Mobile Toggle */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4 shrink-0">
             <a
               href="#how-it-works"
               onClick={(e) => handleNavClick(e, '#how-it-works')}
-              className="hidden sm:inline-flex items-center space-x-2 text-[11px] font-semibold tracking-[0.2em] uppercase px-5 py-2.5 border border-earth-forest text-earth-forest hover:bg-earth-forest hover:text-earth-ivory transition-all duration-300"
+              className="hidden sm:inline-flex items-center space-x-2 text-[11px] font-semibold tracking-[0.2em] uppercase px-4 sm:px-5 py-2 sm:py-2.5 border border-earth-forest text-earth-forest hover:bg-earth-forest hover:text-earth-ivory transition-all duration-300"
             >
               <span>EXPLORE</span>
               <ArrowUpRight className="w-3.5 h-3.5" />
@@ -98,13 +98,13 @@ export const Navbar: React.FC = () => {
               aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
               className="lg:hidden p-2 text-earth-forest hover:text-earth-sage transition-colors focus:outline-none"
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {mobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
             </button>
           </div>
         </div>
       </header>
 
-      {/* Full-Screen Mobile Drawer Rendered via Portal to eliminate backdrop-blur containment */}
+      {/* Full-Screen Mobile Drawer Rendered via Portal */}
       {mobileMenuOpen && typeof document !== 'undefined' && createPortal(
         <div 
           className="fixed inset-0 z-[60] bg-earth-ivory flex flex-col justify-between animate-fadeIn lg:hidden"
@@ -112,17 +112,17 @@ export const Navbar: React.FC = () => {
           aria-modal="true"
           aria-label="Mobile Navigation Menu"
         >
-          {/* Top Bar inside Drawer: Perfectly aligned with header height and padding */}
-          <div className="h-20 px-6 md:px-12 flex items-center justify-between border-b border-earth-border/70 bg-earth-ivory shrink-0">
+          {/* Top Bar inside Drawer */}
+          <div className="h-16 sm:h-20 px-4 sm:px-6 lg:px-12 flex items-center justify-between border-b border-earth-border/70 bg-earth-ivory shrink-0">
             <a
               href="#top"
               onClick={(e) => handleNavClick(e, '#top')}
               className="inline-block"
             >
-              <span className="font-editorial text-[22px] font-bold tracking-[0.22em] text-earth-forest uppercase block leading-none">
+              <span className="font-editorial text-[18px] sm:text-[22px] font-bold tracking-[0.18em] sm:tracking-[0.22em] text-earth-forest uppercase block leading-none">
                 GEOTHERMAL GREEN
               </span>
-              <span className="block text-[8px] tracking-[0.35em] text-earth-muted uppercase mt-1 font-sans font-medium">
+              <span className="block text-[8px] tracking-[0.28em] text-earth-muted uppercase mt-1 font-sans font-medium">
                 Earth's Baseload Power
               </span>
             </a>
@@ -132,23 +132,23 @@ export const Navbar: React.FC = () => {
               aria-label="Close navigation menu"
               className="p-2 text-earth-forest hover:text-earth-sage transition-colors focus:outline-none"
             >
-              <X className="w-6 h-6" />
+              <X className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
           </div>
 
           {/* Scrollable Body */}
-          <div className="flex-1 overflow-y-auto px-6 md:px-12 py-8 flex flex-col justify-between">
-            <div className="space-y-6">
+          <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-12 py-6 sm:py-8 flex flex-col justify-between">
+            <div className="space-y-5 sm:space-y-6">
               <span className="text-[10px] tracking-[0.28em] text-earth-muted uppercase font-semibold block">
                 DIRECTORY / NAVIGATION
               </span>
-              <nav className="flex flex-col space-y-4">
+              <nav className="flex flex-col space-y-3 sm:space-y-4">
                 {NAV_LINKS.map((link, idx) => (
                   <a
                     key={link.label}
                     href={link.href}
                     onClick={(e) => handleNavClick(e, link.href)}
-                    className="font-editorial text-2xl sm:text-3xl font-medium tracking-wide text-earth-forest hover:text-earth-sage transition-colors flex items-center justify-between border-b border-earth-border/50 pb-3"
+                    className="font-editorial text-2xl sm:text-3xl font-medium tracking-wide text-earth-forest hover:text-earth-sage transition-colors flex items-center justify-between border-b border-earth-border/50 pb-2.5 sm:pb-3"
                   >
                     <span>{link.label}</span>
                     <span className="font-sans text-xs tracking-widest text-earth-muted">
@@ -159,7 +159,7 @@ export const Navbar: React.FC = () => {
               </nav>
             </div>
 
-            <div className="pt-8 border-t border-earth-border mt-8 space-y-5">
+            <div className="pt-6 sm:pt-8 border-t border-earth-border mt-6 sm:mt-8 space-y-4 sm:space-y-5">
               <div>
                 <span className="text-[10px] tracking-[0.25em] uppercase text-earth-muted block mb-1">
                   POSITIONING
@@ -171,7 +171,7 @@ export const Navbar: React.FC = () => {
               <a
                 href="#origins"
                 onClick={(e) => handleNavClick(e, '#origins')}
-                className="w-full text-center block text-xs font-semibold tracking-[0.22em] uppercase py-3.5 bg-earth-forest text-earth-ivory hover:bg-earth-black transition-colors"
+                className="w-full text-center block text-xs font-semibold tracking-[0.22em] uppercase py-3 sm:py-3.5 bg-earth-forest text-earth-ivory hover:bg-earth-black transition-colors"
               >
                 EXPLORE THE ENERGY
               </a>
