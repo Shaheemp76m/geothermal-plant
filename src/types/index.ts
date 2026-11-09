@@ -59,12 +59,13 @@ export interface ImpactPoint {
   qualification: string;
 }
 
-export interface FutureTechItem {
-  name: string;
-  status: 'Commercial & Expanding' | 'Field Demonstration' | 'Emerging R&D';
+export interface NextGenTechEntry {
+  number: string;
+  classification: string;
+  title: string;
+  subtitle: string;
   description: string;
-  potential: string;
-  image?: string;
+  status: string;
 }
 
 export interface ReferenceItem {

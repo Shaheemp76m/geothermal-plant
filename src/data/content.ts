@@ -5,7 +5,7 @@ import {
   BenefitStat,
   ApplicationCard,
   ImpactPoint,
-  FutureTechItem,
+  NextGenTechEntry,
   ReferenceItem
 } from '../types';
 
@@ -295,34 +295,44 @@ export const IMPACT_POINTS: ImpactPoint[] = [
   }
 ];
 
-export const FUTURE_TECH: FutureTechItem[] = [
+export const NEXT_GEN_SECTION = {
+  eyebrow: "THE NEXT GENERATION OF SUBTERRANEAN TECHNOLOGY",
+  headline: "Expanding the Subsurface Frontier.",
+  description: "Advances in geothermal engineering are pushing beyond conventional geological limitations. From engineered reservoirs to next-generation drilling, new technologies are exploring how Earth's natural heat could become accessible to more regions around the world."
+};
+
+export const NEXT_GEN_TECH: NextGenTechEntry[] = [
   {
-    name: "Enhanced Geothermal Systems (EGS)",
-    status: "Field Demonstration",
-    description: "Creating engineered permeability in deep, hot, impermeable granite through hydraulic shearing and multi-stage stimulation.",
-    potential: "Expands geothermal access beyond volcanic rifts to deep hot basement rock anywhere across continental landmasses.",
-    image: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80"
+    number: "01",
+    classification: "SUBSURFACE PERMEABILITY",
+    title: "Enhanced Geothermal Systems (EGS)",
+    subtitle: "Unlocking heat in places once considered unreachable.",
+    description: "Enhanced geothermal systems use engineered reservoirs to access heat in hot rock formations that lack sufficient natural permeability. Carefully managed stimulation creates pathways for fluid circulation and heat extraction.",
+    status: "FIELD DEMONSTRATION"
   },
   {
-    name: "Advanced Closed-Loop Systems (AGS)",
-    status: "Field Demonstration",
-    description: "Subsurface closed radiator loops (e.g., Eavor-Loop) that circulate working fluids through sealed multi-lateral boreholes without fracking or fluid extraction.",
-    potential: "Eliminates fluid loss and induced seismicity risks; operates as a pure conductive subterranean heat exchanger.",
-    image: "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=800&q=80"
+    number: "02",
+    classification: "CLOSED-LOOP CONDUCTION",
+    title: "Closed-Loop Geothermal Systems",
+    subtitle: "Heat exchange without extracting reservoir fluid.",
+    description: "Closed-loop systems circulate a working fluid through sealed underground pipes, transferring heat from surrounding rock without directly producing geothermal reservoir fluids.",
+    status: "DEVELOPING TECHNOLOGY"
   },
   {
-    name: "Supercritical Geothermal (>400°C)",
-    status: "Emerging R&D",
-    description: "Drilling 5–10 km deep to tap supercritical water conditions (where fluid carries up to 10× the energy of conventional steam).",
-    potential: "A single supercritical well could produce up to 50 MW of power, drastically reducing capital costs and well count.",
-    image: "https://images.unsplash.com/photo-1542332213-9b5a5a3fad35?auto=format&fit=crop&w=800&q=80"
+    number: "03",
+    classification: "EXTREME ENTHALPY",
+    title: "Superhot Geothermal",
+    subtitle: "Going deeper. Reaching hotter resources.",
+    description: "Research into extremely high-temperature geothermal resources explores the potential to produce significantly more energy from individual wells. Accessing these conditions requires advanced materials, drilling methods, and engineering.",
+    status: "EMERGING RESEARCH"
   },
   {
-    name: "Millimeter-Wave & Thermal Spallation Drilling",
-    status: "Emerging R&D",
-    description: "Replacing mechanical drill bits with directed energy microwaves or thermal torches to vaporize ultra-hard crystalline basement rocks at high speed.",
-    potential: "Could reduce deep drilling costs by an order of magnitude, unlocking widespread 10-kilometer deep geothermal access.",
-    image: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80"
+    number: "04",
+    classification: "NON-MECHANICAL SPALLATION",
+    title: "Next-Generation Drilling",
+    subtitle: "Redefining how we reach Earth's heat.",
+    description: "Experimental drilling approaches, including millimeter-wave and thermal spallation concepts, investigate alternatives to conventional mechanical drilling in extremely hard underground formations.",
+    status: "EXPERIMENTAL R&D"
   }
 ];
 
