@@ -12,16 +12,16 @@ export const EditorialFeatureBanner: React.FC = () => {
   };
 
   return (
-    <section id="process-detail" className="bg-earth-ivory py-16 md:py-24 border-b border-earth-border">
+    <section className="bg-earth-ivory py-16 md:py-24 border-b border-earth-border">
       <div className="max-w-[1440px] mx-auto px-6 md:px-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           {/* Left: Editorial Text Content */}
           <div className="lg:col-span-6 flex flex-col justify-center space-y-6">
             <div>
-              <span className="text-[10px] tracking-[0.28em] uppercase font-semibold text-earth-green block mb-3">
+              <span className="text-[10px] tracking-[0.28em] uppercase font-semibold text-earth-forest block mb-3">
                 {EDITORIAL_BANNER.eyebrow}
               </span>
-              <h2 className="font-editorial text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight text-earth-black leading-[1.15]">
+              <h2 className="font-editorial text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight text-earth-forest leading-[1.14]">
                 {EDITORIAL_BANNER.headline}
               </h2>
             </div>
@@ -36,7 +36,7 @@ export const EditorialFeatureBanner: React.FC = () => {
               <a
                 href={EDITORIAL_BANNER.ctaTarget}
                 onClick={(e) => handleScroll(e, EDITORIAL_BANNER.ctaTarget)}
-                className="inline-flex items-center space-x-3 text-xs font-semibold tracking-[0.2em] uppercase px-7 py-3.5 bg-earth-black text-earth-ivory hover:bg-earth-green transition-colors duration-300"
+                className="inline-flex items-center space-x-3 text-xs font-semibold tracking-[0.22em] uppercase px-7 py-3.5 bg-earth-forest text-earth-ivory hover:bg-earth-black transition-colors duration-300"
               >
                 <span>{EDITORIAL_BANNER.ctaText}</span>
                 <ArrowUpRight className="w-3.5 h-3.5" />
@@ -46,7 +46,7 @@ export const EditorialFeatureBanner: React.FC = () => {
 
           {/* Right: Strong Editorial Geothermal Photograph */}
           <div className="lg:col-span-6">
-            <div className="relative group overflow-hidden bg-earth-stone/20 border border-earth-border shadow-[0_15px_40px_rgba(17,17,15,0.06)]">
+            <div className="relative group overflow-hidden bg-earth-stone/20 border border-earth-border shadow-[0_15px_40px_rgba(16,37,28,0.06)]">
               <div className="aspect-[4/3] sm:aspect-[16/11] overflow-hidden">
                 <img
                   src={EDITORIAL_BANNER.image}
@@ -59,7 +59,7 @@ export const EditorialFeatureBanner: React.FC = () => {
                 <span className="text-[11px] font-sans text-earth-muted">
                   {EDITORIAL_BANNER.caption}
                 </span>
-                <span className="text-[10px] font-mono tracking-wider text-earth-muted/80">
+                <span className="text-[10px] font-mono tracking-wider text-earth-forest">
                   FIG. 02
                 </span>
               </div>

@@ -9,17 +9,18 @@ export default {
       colors: {
         earth: {
           ivory: '#F3F0E6',
+          forest: '#10251C',
           black: '#11110F',
           dark: '#10110F',
-          green: '#748A70',
-          'green-light': '#8EAA8A',
-          'green-dark': '#556652',
+          sage: '#8BAF91',
+          green: '#10251C',
+          'green-accent': '#8BAF91',
           stone: '#D8D2C5',
-          'stone-light': '#EBE7DD',
-          border: '#E2DDD1',
+          'stone-light': '#EAE5D9',
+          border: '#DDD7C8',
           'border-dark': '#232521',
-          muted: '#6B6A64',
-          'muted-dark': '#9E9D95',
+          muted: '#686762',
+          'muted-dark': '#A3A199',
         }
       },
       fontFamily: {

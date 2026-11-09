@@ -1,67 +1,115 @@
-import React from 'react';
-import { Clock, Leaf, Layers, Compass } from 'lucide-react';
-import { BENEFITS_ITEMS } from '../../data/content';
+import React, { useState, useEffect, useRef } from 'react';
+import { useInView } from 'motion/react';
+import { BENEFIT_STATS } from '../../data/content';
 
-const iconMap = {
-  Clock: Clock,
-  Leaf: Leaf,
-  Layers: Layers,
-  Compass: Compass,
+// Count-up helper component
+const Counter: React.FC<{ target: number; suffix: string; duration?: number }> = ({
+  target,
+  suffix,
+  duration = 1800,
+}) => {
+  const [count, setCount] = useState(0);
+  const ref = useRef<HTMLSpanElement>(null);
+  const isInView = useInView(ref, { once: true, margin: '-50px' });
+
+  useEffect(() => {
+    if (!isInView) return;
+
+    let startTime: number | null = null;
+    let animationFrameId: number;
+
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      
+      // Easing function: easeOutExpo
+      const easeOut = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+      const current = Math.floor(easeOut * target);
+      
+      setCount(current);
+
+      if (progress < 1) {
+        animationFrameId = requestAnimationFrame(animate);
+      } else {
+        setCount(target);
+      }
+    };
+
+    animationFrameId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [isInView, target, duration]);
+
+  return (
+    <span ref={ref} className="font-editorial text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-earth-forest">
+      {count}
+      <span className="text-earth-sage ml-1 text-2xl sm:text-3xl font-sans font-semibold">
+        {suffix}
+      </span>
+    </span>
+  );
 };
 
 export const BenefitsStrip: React.FC = () => {
   return (
-    <section className="bg-earth-stone-light/70 py-16 md:py-20 border-b border-earth-border">
+    <section className="bg-earth-stone-light/60 py-16 md:py-20 border-b border-earth-border">
       <div className="max-w-[1440px] mx-auto px-6 md:px-12">
-        {/* Section Pre-label */}
-        <div className="text-center mb-12">
-          <span className="text-[10px] tracking-[0.28em] font-semibold text-earth-green uppercase block mb-2">
-            PROVEN ATTRIBUTES
+        {/* Section Header */}
+        <div className="text-center mb-12 md:mb-16 max-w-2xl mx-auto">
+          <span className="text-[10px] tracking-[0.28em] font-semibold text-earth-forest uppercase block mb-2">
+            PROVEN BENCHMARKS
           </span>
-          <h2 className="font-editorial text-2xl md:text-3xl text-earth-black font-normal tracking-tight">
-            Fundamental Principles of Subsurface Heat
+          <h2 className="font-editorial text-2xl sm:text-3xl md:text-4xl text-earth-forest font-medium tracking-tight mb-3">
+            Peer-Reviewed Operational Metrics
           </h2>
+          <p className="text-xs sm:text-sm text-earth-black/70 font-sans">
+            Quantifiable advantages verified by the International Energy Agency and US Department of Energy national laboratories.
+          </p>
         </div>
 
-        {/* 4 Concise Items with Line Icons */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {BENEFITS_ITEMS.map((item, idx) => {
-            const IconComponent = iconMap[item.iconName];
-            return (
-              <div
-                key={idx}
-                className="bg-earth-ivory p-6 md:p-8 border border-earth-border flex flex-col justify-between hover:border-earth-green/60 transition-all duration-300 shadow-[0_4px_20px_rgba(17,17,15,0.02)] group"
-              >
-                <div>
-                  {/* Icon & Metric */}
-                  <div className="flex items-center justify-between mb-5">
-                    <span className="font-editorial text-2xl md:text-3xl font-bold tracking-tight text-earth-black group-hover:text-earth-green transition-colors">
-                      {item.metric}
+        {/* 4 Statistical Benchmark Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+          {BENEFIT_STATS.map((stat, idx) => (
+            <div
+              key={idx}
+              className="bg-earth-ivory p-6 md:p-8 border border-earth-border flex flex-col justify-between hover:border-earth-forest/60 transition-all duration-300 shadow-[0_4px_20px_rgba(16,37,28,0.03)] group"
+            >
+              <div>
+                {/* Metric Counter & Title */}
+                <div className="mb-4">
+                  <div className="flex items-baseline justify-between mb-2">
+                    <Counter target={stat.value} suffix={stat.suffix} />
+                    <span className="text-[10px] font-mono text-earth-muted">
+                      0{idx + 1}
                     </span>
-                    <div className="p-2.5 rounded-full bg-earth-stone/30 text-earth-black/70 group-hover:text-earth-green group-hover:bg-earth-green/10 transition-colors">
-                      <IconComponent className="w-4 h-4" />
-                    </div>
                   </div>
-
-                  {/* Title */}
-                  <h3 className="text-xs font-semibold tracking-[0.18em] text-earth-black uppercase mb-3 font-sans">
-                    {item.title}
+                  <h3 className="text-xs font-semibold tracking-[0.2em] text-earth-forest uppercase font-sans">
+                    {stat.title}
                   </h3>
-
-                  {/* Description */}
-                  <p className="text-xs md:text-sm text-earth-black/70 font-sans leading-relaxed">
-                    {item.description}
-                  </p>
+                  <span className="text-[11px] font-mono text-earth-sage block mt-1">
+                    {stat.highlight}
+                  </span>
                 </div>
 
-                {/* Footnote qualifier */}
-                <div className="mt-6 pt-3 border-t border-earth-border/50 flex items-center justify-between text-[10px] font-mono text-earth-muted">
-                  <span>SPEC · 0{idx + 1}</span>
-                  <span>VERIFIED</span>
+                {/* Description */}
+                <p className="text-xs text-earth-black/75 font-sans leading-relaxed mb-4">
+                  {stat.description}
+                </p>
+
+                {/* Qualification */}
+                <div className="text-[11px] text-earth-muted font-sans border-t border-earth-border/60 pt-3 italic">
+                  {stat.qualification}
                 </div>
               </div>
-            );
-          })}
+
+              {/* Source attribution */}
+              <div className="mt-5 pt-3 border-t border-earth-border/60 flex items-center justify-between text-[10px] font-mono text-earth-muted">
+                <span>VERIFIED SOURCE</span>
+                <span className="truncate max-w-[120px] text-right font-medium text-earth-forest">
+                  {stat.source}
+                </span>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>

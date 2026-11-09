@@ -14,11 +14,30 @@ export interface FeatureStripItem {
   targetId: string;
 }
 
-export interface BenefitItem {
-  metric: string;
+export interface ProcessStep {
+  step: string;
   title: string;
+  mechanism: string;
+  thermodynamics: string;
+  icon: 'Flame' | 'Droplets' | 'Cpu' | 'Zap';
+}
+
+export interface GeothermalTechType {
+  name: string;
+  temperature: string;
+  process: string;
+  application: string;
+  efficiency: string;
+}
+
+export interface BenefitStat {
+  value: number;
+  suffix: string;
+  title: string;
+  highlight: string;
   description: string;
-  iconName: 'Clock' | 'Leaf' | 'Layers' | 'Compass';
+  qualification: string;
+  source: string;
 }
 
 export interface ApplicationCard {
@@ -42,9 +61,10 @@ export interface ImpactPoint {
 
 export interface FutureTechItem {
   name: string;
-  status: 'Commercial & Expanding' | 'Field Demonstration' | 'Early R&D';
+  status: 'Commercial & Expanding' | 'Field Demonstration' | 'Emerging R&D';
   description: string;
   potential: string;
+  image?: string;
 }
 
 export interface ReferenceItem {
