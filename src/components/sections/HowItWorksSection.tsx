@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
 import { Flame, Droplets, Cpu, Zap, ArrowRight, CheckCircle2 } from 'lucide-react';
-import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { PROCESS_STEPS, TECH_TYPES } from '../../data/content';
+import { TextReveal } from '../motion/TextReveal';
+import { Reveal } from '../motion/Reveal';
+import { StaggerGroup, StaggerItem } from '../motion/StaggerGroup';
+import { useReducedMotionPreference } from '../../hooks/useReducedMotionPreference';
+import { MOTION_DURATIONS, MOTION_EASINGS } from '../../lib/motionTokens';
 
 const iconMap = {
   Flame: Flame,
@@ -12,22 +17,32 @@ const iconMap = {
 
 export const HowItWorksSection: React.FC = () => {
   const [activeTechIdx, setActiveTechIdx] = useState(0);
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = useReducedMotionPreference();
 
   return (
     <section id="how-it-works" className="bg-[#11110F] text-[#E8E6DF] py-14 sm:py-20 md:py-24 border-b border-[#232521] scroll-mt-24">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12">
         {/* Header */}
         <div className="max-w-3xl mb-12 sm:mb-14 md:mb-16">
-          <div className="flex items-center space-x-2 text-[10px] sm:text-[11px] font-semibold tracking-[0.24em] sm:tracking-[0.28em] text-earth-sage uppercase mb-2.5 sm:mb-3">
-            <span>THERMODYNAMIC ENERGY CONVERSION</span>
-          </div>
-          <h2 className="font-editorial text-2xl sm:text-4xl lg:text-5xl font-medium tracking-tight text-white leading-[1.12] mb-4 sm:mb-5">
-            How It Works: From Crust to Grid.
-          </h2>
-          <p className="text-xs sm:text-sm md:text-base text-[#A3A199] font-sans leading-relaxed">
-            Geothermal energy harnesses the natural heat of subterranean rock. While specific plants vary based on geological temperature and pressure, all systems follow a four-phase thermodynamic sequence.
-          </p>
+          <Reveal variant="fadeUp" delay={0.05}>
+            <div className="flex items-center space-x-2 text-[10px] sm:text-[11px] font-semibold tracking-[0.24em] sm:tracking-[0.28em] text-earth-sage uppercase mb-2.5 sm:mb-3">
+              <span>THERMODYNAMIC ENERGY CONVERSION</span>
+            </div>
+          </Reveal>
+
+          <TextReveal
+            text="How It Works: From Crust to Grid."
+            mode="line"
+            as="h2"
+            delay={0.1}
+            className="font-editorial text-2xl sm:text-4xl lg:text-5xl font-medium tracking-tight text-white leading-[1.12] mb-4 sm:mb-5"
+          />
+
+          <Reveal variant="fadeUp" delay={0.2}>
+            <p className="text-xs sm:text-sm md:text-base text-[#A3A199] font-sans leading-relaxed">
+              Geothermal energy harnesses the natural heat of subterranean rock. While specific plants vary based on geological temperature and pressure, all systems follow a four-phase thermodynamic sequence.
+            </p>
+          </Reveal>
         </div>
 
         {/* 1. Visual Diagram Flow */}
@@ -41,16 +56,12 @@ export const HowItWorksSection: React.FC = () => {
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <StaggerGroup className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {PROCESS_STEPS.map((step, idx) => {
               const IconComp = iconMap[step.icon];
               return (
-                <motion.div
+                <StaggerItem
                   key={idx}
-                  initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: idx * 0.08 }}
                   className="relative p-5 sm:p-6 lg:p-7 bg-[#171816] border border-[#2B2D29] flex flex-col justify-between hover:border-earth-sage transition-all duration-300 group"
                 >
                   <div>
@@ -84,10 +95,10 @@ export const HowItWorksSection: React.FC = () => {
                       <ArrowRight className="w-5 h-5 bg-[#11110F] p-0.5 rounded-full" />
                     </div>
                   )}
-                </motion.div>
+                </StaggerItem>
               );
             })}
-          </div>
+          </StaggerGroup>
         </div>
 
         {/* 2. Different Geothermal Technologies */}
@@ -106,27 +117,36 @@ export const HowItWorksSection: React.FC = () => {
             </p>
           </div>
 
-          {/* Technology Selector Tabs */}
+          {/* Technology Selector Tabs with layoutId indicator */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-6 sm:mb-8">
             {TECH_TYPES.map((tech, idx) => (
               <button
                 key={tech.name}
                 onClick={() => setActiveTechIdx(idx)}
-                className={`text-left p-3 sm:p-4 border transition-all duration-300 min-w-0 ${
+                className={`relative text-left p-3 sm:p-4 border transition-colors duration-200 min-w-0 ${
                   activeTechIdx === idx
-                    ? 'bg-earth-forest border-earth-sage text-white'
+                    ? 'border-earth-sage text-white'
                     : 'bg-[#181917] border-[#2B2D29] text-[#A3A199] hover:border-[#40433C]'
                 }`}
               >
-                <span className="block text-[9px] sm:text-[10px] font-mono tracking-widest uppercase text-earth-sage mb-0.5 sm:mb-1">
-                  TYPE 0{idx + 1}
-                </span>
-                <span className="font-editorial text-sm sm:text-base md:text-lg block font-medium truncate">
-                  {tech.name}
-                </span>
-                <span className="text-[10px] sm:text-[11px] font-mono text-[#D5D2C7] mt-0.5 sm:mt-1 block truncate">
-                  {tech.temperature}
-                </span>
+                {activeTechIdx === idx && (
+                  <motion.div
+                    layoutId="tech-tab-active-bg"
+                    className="absolute inset-0 bg-earth-forest z-0"
+                    transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+                  />
+                )}
+                <div className="relative z-10">
+                  <span className="block text-[9px] sm:text-[10px] font-mono tracking-widest uppercase text-earth-sage mb-0.5 sm:mb-1">
+                    TYPE 0{idx + 1}
+                  </span>
+                  <span className="font-editorial text-sm sm:text-base md:text-lg block font-medium truncate">
+                    {tech.name}
+                  </span>
+                  <span className="text-[10px] sm:text-[11px] font-mono text-[#D5D2C7] mt-0.5 sm:mt-1 block truncate">
+                    {tech.temperature}
+                  </span>
+                </div>
               </button>
             ))}
           </div>
@@ -138,7 +158,7 @@ export const HowItWorksSection: React.FC = () => {
               initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: shouldReduceMotion ? 0 : -8 }}
-              transition={{ duration: 0.25 }}
+              transition={{ duration: MOTION_DURATIONS.quick, ease: MOTION_EASINGS.editorial }}
               className="p-5 sm:p-7 md:p-8 bg-[#181917] border border-[#2B2D29] grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-center"
             >
               <div className="md:col-span-7 space-y-3 sm:space-y-4">

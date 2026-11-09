@@ -1,7 +1,12 @@
 import React, { useRef, useState } from 'react';
-import { motion, useScroll, useTransform, useMotionValueEvent, useReducedMotion } from 'motion/react';
+import { motion, useScroll, useTransform, useMotionValueEvent, useSpring } from 'motion/react';
 import { ArrowRight, Sparkles, ArrowDown } from 'lucide-react';
 import { NEXT_GEN_SECTION, NEXT_GEN_TECH } from '../../data/content';
+import { TextReveal } from '../motion/TextReveal';
+import { Reveal } from '../motion/Reveal';
+import { MagneticButton } from '../motion/MagneticButton';
+import { useReducedMotionPreference } from '../../hooks/useReducedMotionPreference';
+import { MOTION_SPRINGS } from '../../lib/motionTokens';
 
 interface FutureSectionProps {
   onOpenReferences: () => void;
@@ -9,7 +14,7 @@ interface FutureSectionProps {
 
 export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = useReducedMotionPreference();
   const [currentStage, setCurrentStage] = useState(1);
 
   // Measure vertical scroll through the pinned container
@@ -18,9 +23,16 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
     offset: ['start start', 'end end'],
   });
 
+  // Smooth scroll progress using spring physics for liquid indicator movement
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: MOTION_SPRINGS.smooth.stiffness,
+    damping: MOTION_SPRINGS.smooth.damping,
+    restDelta: 0.001,
+  });
+
   // Transform vertical scroll progress into horizontal translateX across 4 panels (0% to -75%)
-  const translateX = useTransform(scrollYProgress, [0, 1], ['0%', '-75%']);
-  const progressBarWidth = useTransform(scrollYProgress, [0, 1], ['0%', '100%']);
+  const translateX = useTransform(smoothProgress, [0, 1], ['0%', '-75%']);
+  const progressBarWidth = useTransform(smoothProgress, [0, 1], ['0%', '100%']);
 
   // Update active stage indicator smoothly as horizontal track advances
   useMotionValueEvent(scrollYProgress, 'change', (latest) => {
@@ -89,12 +101,13 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
 
           <div className="mt-16 pt-8 border-t border-earth-border flex items-center justify-between">
             <span className="text-xs text-earth-muted font-sans">Next-generation subterranean technology roadmap.</span>
-            <button
+            <MagneticButton
+              as="button"
               onClick={onOpenReferences}
               className="text-xs font-semibold tracking-widest uppercase px-6 py-3 border border-earth-forest text-earth-forest hover:bg-earth-forest hover:text-earth-ivory transition-colors"
             >
               REVIEW DOE ROADMAP
-            </button>
+            </MagneticButton>
           </div>
         </div>
       </section>
@@ -107,33 +120,37 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
       <section className="pt-20 sm:pt-28 md:pt-36 pb-16 sm:pb-20 md:pb-24 px-4 sm:px-6 lg:px-12 max-w-[1440px] mx-auto border-b border-earth-border/60">
         <div className="max-w-5xl">
           {/* Eyebrow */}
-          <div className="flex items-center space-x-2 text-[10px] sm:text-[11px] font-semibold tracking-[0.24em] sm:tracking-[0.28em] text-earth-forest uppercase mb-4 sm:mb-6">
-            <Sparkles className="w-3.5 h-3.5 text-earth-sage shrink-0" />
-            <span className="truncate">{NEXT_GEN_SECTION.eyebrow}</span>
-          </div>
+          <Reveal variant="fadeUp" delay={0.05}>
+            <div className="flex items-center space-x-2 text-[10px] sm:text-[11px] font-semibold tracking-[0.24em] sm:tracking-[0.28em] text-earth-forest uppercase mb-4 sm:mb-6">
+              <Sparkles className="w-3.5 h-3.5 text-earth-sage shrink-0" />
+              <span className="truncate">{NEXT_GEN_SECTION.eyebrow}</span>
+            </div>
+          </Reveal>
 
-          {/* Main Heading with large editorial serif clamp */}
-          <h2 
-            className="font-editorial font-medium tracking-tight text-earth-forest leading-[1.05] mb-6 sm:mb-8"
-            style={{ fontSize: 'clamp(2.75rem, 7vw, 6.5rem)' }}
-          >
-            {NEXT_GEN_SECTION.headline}
-          </h2>
+          {/* Main Heading with TextReveal and responsive clamp */}
+          <TextReveal
+            text={NEXT_GEN_SECTION.headline}
+            mode="line"
+            as="h2"
+            delay={0.1}
+            className="font-editorial font-medium tracking-tight text-earth-forest leading-[1.05] mb-6 sm:mb-8 text-4xl sm:text-6xl md:text-7xl lg:text-8xl"
+          />
 
           {/* Supporting Description */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-10 items-end">
-            <p 
-              className="lg:col-span-8 text-earth-black/80 font-sans leading-relaxed border-l-2 border-earth-forest/40 pl-4 sm:pl-6"
-              style={{ fontSize: 'clamp(1rem, 1.35vw, 1.25rem)' }}
-            >
-              {NEXT_GEN_SECTION.description}
-            </p>
+          <Reveal variant="fadeUp" delay={0.25}>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-10 items-end">
+              <p 
+                className="lg:col-span-8 text-earth-black/80 font-sans leading-relaxed border-l-2 border-earth-forest/40 pl-4 sm:pl-6 text-sm sm:text-base md:text-lg"
+              >
+                {NEXT_GEN_SECTION.description}
+              </p>
 
-            <div className="lg:col-span-4 flex items-center space-x-3 text-xs font-mono tracking-widest text-earth-sage uppercase">
-              <span>CONTINUOUS HORIZONTAL JOURNEY</span>
-              <ArrowDown className="w-3.5 h-3.5 text-earth-forest animate-bounce" />
+              <div className="lg:col-span-4 flex items-center space-x-3 text-xs font-mono tracking-widest text-earth-sage uppercase">
+                <span>CONTINUOUS HORIZONTAL JOURNEY</span>
+                <ArrowDown className="w-3.5 h-3.5 text-earth-forest animate-bounce" />
+              </div>
             </div>
-          </div>
+          </Reveal>
         </div>
       </section>
 
@@ -401,15 +418,16 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
                     {NEXT_GEN_TECH[3].description}
                   </p>
 
-                  {/* Action Link to Research / DOE Roadmap */}
+                  {/* Action Link to Research / DOE Roadmap with MagneticButton */}
                   <div className="pt-2 sm:pt-4">
-                    <button
+                    <MagneticButton
+                      as="button"
                       onClick={onOpenReferences}
-                      className="inline-flex items-center space-x-2.5 px-6 sm:px-8 py-3 sm:py-3.5 border border-earth-forest text-earth-forest hover:bg-earth-forest hover:text-earth-ivory text-xs font-semibold tracking-[0.2em] uppercase transition-all duration-300 shadow-sm"
+                      className="space-x-2.5 px-6 sm:px-8 py-3 sm:py-3.5 border border-earth-forest text-earth-forest hover:bg-earth-forest hover:text-earth-ivory text-xs font-semibold tracking-[0.2em] uppercase transition-all duration-300 shadow-sm"
                     >
                       <span>REVIEW DOE ROADMAP & REFERENCES</span>
                       <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
+                    </MagneticButton>
                   </div>
                 </div>
               </section>

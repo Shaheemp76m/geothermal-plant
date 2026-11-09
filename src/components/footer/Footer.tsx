@@ -1,6 +1,8 @@
 import React from 'react';
 import { ArrowUp, BookOpen, Globe2 } from 'lucide-react';
 import { NAV_LINKS } from '../../data/content';
+import { Reveal } from '../motion/Reveal';
+import { MagneticButton } from '../motion/MagneticButton';
 
 interface FooterProps {
   onOpenReferences: () => void;
@@ -25,7 +27,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenReferences }) => {
         {/* Top Footer Row: Wordmark, Mission, Back to Top */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10 pb-12 sm:pb-16 border-b border-[#1C3328]">
           {/* Brand & Mission */}
-          <div className="lg:col-span-5 space-y-3 sm:space-y-4">
+          <Reveal variant="fadeUp" delay={0.05} className="lg:col-span-5 space-y-3 sm:space-y-4">
             <span className="font-editorial text-2xl sm:text-3xl font-bold tracking-[0.2em] sm:tracking-[0.22em] text-white uppercase block">
               GEOTHERMAL GREEN
             </span>
@@ -36,10 +38,10 @@ export const Footer: React.FC<FooterProps> = ({ onOpenReferences }) => {
               <Globe2 className="w-3.5 h-3.5 shrink-0" />
               <span>GLOBAL SUBSURFACE RESOURCE STUDY</span>
             </div>
-          </div>
+          </Reveal>
 
           {/* Navigation Links */}
-          <div className="lg:col-span-4 space-y-2.5 sm:space-y-3">
+          <Reveal variant="fadeUp" delay={0.15} className="lg:col-span-4 space-y-2.5 sm:space-y-3">
             <span className="text-[10px] tracking-[0.25em] uppercase font-semibold text-white/50 block mb-3 sm:mb-4">
               SITE MAP & EXPLORATION
             </span>
@@ -65,23 +67,24 @@ export const Footer: React.FC<FooterProps> = ({ onOpenReferences }) => {
                 </button>
               </li>
             </ul>
-          </div>
+          </Reveal>
 
           {/* Back to top & Action */}
-          <div className="md:col-span-2 lg:col-span-3 flex flex-col justify-between items-start md:items-end">
-            <button
+          <Reveal variant="fadeUp" delay={0.25} className="md:col-span-2 lg:col-span-3 flex flex-col justify-between items-start md:items-end">
+            <MagneticButton
+              as="button"
               onClick={scrollToTop}
-              className="inline-flex items-center space-x-2 text-xs font-semibold tracking-[0.2em] uppercase px-4 sm:px-5 py-2.5 sm:py-3 border border-[#264539] text-white hover:bg-white hover:text-earth-forest transition-all duration-300"
+              className="space-x-2 text-xs font-semibold tracking-[0.2em] uppercase px-4 sm:px-5 py-2.5 sm:py-3 border border-[#264539] text-white hover:bg-white hover:text-earth-forest transition-all duration-300"
             >
               <span>RETURN TO TOP</span>
               <ArrowUp className="w-3.5 h-3.5" />
-            </button>
+            </MagneticButton>
 
             <div className="mt-6 md:mt-0 text-[10px] sm:text-[11px] font-mono text-[#8E8C83] text-left md:text-right">
               SYSTEM REVISION: 2026.11<br />
               STANDARDS COMPLIANT · VERCEL DEPLOYABLE
             </div>
-          </div>
+          </Reveal>
         </div>
 
         {/* Bottom Credits & Copyright */}
