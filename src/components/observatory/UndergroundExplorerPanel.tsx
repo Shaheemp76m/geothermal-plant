@@ -24,11 +24,11 @@ export const UndergroundExplorerPanel: React.FC<UndergroundExplorerPanelProps> =
         <div className="flex items-center space-x-2">
           <Layers className="w-3.5 h-3.5 text-earth-sage" />
           <span className="font-mono text-[10px] uppercase tracking-widest text-earth-sage font-semibold">
-            COMPONENT TELEMETRY
+            TECHNICAL SPECIFICATIONS
           </span>
         </div>
         <span className="font-mono text-[9px] text-[#707E75]">
-          DEPTH PROFILED
+          STRATIGRAPHIC PROFILE
         </span>
       </div>
 

@@ -134,7 +134,7 @@ export const HowItWorksSection: React.FC = () => {
           <Reveal variant="fadeUp" delay={0.05}>
             <div className="flex items-center space-x-2 text-[10px] sm:text-[11px] font-semibold tracking-[0.24em] sm:tracking-[0.28em] text-earth-sage uppercase mb-3 sm:mb-4">
               <span className="w-1.5 h-1.5 rounded-full bg-earth-sage" />
-              <span>THERMODYNAMIC ENERGY CONVERSION // SUBSURFACE DYNAMICS</span>
+              <span>THERMODYNAMIC ENERGY CONVERSION · SUBSURFACE DYNAMICS</span>
             </div>
           </Reveal>
 
@@ -227,13 +227,13 @@ export const HowItWorksSection: React.FC = () => {
         <div className="bg-[#141513] border border-[#262824] p-6 sm:p-8 md:p-12 mb-16 sm:mb-24 shadow-[0_25px_60px_rgba(0,0,0,0.5)]">
           <div className="border-b border-[#232521] pb-4 mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div className="flex items-center space-x-2">
-              <span className="w-2 h-2 rounded-full bg-earth-sage animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-earth-sage" />
               <span className="font-mono text-[10px] tracking-widest uppercase text-white font-semibold">
-                ACTIVE PHASE DEEP DIVE: {PHASES[activePhase].tag}
+                ACTIVE PHASE: {PHASES[activePhase].tag}
               </span>
             </div>
             <span className="text-[10px] font-mono text-earth-sage">
-              THERMODYNAMICS // RANKINE CYCLE
+              THERMODYNAMIC CYCLE · RANKINE & BINARY
             </span>
           </div>
 

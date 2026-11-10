@@ -90,8 +90,8 @@ export const TechnologyExplorer: React.FC = () => {
       <div className="max-w-4xl mb-12 sm:mb-16 md:mb-20">
         <Reveal variant="fadeUp" delay={0.05}>
           <div className="flex items-center space-x-2 text-[10px] sm:text-[11px] font-mono font-semibold tracking-[0.24em] sm:tracking-[0.28em] text-earth-sage uppercase mb-3 sm:mb-4">
-            <span className="w-1.5 h-1.5 rounded-full bg-earth-sage animate-pulse" />
-            <span>GEOTHERMAL TECHNOLOGY // 01–04</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-earth-sage" />
+            <span>GEOTHERMAL CLASSIFICATION · SYSTEMS 01–04</span>
           </div>
         </Reveal>
 
@@ -405,7 +405,7 @@ export const TechnologyExplorer: React.FC = () => {
                   {activeTech.imageCaption}
                 </span>
                 <span className="font-mono text-[10px] tracking-wider text-earth-sage shrink-0 font-medium">
-                  TYPE {activeTech.number} // 04
+                  SYSTEM {activeTech.number} OF 04
                 </span>
               </div>
             </motion.div>

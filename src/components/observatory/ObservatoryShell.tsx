@@ -296,21 +296,18 @@ export const ObservatoryShell: React.FC<ObservatoryShellProps> = ({ onOpenArchiv
               )}
             </AnimatePresence>
 
-            {/* Bottom Status Card */}
+            {/* Reservoir Thermodynamic Parameters */}
             <div className="p-2.5 bg-[#121814] border border-[#1E2721] rounded-lg text-[10px] font-mono text-[#76877D] space-y-1">
               <div className="flex items-center justify-between text-earth-sage font-semibold">
-                <span>SYSTEM STATUS</span>
-                <span className="flex items-center space-x-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  <span>ONLINE</span>
-                </span>
+                <span>RESERVOIR EQUILIBRIUM</span>
+                <span className="text-[#A2B5A8]">MASS BALANCED</span>
               </div>
               <div className="flex justify-between">
-                <span>HYDROSTATIC BALANCE</span>
+                <span>HYDROSTATIC FLOW</span>
                 <span className="text-[#A2B5A8]">100% REINJECTION</span>
               </div>
               <div className="flex justify-between">
-                <span>ATMOSPHERIC SEAL</span>
+                <span>SURFACE CONTAINMENT</span>
                 <span className="text-[#A2B5A8]">HERMETIC</span>
               </div>
             </div>

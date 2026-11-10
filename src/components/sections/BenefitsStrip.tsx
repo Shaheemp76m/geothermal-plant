@@ -599,7 +599,7 @@ export const BenefitsStrip: React.FC = () => {
           {/* Editorial Methodology Tag */}
           <Reveal variant="fadeUp" delay={0.25}>
             <div className="inline-flex items-center space-x-2 mt-5 px-3.5 py-1.5 border border-earth-border/80 rounded-full text-[9px] font-mono tracking-widest text-earth-muted uppercase">
-              <span className="w-1.5 h-1.5 rounded-full bg-earth-sage animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-earth-sage" />
               <span>INDEPENDENT LABORATORY AUDIT · PEER-REVIEWED DATA</span>
             </div>
           </Reveal>

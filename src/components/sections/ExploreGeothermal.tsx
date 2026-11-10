@@ -1,48 +1,25 @@
 import React, { useState } from 'react';
-import { Plus, Minus, ArrowUpRight } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { InView } from '@/components/core/in-view';
 import { APPLICATION_CARDS } from '../../data/content';
 import { TextReveal } from '../motion/TextReveal';
 import { Reveal } from '../motion/Reveal';
+import { ImageReveal } from '../motion/ImageReveal';
 import { useReducedMotionPreference } from '../../hooks/useReducedMotionPreference';
-import { MOTION_EASINGS } from '../../lib/motionTokens';
+import { MOTION_DURATIONS, MOTION_EASINGS } from '../../lib/motionTokens';
 
 export const ExploreGeothermal: React.FC = () => {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const shouldReduceMotion = useReducedMotionPreference();
 
-  const toggleCard = (id: string) => {
+  const toggleDetail = (id: string) => {
     setExpandedId(expandedId === id ? null : id);
   };
 
-  // Staggered InView parent and child animation variants as specified in reference design
-  const parentVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.09,
-      },
-    },
-  };
-
-  const childVariants = {
-    hidden: {
-      opacity: 0,
-      scale: shouldReduceMotion ? 1 : 0.8,
-      filter: shouldReduceMotion ? 'blur(0px)' : 'blur(10px)',
-    },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      filter: 'blur(0px)',
-      transition: {
-        duration: 0.55,
-        ease: MOTION_EASINGS.editorial,
-      },
-    },
-  };
+  const electricityApp = APPLICATION_CARDS.find((c) => c.id === 'electricity') || APPLICATION_CARDS[0];
+  const districtApp = APPLICATION_CARDS.find((c) => c.id === 'district-heating') || APPLICATION_CARDS[2];
+  const agricultureApp = APPLICATION_CARDS.find((c) => c.id === 'industrial-agri') || APPLICATION_CARDS[3];
+  const residentialApp = APPLICATION_CARDS.find((c) => c.id === 'residential') || APPLICATION_CARDS[1];
 
   return (
     <section 
@@ -51,13 +28,13 @@ export const ExploreGeothermal: React.FC = () => {
     >
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12">
         {/* ======================================================== */}
-        {/* SECTION HEADER                                           */}
+        {/* 1. EDITORIAL SECTION HEADER                              */}
         {/* ======================================================== */}
-        <div className="max-w-4xl mb-12 sm:mb-16 md:mb-20">
+        <div className="max-w-4xl mb-14 sm:mb-20 md:mb-24">
           <Reveal variant="fadeUp" delay={0.05}>
             <div className="flex items-center space-x-2 text-[10px] sm:text-[11px] font-semibold tracking-[0.24em] sm:tracking-[0.28em] text-earth-forest uppercase mb-3 sm:mb-4">
               <span className="w-1.5 h-1.5 rounded-full bg-earth-sage" />
-              <span>DIVERSE THERMAL APPLICATIONS // THE FULL ENTHALPY SPECTRUM</span>
+              <span>DIVERSE THERMAL APPLICATIONS · FULL ENTHALPY SPECTRUM</span>
             </div>
           </Reveal>
 
@@ -71,125 +48,313 @@ export const ExploreGeothermal: React.FC = () => {
 
           <Reveal variant="fadeUp" delay={0.2}>
             <p className="text-xs sm:text-sm md:text-base text-earth-black/80 font-sans leading-relaxed max-w-3xl border-l-2 border-earth-forest/40 pl-4 sm:pl-6">
-              From multi-megawatt high-temperature electrical generation to municipal district warmth and agricultural food production, geothermal energy serves diverse human needs across the entire thermal enthalpy spectrum.
+              From multi-megawatt high-temperature electrical generation to municipal district warmth, agricultural greenhouses, and residential geo-exchange, geothermal energy serves society across every tier of the thermal enthalpy spectrum.
             </p>
           </Reveal>
         </div>
 
         {/* ======================================================== */}
-        {/* TWO-COLUMN IN-VIEW PHOTOGRAPHIC GRID                     */}
-        {/* Staggered children with blur and scale reveal            */}
+        {/* 2. PRIMARY APPLICATION: ELECTRICITY GENERATION           */}
+        {/* Dominant asymmetric hero split layout                    */}
         {/* ======================================================== */}
-        <InView
-          variants={parentVariants}
-          viewOptions={{
-            once: true,
-            margin: '0px 0px -120px 0px',
-          }}
-          className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12"
-        >
-          {APPLICATION_CARDS.map((card, idx) => {
-            const isExpanded = expandedId === card.id;
-
-            return (
-              <motion.article
-                key={card.id}
-                variants={childVariants}
-                className="bg-earth-ivory border border-earth-border flex flex-col justify-between group hover:border-earth-forest transition-colors duration-300 shadow-[0_10px_30px_rgba(16,37,28,0.04)]"
-              >
-                <div>
-                  {/* Large Photographic Area with Operating Temp Badge */}
-                  <div className="relative aspect-[16/10] overflow-hidden bg-earth-stone/30 border-b border-earth-border">
-                    <img
-                      src={card.image}
-                      alt={card.imageAlt}
-                      loading="lazy"
-                      decoding="async"
-                      width={900}
-                      height={562}
-                      className="w-full h-full object-cover img-editorial-zoom filter saturate-[0.92] contrast-[1.03]"
-                    />
-                    
-                    {/* Operating Temperature Pill */}
-                    <div className="absolute top-3 left-3 bg-earth-forest/90 text-earth-ivory backdrop-blur-sm px-3 py-1 text-[9px] sm:text-[10px] font-mono tracking-widest border border-white/10 shadow-md">
-                      <span>OPERATING ENTHALPY: {card.operatingTemp}</span>
-                    </div>
-
-                    {/* Category Label Overlay */}
-                    <div className="absolute bottom-3 right-3 bg-earth-ivory/95 px-2.5 py-1 text-[9px] font-mono tracking-wider text-earth-forest border border-earth-border shadow-sm">
-                      0{idx + 1} // APPLICATION
-                    </div>
-                  </div>
-
-                  {/* Card Editorial Content */}
-                  <div className="p-6 sm:p-8">
-                    <span className="text-[10px] sm:text-[11px] font-mono tracking-widest text-earth-sage uppercase font-semibold block mb-2">
-                      0{idx + 1} — {card.tag}
-                    </span>
-
-                    <h3 className="font-editorial text-2xl sm:text-3xl font-medium text-earth-forest mb-3 leading-snug">
-                      {card.title}
-                    </h3>
-
-                    <p className="text-xs sm:text-sm text-earth-black/75 font-sans leading-relaxed mb-4">
-                      {card.description}
-                    </p>
-
-                    {/* Expandable Technical Specification Panel */}
-                    <AnimatePresence>
-                      {isExpanded && (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: 'auto' }}
-                          exit={{ opacity: 0, height: 0 }}
-                          transition={{
-                            duration: shouldReduceMotion ? 0.05 : 0.35,
-                            ease: MOTION_EASINGS.editorial,
-                          }}
-                          className="overflow-hidden"
-                        >
-                          <div className="p-4 bg-earth-stone-light/80 border border-earth-border mb-4 text-xs text-earth-black/90 space-y-2.5 shadow-inner">
-                            <span className="font-semibold block text-[10px] uppercase font-mono tracking-wider text-earth-forest">
-                              TECHNICAL SPECIFICATIONS & CASE STUDIES:
-                            </span>
-                            <ul className="space-y-2 list-none">
-                              {card.details.map((detail, dIdx) => (
-                                <li key={dIdx} className="flex items-start space-x-2 text-[11px] sm:text-xs leading-relaxed text-earth-black/85">
-                                  <ArrowUpRight className="w-3.5 h-3.5 text-earth-sage shrink-0 mt-0.5" />
-                                  <span>{detail}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
+        <div className="border-t border-earth-border pt-10 sm:pt-14 pb-14 sm:pb-20">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
+            {/* Left: Large Editorial Image */}
+            <div className="lg:col-span-7">
+              <div className="relative group overflow-hidden bg-earth-stone/30 border border-earth-border">
+                <ImageReveal
+                  src={electricityApp.image}
+                  alt={electricityApp.imageAlt}
+                  aspectRatio="aspect-[16/10]"
+                  duration={MOTION_DURATIONS.image}
+                />
+                <div className="p-3 sm:p-4 bg-earth-ivory border-t border-earth-border flex items-center justify-between text-xs text-earth-muted">
+                  <span className="font-sans text-[11px] sm:text-xs truncate mr-2">
+                    High-Pressure Steam Turbine Hall · Multi-Stage Expansion
+                  </span>
+                  <span className="font-mono text-[9px] sm:text-[10px] tracking-wider text-earth-forest shrink-0 font-medium">
+                    ENTHALPY: {electricityApp.operatingTemp}
+                  </span>
                 </div>
+              </div>
+            </div>
 
-                {/* Card Expand/Collapse Footer Control */}
-                <div className="px-6 sm:px-8 pb-6 sm:pb-8">
-                  <button
-                    onClick={() => toggleCard(card.id)}
-                    aria-expanded={isExpanded}
-                    className="w-full flex items-center justify-between py-2.5 text-xs font-semibold tracking-wider text-earth-forest hover:text-earth-black border-t border-earth-border/80 transition-colors focus:outline-none focus:ring-1 focus:ring-earth-sage"
-                  >
-                    <span className="uppercase text-[10px] font-mono tracking-widest">
-                      {isExpanded ? 'COLLAPSE SPECIFICATIONS' : 'EXPAND TECHNICAL SPECIFICATIONS'}
-                    </span>
-                    <span className="p-1 rounded-full bg-earth-stone/30 group-hover:bg-earth-stone/60 transition-colors">
-                      {isExpanded ? (
-                        <Minus className="w-3.5 h-3.5 text-earth-forest" />
-                      ) : (
-                        <Plus className="w-3.5 h-3.5 text-earth-forest" />
-                      )}
-                    </span>
-                  </button>
+            {/* Right: Technical Narrative */}
+            <div className="lg:col-span-5 space-y-4 sm:space-y-5">
+              <div className="flex items-center space-x-2 text-[10px] font-mono tracking-widest text-earth-sage uppercase font-semibold">
+                <span>01</span>
+                <span className="text-earth-border">·</span>
+                <span>{electricityApp.tag}</span>
+              </div>
+
+              <h3 className="font-editorial text-2xl sm:text-3xl md:text-4xl font-medium text-earth-forest leading-tight">
+                {electricityApp.title}
+              </h3>
+
+              <p className="text-xs sm:text-sm text-earth-black/80 font-sans leading-relaxed">
+                {electricityApp.description}
+              </p>
+
+              <div className="border-t border-b border-earth-border/80 py-3 space-y-2 text-xs font-mono text-earth-black/75">
+                <div className="flex justify-between items-center">
+                  <span className="text-earth-muted uppercase text-[10px]">Operating Range</span>
+                  <span className="font-semibold text-earth-forest">{electricityApp.operatingTemp}</span>
                 </div>
-              </motion.article>
-            );
-          })}
-        </InView>
+                <div className="flex justify-between items-center">
+                  <span className="text-earth-muted uppercase text-[10px]">Thermodynamic Cycle</span>
+                  <span className="font-semibold text-earth-forest">Flash & Organic Rankine</span>
+                </div>
+              </div>
+
+              <div>
+                <button
+                  type="button"
+                  onClick={() => toggleDetail(electricityApp.id)}
+                  className="inline-flex items-center space-x-2 text-xs font-mono tracking-wider uppercase text-earth-forest hover:text-earth-black transition-colors font-semibold"
+                >
+                  <span>{expandedId === electricityApp.id ? 'Hide Specifications' : 'View Specifications'}</span>
+                  <ChevronDown className={`w-3.5 h-3.5 transform transition-transform ${expandedId === electricityApp.id ? 'rotate-180' : ''}`} />
+                </button>
+
+                <AnimatePresence>
+                  {expandedId === electricityApp.id && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: shouldReduceMotion ? 0.05 : 0.3, ease: MOTION_EASINGS.editorial }}
+                      className="overflow-hidden mt-3 pt-3 border-t border-earth-border/60"
+                    >
+                      <ul className="space-y-2 text-xs text-earth-black/75 font-sans">
+                        {electricityApp.details.map((detail, dIdx) => (
+                          <li key={dIdx} className="flex items-start space-x-2">
+                            <span className="text-earth-sage font-bold">·</span>
+                            <span>{detail}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ======================================================== */}
+        {/* 3. ASYMMETRIC PAIR: DISTRICT HEATING & AGRICULTURE       */}
+        {/* Varied editorial split layout without repetitive cards    */}
+        {/* ======================================================== */}
+        <div className="border-t border-earth-border pt-12 sm:pt-16 pb-14 sm:pb-20">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
+            
+            {/* Left: District Heating (7 cols) */}
+            <div className="lg:col-span-7 space-y-5">
+              <div className="flex items-center space-x-2 text-[10px] font-mono tracking-widest text-earth-sage uppercase font-semibold">
+                <span>02</span>
+                <span className="text-earth-border">·</span>
+                <span>{districtApp.tag}</span>
+              </div>
+
+              <h3 className="font-editorial text-2xl sm:text-3xl font-medium text-earth-forest leading-tight">
+                {districtApp.title}
+              </h3>
+
+              <p className="text-xs sm:text-sm text-earth-black/80 font-sans leading-relaxed">
+                {districtApp.description}
+              </p>
+
+              <div className="relative group overflow-hidden bg-earth-stone/30 border border-earth-border my-4">
+                <ImageReveal
+                  src={districtApp.image}
+                  alt={districtApp.imageAlt}
+                  aspectRatio="aspect-[16/9]"
+                  duration={MOTION_DURATIONS.image}
+                />
+                <div className="p-3 bg-earth-ivory border-t border-earth-border flex items-center justify-between text-xs text-earth-muted">
+                  <span className="font-sans text-[11px] truncate mr-2">Municipal Subsurface Pipeline Network</span>
+                  <span className="font-mono text-[9px] tracking-wider text-earth-forest shrink-0 font-medium">{districtApp.operatingTemp}</span>
+                </div>
+              </div>
+
+              <div>
+                <button
+                  type="button"
+                  onClick={() => toggleDetail(districtApp.id)}
+                  className="inline-flex items-center space-x-2 text-xs font-mono tracking-wider uppercase text-earth-forest hover:text-earth-black transition-colors font-semibold"
+                >
+                  <span>{expandedId === districtApp.id ? 'Hide Case Studies' : 'View Case Studies'}</span>
+                  <ChevronDown className={`w-3.5 h-3.5 transform transition-transform ${expandedId === districtApp.id ? 'rotate-180' : ''}`} />
+                </button>
+
+                <AnimatePresence>
+                  {expandedId === districtApp.id && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: shouldReduceMotion ? 0.05 : 0.3, ease: MOTION_EASINGS.editorial }}
+                      className="overflow-hidden mt-3 pt-3 border-t border-earth-border/60"
+                    >
+                      <ul className="space-y-2 text-xs text-earth-black/75 font-sans">
+                        {districtApp.details.map((detail, dIdx) => (
+                          <li key={dIdx} className="flex items-start space-x-2">
+                            <span className="text-earth-sage font-bold">·</span>
+                            <span>{detail}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+
+            {/* Right: Industry & Agriculture (5 cols) */}
+            <div className="lg:col-span-5 space-y-5 lg:border-l lg:border-earth-border lg:pl-10">
+              <div className="flex items-center space-x-2 text-[10px] font-mono tracking-widest text-earth-sage uppercase font-semibold">
+                <span>03</span>
+                <span className="text-earth-border">·</span>
+                <span>{agricultureApp.tag}</span>
+              </div>
+
+              <h3 className="font-editorial text-2xl sm:text-3xl font-medium text-earth-forest leading-tight">
+                {agricultureApp.title}
+              </h3>
+
+              <p className="text-xs sm:text-sm text-earth-black/80 font-sans leading-relaxed">
+                {agricultureApp.description}
+              </p>
+
+              <div className="relative group overflow-hidden bg-earth-stone/30 border border-earth-border my-4">
+                <ImageReveal
+                  src={agricultureApp.image}
+                  alt={agricultureApp.imageAlt}
+                  aspectRatio="aspect-[4/3]"
+                  duration={MOTION_DURATIONS.image}
+                />
+                <div className="p-3 bg-earth-ivory border-t border-earth-border flex items-center justify-between text-xs text-earth-muted">
+                  <span className="font-sans text-[11px] truncate mr-2">Geothermal Agronomic Greenhouse</span>
+                  <span className="font-mono text-[9px] tracking-wider text-earth-forest shrink-0 font-medium">{agricultureApp.operatingTemp}</span>
+                </div>
+              </div>
+
+              <div>
+                <button
+                  type="button"
+                  onClick={() => toggleDetail(agricultureApp.id)}
+                  className="inline-flex items-center space-x-2 text-xs font-mono tracking-wider uppercase text-earth-forest hover:text-earth-black transition-colors font-semibold"
+                >
+                  <span>{expandedId === agricultureApp.id ? 'Hide Applications' : 'View Mineral & Food Data'}</span>
+                  <ChevronDown className={`w-3.5 h-3.5 transform transition-transform ${expandedId === agricultureApp.id ? 'rotate-180' : ''}`} />
+                </button>
+
+                <AnimatePresence>
+                  {expandedId === agricultureApp.id && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: shouldReduceMotion ? 0.05 : 0.3, ease: MOTION_EASINGS.editorial }}
+                      className="overflow-hidden mt-3 pt-3 border-t border-earth-border/60"
+                    >
+                      <ul className="space-y-2 text-xs text-earth-black/75 font-sans">
+                        {agricultureApp.details.map((detail, dIdx) => (
+                          <li key={dIdx} className="flex items-start space-x-2">
+                            <span className="text-earth-sage font-bold">·</span>
+                            <span>{detail}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {/* ======================================================== */}
+        {/* 4. SHALLOW ENTHALPY HORIZONTAL BAND: GEO-EXCHANGE        */}
+        {/* Open horizontal editorial timeline band                  */}
+        {/* ======================================================== */}
+        <div className="border-t border-earth-border pt-12 sm:pt-16">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center bg-earth-stone/15 border border-earth-border p-6 sm:p-10 lg:p-12">
+            
+            {/* Left Stat Callout */}
+            <div className="lg:col-span-3 space-y-2">
+              <span className="font-mono text-[10px] tracking-widest uppercase text-earth-muted block">
+                04 · {residentialApp.tag}
+              </span>
+              <div className="font-editorial text-4xl sm:text-5xl text-earth-forest font-normal leading-none">
+                300–500%
+              </div>
+              <span className="font-mono text-[10px] tracking-wider text-earth-sage uppercase font-semibold block">
+                COEFFICIENT OF PERFORMANCE (COP)
+              </span>
+            </div>
+
+            {/* Middle Narrative */}
+            <div className="lg:col-span-5 space-y-3">
+              <h3 className="font-editorial text-xl sm:text-2xl font-medium text-earth-forest">
+                {residentialApp.title}
+              </h3>
+              <p className="text-xs sm:text-sm text-earth-black/80 font-sans leading-relaxed">
+                {residentialApp.description}
+              </p>
+              <div className="pt-1">
+                <button
+                  type="button"
+                  onClick={() => toggleDetail(residentialApp.id)}
+                  className="inline-flex items-center space-x-2 text-xs font-mono tracking-wider uppercase text-earth-forest hover:text-earth-black transition-colors font-semibold"
+                >
+                  <span>{expandedId === residentialApp.id ? 'Hide Details' : 'Read COP & Seasonal Mechanism'}</span>
+                  <ChevronDown className={`w-3.5 h-3.5 transform transition-transform ${expandedId === residentialApp.id ? 'rotate-180' : ''}`} />
+                </button>
+
+                <AnimatePresence>
+                  {expandedId === residentialApp.id && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: shouldReduceMotion ? 0.05 : 0.3, ease: MOTION_EASINGS.editorial }}
+                      className="overflow-hidden mt-3 pt-3 border-t border-earth-border/60"
+                    >
+                      <ul className="space-y-1.5 text-xs text-earth-black/75 font-sans">
+                        {residentialApp.details.map((detail, dIdx) => (
+                          <li key={dIdx} className="flex items-start space-x-2">
+                            <span className="text-earth-sage font-bold">·</span>
+                            <span>{detail}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+
+            {/* Right Compact Architectural Image */}
+            <div className="lg:col-span-4">
+              <div className="relative group overflow-hidden bg-earth-stone/30 border border-earth-border">
+                <ImageReveal
+                  src={residentialApp.image}
+                  alt={residentialApp.imageAlt}
+                  aspectRatio="aspect-[16/10]"
+                  duration={MOTION_DURATIONS.image}
+                />
+                <div className="p-2.5 bg-earth-ivory border-t border-earth-border flex items-center justify-between text-[11px] text-earth-muted">
+                  <span className="truncate mr-2">Geo-Exchange Architectural Cooling</span>
+                  <span className="font-mono text-[9px] text-earth-forest shrink-0 font-medium">{residentialApp.operatingTemp}</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
       </div>
     </section>
   );

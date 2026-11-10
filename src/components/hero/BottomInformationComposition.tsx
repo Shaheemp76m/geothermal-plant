@@ -33,7 +33,7 @@ export const BottomInformationComposition: React.FC = () => {
             <div className="h-2 bg-[#8C7A6B] rounded-xs opacity-90" />
             <div className="h-2.5 bg-[#54463A] rounded-xs opacity-85" />
             <div className="h-3.5 bg-[#C85A32] rounded-xs flex items-center justify-center">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-300 animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-200" />
             </div>
           </div>
 

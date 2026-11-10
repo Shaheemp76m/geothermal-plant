@@ -31,7 +31,7 @@ export const GeologicalCrossSection: React.FC<GeologicalCrossSectionProps> = ({
       {/* Visual Top Bar / Telemetry Stamp */}
       <div className="absolute top-2 left-3 right-3 z-20 flex items-center justify-between text-[9px] sm:text-[10px] font-mono tracking-widest text-[#7C8B82] uppercase pointer-events-none">
         <div className="flex items-center space-x-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-earth-sage animate-pulse" />
+          <span className="w-1.5 h-1.5 rounded-full bg-earth-sage" />
           <span className="text-earth-sage font-semibold">GEOLOGICAL STRATA 0 – 6,000M</span>
         </div>
         <div className="flex items-center space-x-3 text-[9px]">

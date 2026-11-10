@@ -14,10 +14,10 @@ interface FutureSectionProps {
 type CheckpointStage = 0 | 1 | 2 | 3;
 
 const CHECKPOINT_NAMES = [
-  'STAGE A // HEADING',
-  'STAGE B // SUBHEADING',
-  'STAGE C // DESCRIPTION',
-  'STAGE D // SPECIFICATIONS',
+  'STAGE A · HEADING',
+  'STAGE B · SUBHEADING',
+  'STAGE C · DESCRIPTION',
+  'STAGE D · SPECIFICATIONS',
 ] as const;
 
 // Precision Timing Tokens
@@ -438,7 +438,7 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
           {/* Left: Section Sub-eyebrow & Active Checkpoint Badge */}
           <div className="flex items-center space-x-3 sm:space-x-4">
             <div className="flex items-center space-x-2">
-              <span className="w-2 h-2 rounded-full bg-earth-sage animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-earth-sage" />
               <span className="font-mono text-[9px] sm:text-[10px] tracking-[0.22em] text-earth-forest uppercase font-semibold">
                 THE NEXT GENERATION FRONTIER
               </span>
@@ -551,7 +551,7 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
                       {currentTech.classification}
                     </span>
                     <span className="inline-flex items-center space-x-1.5 px-3 py-1 bg-earth-forest/5 border border-earth-forest/15 rounded-full text-[9px] sm:text-[10px] font-mono tracking-widest text-earth-forest font-semibold uppercase">
-                      <span className="w-1.5 h-1.5 rounded-full bg-earth-sage animate-pulse" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-earth-sage" />
                       <span>{currentTech.status}</span>
                     </span>
                     {activeCardIndex === 2 && (
@@ -712,7 +712,7 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
               <span>
                 {activeCardIndex === NEXT_GEN_TECH.length - 1 && activeCheckpoint === 3
                   ? 'FINAL CHECKPOINT REACHED · SCROLL DOWN TO CONTINUE'
-                  : `SCROLL DOWN TO ADVANCE // ${CHECKPOINT_NAMES[activeCheckpoint]}`}
+                  : `SCROLL DOWN TO ADVANCE · ${CHECKPOINT_NAMES[activeCheckpoint]}`}
               </span>
               <ArrowDown
                 className={`w-3 h-3 text-earth-sage ${

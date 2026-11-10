@@ -106,7 +106,7 @@ export const ObservatoryNavigation: React.FC<ObservatoryNavigationProps> = ({
           INTERACTIVE MODES
         </span>
         <span className="font-mono text-[8px] text-earth-sage/80 bg-earth-forest/50 px-1.5 py-0.5 rounded border border-earth-sage/20">
-          4 LIVE
+          4 MODES
         </span>
       </div>
 

@@ -13,17 +13,14 @@ export const ObservatoryFeatureBanner: React.FC<ObservatoryFeatureBannerProps> =
   const shouldReduceMotion = useReducedMotionPreference();
 
   return (
-    <section className="w-full bg-[#0E1310] text-[#F3F0E6] py-16 sm:py-20 px-4 sm:px-6 lg:px-12 border-y border-[#1E2621] relative overflow-hidden select-none">
-      {/* Background Subtle Gradient Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-gradient-to-r from-earth-forest/30 via-earth-sage/10 to-transparent blur-3xl pointer-events-none" />
-
+    <section className="w-full bg-[#0E1310] text-[#F3F0E6] py-16 sm:py-20 px-4 sm:px-6 lg:px-12 border-y border-[#1E2621] relative select-none">
       <div className="max-w-[1400px] mx-auto relative z-10">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8 lg:gap-12">
           {/* Left Editorial Copy */}
           <div className="space-y-4 max-w-2xl">
             <div className="flex items-center space-x-2 text-[10px] font-mono tracking-widest text-earth-sage uppercase font-semibold">
-              <span className="w-2 h-2 rounded-full bg-earth-sage animate-pulse" />
-              <span>INTERACTIVE APPLICATION // 01–04</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-earth-sage" />
+              <span>INTERACTIVE OBSERVATORY · 4 MODES</span>
             </div>
 
             <h2 className="font-editorial text-3xl sm:text-4xl md:text-5xl font-medium tracking-tight text-white leading-tight">
@@ -34,8 +31,8 @@ export const ObservatoryFeatureBanner: React.FC<ObservatoryFeatureBannerProps> =
               Explore Earth’s subterranean energy system in a dedicated single-screen simulator. Manipulate downhole fluid temperatures, examine closed-loop production wells, challenge public perceptions with peer-reviewed science, and benchmark lifecycle carbon intensity head-to-head.
             </p>
 
-            {/* Feature Capability Badges */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2">
+            {/* Feature Capability List */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
               {[
                 { icon: Compass, label: '01 Strata & Wells' },
                 { icon: Flame, label: '02 Temperature Enthalpy' },
@@ -46,7 +43,7 @@ export const ObservatoryFeatureBanner: React.FC<ObservatoryFeatureBannerProps> =
                 return (
                   <div
                     key={badge.label}
-                    className="flex items-center space-x-2 px-2.5 py-2 rounded bg-[#151C18] border border-[#233027] text-[11px] font-mono text-[#C8D6CD]"
+                    className="flex items-center space-x-2 py-1 text-[11px] font-mono text-[#C8D6CD] border-b border-[#233027]"
                   >
                     <Icon className="w-3.5 h-3.5 text-earth-sage shrink-0" />
                     <span className="truncate">{badge.label}</span>

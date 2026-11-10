@@ -337,35 +337,44 @@ export const EnvironmentalImpact: React.FC<EnvironmentalImpactProps> = ({ onOpen
               </Reveal>
 
               {/* Three Specific Considerations */}
-              <div className="space-y-4 pt-2">
+              <div className="space-y-6 pt-2">
                 <Reveal variant="fadeUp" delay={0.25}>
-                  <div className="p-4 bg-[#131916] border border-[#222E27] space-y-1.5">
-                    <span className="text-xs font-semibold text-white font-sans uppercase tracking-wider block">
-                      1. Water Management & Reservoir Reinjection
-                    </span>
-                    <p className="text-xs text-[#A3A199] font-sans leading-relaxed">
+                  <div className="border-l-2 border-earth-sage/60 pl-5 space-y-1.5">
+                    <div className="flex items-center space-x-2">
+                      <span className="font-mono text-[10px] text-earth-sage font-bold">01</span>
+                      <span className="text-sm font-semibold text-white font-sans uppercase tracking-wider block">
+                        Water Management & Reservoir Reinjection
+                      </span>
+                    </div>
+                    <p className="text-xs sm:text-sm text-[#A3A199] font-sans leading-relaxed">
                       Extracted brine contains dissolved minerals. In modern closed-loop binary plants, 100% of fluid is reinjected deep into the source formation to maintain pressure, shield shallow drinking aquifers, and eliminate surface disposal.
                     </p>
                   </div>
                 </Reveal>
 
                 <Reveal variant="fadeUp" delay={0.35}>
-                  <div className="p-4 bg-[#131916] border border-[#222E27] space-y-1.5">
-                    <span className="text-xs font-semibold text-white font-sans uppercase tracking-wider block">
-                      2. Induced Micro-Seismicity Management
-                    </span>
-                    <p className="text-xs text-[#A3A199] font-sans leading-relaxed">
+                  <div className="border-l-2 border-earth-sage/60 pl-5 space-y-1.5">
+                    <div className="flex items-center space-x-2">
+                      <span className="font-mono text-[10px] text-earth-sage font-bold">02</span>
+                      <span className="text-sm font-semibold text-white font-sans uppercase tracking-wider block">
+                        Induced Micro-Seismicity Management
+                      </span>
+                    </div>
+                    <p className="text-xs sm:text-sm text-[#A3A199] font-sans leading-relaxed">
                       Pumping fluids into deep rock can relieve natural tectonic stresses as micro-tremors. Dense passive seismic monitoring arrays and real-time "traffic-light" pump protocols throttle injection immediately if seismic thresholds are approached.
                     </p>
                   </div>
                 </Reveal>
 
                 <Reveal variant="fadeUp" delay={0.45}>
-                  <div className="p-4 bg-[#131916] border border-[#222E27] space-y-1.5">
-                    <span className="text-xs font-semibold text-white font-sans uppercase tracking-wider block">
-                      3. Subsurface Reservoir Longevity
-                    </span>
-                    <p className="text-xs text-[#A3A199] font-sans leading-relaxed">
+                  <div className="border-l-2 border-earth-sage/60 pl-5 space-y-1.5">
+                    <div className="flex items-center space-x-2">
+                      <span className="font-mono text-[10px] text-earth-sage font-bold">03</span>
+                      <span className="text-sm font-semibold text-white font-sans uppercase tracking-wider block">
+                        Subsurface Reservoir Longevity
+                      </span>
+                    </div>
+                    <p className="text-xs sm:text-sm text-[#A3A199] font-sans leading-relaxed">
                       Over-extraction can lead to localized thermal cooling. Sustainable operations model extraction rates against natural geological recharge rates to ensure production spans decades without exhaustion.
                     </p>
                   </div>
