@@ -74,7 +74,7 @@ const EditorialCounter: React.FC<EditorialCounterProps> = ({
   // Special layout for 24/7 continuous baseload
   if (subNumber !== undefined) {
     return (
-      <div className="font-editorial text-[clamp(4.25rem,11.5vw,9.5rem)] font-bold text-earth-forest leading-[0.88] tracking-tight select-none inline-flex items-baseline">
+      <div className="font-editorial text-[clamp(3.75rem,9.5vw,8.5rem)] font-bold text-earth-forest leading-[0.88] tracking-tight select-none inline-flex items-baseline">
         <span>{count}</span>
         <span className="text-earth-sage mx-1 sm:mx-1.5 font-normal text-[0.85em]">/</span>
         <span>{subCount}</span>
@@ -83,7 +83,7 @@ const EditorialCounter: React.FC<EditorialCounterProps> = ({
   }
 
   return (
-    <div className="font-editorial text-[clamp(4.25rem,11.5vw,9.5rem)] font-bold text-earth-forest leading-[0.88] tracking-tight select-none inline-flex items-baseline">
+    <div className="font-editorial text-[clamp(3.75rem,9.5vw,8.5rem)] font-bold text-earth-forest leading-[0.88] tracking-tight select-none inline-flex items-baseline">
       <span>{count}</span>
       <span className="text-earth-sage font-editorial font-normal text-[0.55em] ml-1.5 sm:ml-2 align-baseline tracking-normal">
         {suffix.trim()}
@@ -94,44 +94,103 @@ const EditorialCounter: React.FC<EditorialCounterProps> = ({
 
 // ============================================================================
 // INDIVIDUAL EDITORIAL METRIC CHAPTER
-// Asymmetrical layout, generous whitespace, no boxes, fine separators.
+// Strict Alternating Left-Right Composition Around Central Timeline
 // ============================================================================
-interface MetricChapterProps {
+interface MetricTimelineItemProps {
   stat: BenefitStat;
   index: number;
-  isEven: boolean;
   shouldReduceMotion: boolean;
 }
 
-const MetricChapter: React.FC<MetricChapterProps> = ({
+const MetricTimelineItem: React.FC<MetricTimelineItemProps> = ({
   stat,
   index,
-  isEven,
   shouldReduceMotion,
 }) => {
   const itemRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(itemRef, { once: true, margin: '-70px' });
 
-  // Directional entrance: Metric 01 & 03 from Left, Metric 02 & 04 from Right
-  const initialX = shouldReduceMotion ? 0 : isEven ? 28 : -28;
-  const initialY = shouldReduceMotion ? 0 : 25;
+  // 01 (Left), 02 (Right), 03 (Left), 04 (Right)
+  const isLeft = index % 2 === 0;
+
+  // Directional entrance: 01 & 03 from Left, 02 & 04 from Right
+  const initialX = shouldReduceMotion ? 0 : isLeft ? -32 : 32;
+
+  // Metric Composition Block
+  const metricContent = (
+    <div 
+      className={`relative z-10 flex flex-col ${
+        isLeft 
+          ? 'items-start text-left md:items-end md:text-right mr-auto md:mr-0 md:ml-auto max-w-[92%] md:max-w-xl md:pr-10 lg:pr-16 -translate-x-1.5 md:translate-x-0' 
+          : 'items-end text-right md:items-start md:text-left ml-auto md:ml-0 md:mr-auto max-w-[92%] md:max-w-xl md:pl-10 lg:pl-16 translate-x-1.5 md:translate-x-0'
+      }`}
+    >
+      {/* Category Eyebrow */}
+      <span className="font-mono text-[10px] sm:text-[11px] tracking-[0.25em] text-earth-muted uppercase block mb-1.5">
+        {stat.category || `0${index + 1} / METRIC`}
+      </span>
+
+      {/* Oversized Numerical Value */}
+      <div className="my-1 sm:my-2">
+        <EditorialCounter
+          value={stat.value}
+          suffix={stat.suffix}
+          subNumber={stat.subNumber}
+          isInView={isInView}
+          shouldReduceMotion={shouldReduceMotion}
+        />
+      </div>
+
+      {/* Unit Classification Label if present */}
+      {stat.unitLabel && (
+        <span className="font-mono text-[9px] sm:text-[10px] tracking-[0.2em] text-earth-sage uppercase block mb-3 font-medium">
+          {stat.unitLabel}
+        </span>
+      )}
+
+      {/* Metric Title in High-Contrast Serif */}
+      <h3 className="font-editorial text-2xl sm:text-3xl lg:text-4xl text-earth-forest font-medium tracking-tight uppercase mb-3">
+        {stat.title}
+      </h3>
+
+      {/* Core Explanatory Description */}
+      <p className="font-sans text-sm sm:text-base text-earth-black/80 leading-relaxed max-w-md mb-4">
+        {stat.description}
+      </p>
+
+      {/* Fine Hairline Rule */}
+      <div 
+        className={`w-16 h-[1px] bg-earth-border/80 my-3 ${
+          isLeft ? 'ml-0 md:ml-auto' : 'ml-auto md:ml-0'
+        }`} 
+      />
+
+      {/* Methodological Context & Source Footnote */}
+      <div className="space-y-1.5 max-w-md">
+        <p className="font-sans text-xs text-earth-muted/90 leading-relaxed italic">
+          {stat.qualification}
+        </p>
+        <div className="font-mono text-[10px] tracking-widest text-earth-forest font-semibold uppercase pt-1">
+          SOURCE: {stat.source}
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div 
       ref={itemRef} 
-      className="relative scroll-mt-24 group"
+      className="relative scroll-mt-24"
     >
       {/* ------------------------------------------------------------------ */}
-      {/* Numbered Progress Node Marker on Central/Left Line                 */}
+      {/* Numbered Progress Node Marker on the Central Timeline              */}
+      {/* Centered horizontally on desktop, tablet, and mobile               */}
       {/* ------------------------------------------------------------------ */}
       <div 
-        className={`absolute top-0 z-20 flex items-center justify-center transition-all duration-700
-          left-4 -translate-x-1/2 sm:left-6
-          lg:left-1/2 lg:-translate-x-1/2
-        `}
+        className="absolute left-1/2 -translate-x-1/2 top-0 md:top-2 z-20 flex items-center justify-center pointer-events-none"
       >
         <div 
-          className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full font-mono text-[10px] sm:text-[11px] font-bold flex items-center justify-center transition-all duration-700 ${
+          className={`w-8 h-8 rounded-full font-mono text-[11px] font-bold flex items-center justify-center transition-all duration-700 ${
             isInView
               ? 'bg-earth-forest text-earth-ivory border-2 border-earth-forest shadow-sm scale-110'
               : 'bg-earth-ivory text-earth-muted border border-earth-border scale-100'
@@ -142,172 +201,33 @@ const MetricChapter: React.FC<MetricChapterProps> = ({
       </div>
 
       {/* ------------------------------------------------------------------ */}
-      {/* Editorial Content Grid (Alternating Left/Right on Desktop)        */}
+      {/* Alternating Grid Row (Desktop & Tablet: 2-Col | Mobile: Single Col)*/}
       {/* ------------------------------------------------------------------ */}
       <motion.div
-        initial={{ opacity: 0, x: initialX, y: initialY }}
-        animate={isInView ? { opacity: 1, x: 0, y: 0 } : { opacity: 0, x: initialX, y: initialY }}
+        initial={{ opacity: 0, x: initialX, y: 16 }}
+        animate={isInView ? { opacity: 1, x: 0, y: 0 } : { opacity: 0, x: initialX, y: 16 }}
         transition={{
-          duration: 0.8,
+          duration: 0.75,
           ease: MOTION_EASINGS.editorial,
         }}
-        className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start pl-11 sm:pl-16 lg:pl-0"
+        className="grid grid-cols-1 md:grid-cols-2 gap-y-6 md:gap-x-16 lg:gap-x-24 items-start pt-11 md:pt-0"
       >
-        {/* ============================================================== */}
-        {/* DESKTOP LEFT COLUMN (Col 1-5)                                   */}
-        {/* ============================================================== */}
-        {isEven ? (
-          // EVEN (Metrics 02, 04): Editorial Contextual Counterpart on the Left
-          <div className="hidden lg:flex lg:col-span-5 flex-col justify-center lg:text-right pr-6 pt-4">
-            {stat.editorialNote && (
-              <div className="space-y-3">
-                <span className="font-mono text-[10px] tracking-[0.24em] text-earth-sage uppercase block">
-                  [{stat.editorialNote.tag}]
-                </span>
-                <h4 className="font-editorial text-xl text-earth-forest font-medium tracking-tight">
-                  {stat.editorialNote.headline}
-                </h4>
-                <p className="font-sans text-xs text-earth-black/70 leading-relaxed max-w-sm ml-auto">
-                  {stat.editorialNote.detail}
-                </p>
-                <div className="pt-2">
-                  <span className="font-mono text-[9px] tracking-widest text-earth-muted uppercase block">
-                    BENCHMARK AUDIT · {stat.highlight}
-                  </span>
-                </div>
-              </div>
-            )}
-          </div>
+        {isLeft ? (
+          // Metric 01, 03: Placed in the LEFT column; Right column is empty spacer
+          <>
+            <div className="w-full">
+              {metricContent}
+            </div>
+            <div className="hidden md:block w-full" aria-hidden="true" />
+          </>
         ) : (
-          // ODD (Metrics 01, 03): Primary Hero Metric on the Left
-          <div className="lg:col-span-5 flex flex-col items-start text-left lg:items-end lg:text-right pr-0 lg:pr-8">
-            {/* Category Eyebrow */}
-            <span className="font-mono text-[10px] sm:text-[11px] tracking-[0.25em] text-earth-muted uppercase block mb-1">
-              {stat.category || `0${index + 1} / METRIC`}
-            </span>
-
-            {/* Oversized Numerical Value */}
-            <div className="my-1 sm:my-2">
-              <EditorialCounter
-                value={stat.value}
-                suffix={stat.suffix}
-                subNumber={stat.subNumber}
-                isInView={isInView}
-                shouldReduceMotion={shouldReduceMotion}
-              />
+          // Metric 02, 04: Placed in the RIGHT column; Left column is empty spacer
+          <>
+            <div className="hidden md:block w-full" aria-hidden="true" />
+            <div className="w-full">
+              {metricContent}
             </div>
-
-            {/* Unit Classification Label if present */}
-            {stat.unitLabel && (
-              <span className="font-mono text-[9px] sm:text-[10px] tracking-[0.2em] text-earth-sage uppercase block mb-3 font-medium">
-                {stat.unitLabel}
-              </span>
-            )}
-
-            {/* Metric Title in High-Contrast Serif */}
-            <h3 className="font-editorial text-2xl sm:text-3xl lg:text-4xl text-earth-forest font-medium tracking-tight uppercase mb-3">
-              {stat.title}
-            </h3>
-
-            {/* Core Explanatory Description */}
-            <p className="font-sans text-sm sm:text-base text-earth-black/80 leading-relaxed max-w-md mb-4">
-              {stat.description}
-            </p>
-
-            {/* Fine Hairline Rule */}
-            <div className="w-16 h-[1px] bg-earth-border/80 my-3 lg:ml-auto" />
-
-            {/* Methodological Context & Source Footnote */}
-            <div className="space-y-1.5 max-w-md">
-              <p className="font-sans text-xs text-earth-muted/90 leading-relaxed italic">
-                {stat.qualification}
-              </p>
-              <div className="font-mono text-[10px] tracking-widest text-earth-forest font-semibold uppercase pt-1">
-                SOURCE: {stat.source}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ============================================================== */}
-        {/* DESKTOP CENTER DIVIDER COLUMN (Col 6-7, Spacer)                */}
-        {/* ============================================================== */}
-        <div className="hidden lg:block lg:col-span-2" aria-hidden="true" />
-
-        {/* ============================================================== */}
-        {/* DESKTOP RIGHT COLUMN (Col 8-12)                                 */}
-        {/* ============================================================== */}
-        {isEven ? (
-          // EVEN (Metrics 02, 04): Primary Hero Metric on the Right
-          <div className="lg:col-span-5 flex flex-col items-start text-left pl-0 lg:pl-8">
-            {/* Category Eyebrow */}
-            <span className="font-mono text-[10px] sm:text-[11px] tracking-[0.25em] text-earth-muted uppercase block mb-1">
-              {stat.category || `0${index + 1} / METRIC`}
-            </span>
-
-            {/* Oversized Numerical Value */}
-            <div className="my-1 sm:my-2">
-              <EditorialCounter
-                value={stat.value}
-                suffix={stat.suffix}
-                subNumber={stat.subNumber}
-                isInView={isInView}
-                shouldReduceMotion={shouldReduceMotion}
-              />
-            </div>
-
-            {/* Unit Classification Label if present */}
-            {stat.unitLabel && (
-              <span className="font-mono text-[9px] sm:text-[10px] tracking-[0.2em] text-earth-sage uppercase block mb-3 font-medium">
-                {stat.unitLabel}
-              </span>
-            )}
-
-            {/* Metric Title in High-Contrast Serif */}
-            <h3 className="font-editorial text-2xl sm:text-3xl lg:text-4xl text-earth-forest font-medium tracking-tight uppercase mb-3">
-              {stat.title}
-            </h3>
-
-            {/* Core Explanatory Description */}
-            <p className="font-sans text-sm sm:text-base text-earth-black/80 leading-relaxed max-w-md mb-4">
-              {stat.description}
-            </p>
-
-            {/* Fine Hairline Rule */}
-            <div className="w-16 h-[1px] bg-earth-border/80 my-3" />
-
-            {/* Methodological Context & Source Footnote */}
-            <div className="space-y-1.5 max-w-md">
-              <p className="font-sans text-xs text-earth-muted/90 leading-relaxed italic">
-                {stat.qualification}
-              </p>
-              <div className="font-mono text-[10px] tracking-widest text-earth-forest font-semibold uppercase pt-1">
-                SOURCE: {stat.source}
-              </div>
-            </div>
-          </div>
-        ) : (
-          // ODD (Metrics 01, 03): Editorial Contextual Counterpart on the Right
-          <div className="hidden lg:flex lg:col-span-5 flex-col justify-center text-left pl-6 pt-4">
-            {stat.editorialNote && (
-              <div className="space-y-3">
-                <span className="font-mono text-[10px] tracking-[0.24em] text-earth-sage uppercase block">
-                  [{stat.editorialNote.tag}]
-                </span>
-                <h4 className="font-editorial text-xl text-earth-forest font-medium tracking-tight">
-                  {stat.editorialNote.headline}
-                </h4>
-                <p className="font-sans text-xs text-earth-black/70 leading-relaxed max-w-sm">
-                  {stat.editorialNote.detail}
-                </p>
-                <div className="pt-2">
-                  <span className="font-mono text-[9px] tracking-widest text-earth-muted uppercase block">
-                    BENCHMARK AUDIT · {stat.highlight}
-                  </span>
-                </div>
-              </div>
-            )}
-          </div>
+          </>
         )}
       </motion.div>
     </div>
@@ -315,18 +235,18 @@ const MetricChapter: React.FC<MetricChapterProps> = ({
 };
 
 // ============================================================================
-// MAIN BENEFITS STRIP SECTION
-// Redesigned as "THE POWER OF PROOF" Editorial Data Experience
+// MAIN PEER-REVIEWED OPERATIONAL METRICS SECTION
+// Symmetrical Alternating Left-Right Editorial Timeline
 // ============================================================================
 export const BenefitsStrip: React.FC = () => {
   const containerRef = useRef<HTMLElement>(null);
   const metricsListRef = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotionPreference();
 
-  // Scroll tracking for the continuous central/left connecting line
+  // Scroll tracking for the continuous central connecting line
   const { scrollYProgress } = useScroll({
     target: metricsListRef,
-    offset: ['start 70%', 'end 70%'],
+    offset: ['start 65%', 'end 75%'],
   });
 
   const smoothProgress = useSpring(scrollYProgress, {
@@ -347,7 +267,7 @@ export const BenefitsStrip: React.FC = () => {
         {/* 2. SECTION INTRODUCTION                                        */}
         {/* Centered, oversized editorial serif heading, prominent hierarchy*/}
         {/* ============================================================== */}
-        <div className="text-center max-w-3xl mx-auto mb-20 sm:mb-28 lg:mb-36">
+        <div className="text-center max-w-3xl mx-auto mb-24 sm:mb-32 md:mb-40 lg:mb-48">
           <Reveal variant="fadeUp" delay={0.05}>
             <span className="font-mono text-[10px] sm:text-[11px] tracking-[0.28em] sm:tracking-[0.32em] font-semibold text-earth-sage uppercase block mb-3 sm:mb-4">
               PROVEN BENCHMARKS
@@ -378,18 +298,15 @@ export const BenefitsStrip: React.FC = () => {
         </div>
 
         {/* ============================================================== */}
-        {/* 3 & 8. FOUR-METRIC ASYMMETRICAL EDITORIAL COMPOSITION          */}
-        {/* Continuous scroll-tied line + Alternating chapters              */}
+        {/* 1, 2, 3. ALTERNATING METRICS TIMELINE                           */}
+        {/* Central Vertical Timeline + Symmetrical Left/Right Alternation  */}
+        {/* 01 LEFT → 02 RIGHT → 03 LEFT → 04 RIGHT                         */}
         {/* ============================================================== */}
         <div ref={metricsListRef} className="relative">
           
-          {/* Central Vertical Connecting Track (Desktop: Center | Mobile: Left) */}
+          {/* Central Vertical Connecting Line (Exact horizontal center) */}
           <div 
-            className="absolute top-4 bottom-8 pointer-events-none z-10
-              left-4 sm:left-6
-              lg:left-1/2 lg:-translate-x-1/2
-              w-[1px] bg-earth-border/60
-            "
+            className="absolute top-3 bottom-8 pointer-events-none z-10 left-1/2 -translate-x-1/2 w-[1px] bg-earth-border/60"
             aria-hidden="true"
           >
             {/* Scroll-driven Progress Indicator Fill */}
@@ -398,18 +315,17 @@ export const BenefitsStrip: React.FC = () => {
                 scaleY: shouldReduceMotion ? 1 : smoothProgress,
                 transformOrigin: 'top',
               }}
-              className="w-full h-full bg-gradient-to-b from-earth-forest via-earth-sage to-earth-forest/40"
+              className="w-full h-full bg-gradient-to-b from-earth-forest via-earth-sage to-earth-forest/50"
             />
           </div>
 
-          {/* Sequential Metric Chapters with Generous Separation */}
-          <div className="space-y-24 sm:space-y-32 lg:space-y-40">
+          {/* Four Alternating Metric Compositions with Generous Vertical Separation */}
+          <div className="space-y-28 sm:space-y-36 md:space-y-44 lg:space-y-52">
             {BENEFIT_STATS.map((stat, idx) => (
-              <MetricChapter
+              <MetricTimelineItem
                 key={stat.title}
                 stat={stat}
                 index={idx}
-                isEven={idx % 2 === 1}
                 shouldReduceMotion={shouldReduceMotion}
               />
             ))}
@@ -420,7 +336,7 @@ export const BenefitsStrip: React.FC = () => {
         {/* ============================================================== */}
         {/* Section Bottom Synthesis Note                                  */}
         {/* ============================================================== */}
-        <div className="mt-20 sm:mt-28 lg:mt-36 pt-8 border-t border-earth-border/60 flex flex-col sm:flex-row items-center justify-between text-[10px] font-mono tracking-widest text-earth-muted uppercase space-y-3 sm:space-y-0">
+        <div className="mt-24 sm:mt-32 md:mt-40 pt-8 border-t border-earth-border/60 flex flex-col sm:flex-row items-center justify-between text-[10px] font-mono tracking-widest text-earth-muted uppercase space-y-3 sm:space-y-0">
           <div className="flex items-center space-x-2">
             <span className="w-1.5 h-1.5 rounded-full bg-earth-forest" />
             <span>STANDARDIZED MEASUREMENT BOUNDARIES</span>
