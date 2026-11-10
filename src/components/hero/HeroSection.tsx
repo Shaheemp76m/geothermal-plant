@@ -56,9 +56,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenObservatory }) =
               className="w-full h-full object-cover object-[center_right] filter saturate-[0.96] contrast-[1.04]"
               loading="eager"
               fetchPriority="high"
-              decoding="sync"
+              decoding="async"
               width={1920}
-              height={1080}
+              height={1281}
             />
 
             {/* Soft daylight mist wash on upper-left to give the deep forest headline maximum editorial contrast */}
@@ -82,8 +82,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenObservatory }) =
                 
                 {/* Large Editorial Serif 3-Line Heading */}
                 <h1 
-                  className="font-editorial font-bold tracking-tight text-earth-forest leading-[0.88] sm:leading-[0.88] text-left"
-                  style={{ fontSize: 'clamp(3.5rem, 7.2vw, 7.5rem)' }}
+                  className="font-editorial font-bold tracking-tight text-earth-forest leading-[0.98] sm:leading-[0.92] text-left"
+                  style={{ fontSize: 'clamp(2.35rem, 6.8vw, 7.5rem)' }}
                 >
                   {headlineLines.map((line, idx) => (
                     <span key={idx} className="block overflow-hidden">

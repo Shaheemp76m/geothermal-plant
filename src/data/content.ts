@@ -33,8 +33,8 @@ export const HERO_CONTENT = {
   },
   ctaText: "EXPLORE THE ENERGY",
   ctaTarget: "#origins",
-  heroImage: "/images/hero/geothermal-landscape.webp",
-  heroImageAlt: "Dramatic geothermal landscape with steam rising from volcanic fissures in Iceland",
+  heroImage: "/images/hero/geothermal-hero.webp",
+  heroImageAlt: "Hellisheiði Geothermal Power Station nestled in the dramatic Hengill volcanic mountains",
 };
 
 export const INTRODUCTION_CONTENT = {
@@ -125,7 +125,7 @@ export const TECH_TYPES: GeothermalTechType[] = [
     temperature: "100°C – 180°C",
     process: "Brine transfers heat to an organic fluid with a lower boiling point. Vapor turns the turbine in a hermetically sealed closed loop.",
     application: "Moderate-temp sites, near-zero direct emissions",
-    efficiency: "Median life-cycle emissions: ~38 g CO₂/kWh"
+    efficiency: "Median life-cycle emissions: ~38 g CO₂-eq/kWh"
   },
   {
     name: "Flash Steam",
@@ -205,7 +205,7 @@ export const BENEFIT_STATS: BenefitStat[] = [
     suffix: "/7",
     unitLabel: "CONTINUOUS ANNUAL DISPATCH",
     title: "CONTINUOUS BASELOAD",
-    highlight: "8,760 hours annual dispatch",
+    highlight: "7,900–8,300 hours annual dispatch (90–95% availability)",
     description: "Geothermal resources can provide electricity and useful heat around the clock, helping support reliable energy systems.",
     qualification: "Refers to continuous thermal dispatchability and rotating mechanical inertia, independent of seasonal droughts, winter calms, or cloudy periods, subject to planned annual maintenance.",
     source: "International Energy Agency (IEA).",
@@ -312,7 +312,7 @@ export const IMPACT_POINTS: ImpactPoint[] = [
     tag: "AQUIFER PROTECTION",
     isStrength: false,
     description: "100% reinjection of extracted geothermal brine into the source formation is strictly required to preserve subterranean pressure, prevent ground subsidence, and shield shallow freshwater aquifers.",
-    qualification: "Modern binary facilities operate closed loops with negligible consumptive water loss. Flash plants require auxiliary cooling water."
+    qualification: "Modern binary facilities operate hermetic closed loops with near-zero consumptive fluid loss. Flash plants condense separated steam for cooling tower makeup, recycling condensed fluid without depleting external freshwater bodies."
   },
   {
     title: "Induced Seismicity Mitigation",
@@ -371,7 +371,7 @@ export const NEXT_GEN_TECH: NextGenTechEntry[] = [
 export const CLOSING_CONTENT = {
   eyebrow: "THE POWER OF CONTINUITY",
   headline: "Unlocking the Heat of the Planet.",
-  body: "The thermal energy contained within the top 10 kilometers of the Earth's crust exceeds all known fossil fuel reserves by a factor of fifty thousand. By uniting century-old hydrothermal engineering with advanced deep drilling and closed loops, humanity has the opportunity to unlock an omnipresent, clean, baseload energy foundation for generations to come.",
+  body: "The accessible thermal energy stored within the upper crust exceeds global fossil fuel reserves by several thousand times (MIT / Tester et al.). By uniting century-old hydrothermal engineering with advanced deep drilling and closed loops, humanity has the opportunity to unlock an omnipresent, clean, baseload energy foundation for generations to come.",
   ctaText: "BEGIN THE EXPLORATION",
   ctaTarget: "#top",
   image: "/images/misc/future-geothermal-frontier.webp",
@@ -402,9 +402,9 @@ export const SCIENTIFIC_REFERENCES: ReferenceItem[] = [
   },
   {
     source: "Intergovernmental Panel on Climate Change (IPCC)",
-    title: "Special Report on Renewable Energy Sources and Climate Change Mitigation (SRREN)",
-    year: "2018",
-    url: "https://www.ipcc.ch/report/renewable-energy-sources-and-climate-change-mitigation/",
-    description: "Standardized evaluation of high capacity factors (>90%), mineral scaling management, and environmental mitigation."
+    title: "Working Group III Sixth Assessment Report (AR6 WGIII) & SRREN",
+    year: "2022",
+    url: "https://www.ipcc.ch/report/ar6/wg3/",
+    description: "Standardized evaluation of lifecycle emissions (<50 g CO₂-eq/kWh), firm capacity factors (>90%), and environmental mitigation."
   }
 ];

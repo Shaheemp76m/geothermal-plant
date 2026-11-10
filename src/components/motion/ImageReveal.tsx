@@ -16,6 +16,11 @@ interface ImageRevealProps extends Omit<HTMLMotionProps<'div'>, 'children'> {
   delay?: number;
   duration?: number;
   enableHoverZoom?: boolean;
+  width?: number;
+  height?: number;
+  srcSet?: string;
+  sizes?: string;
+  fetchPriority?: 'high' | 'low' | 'auto';
   children?: React.ReactNode;
 }
 
@@ -31,6 +36,11 @@ export const ImageReveal: React.FC<ImageRevealProps> = ({
   delay = 0.1,
   duration = MOTION_DURATIONS.image,
   enableHoverZoom = true,
+  width,
+  height,
+  srcSet,
+  sizes,
+  fetchPriority,
   children,
   ...rest
 }) => {
@@ -42,8 +52,13 @@ export const ImageReveal: React.FC<ImageRevealProps> = ({
         <img
           src={src}
           alt={alt}
+          width={width}
+          height={height}
+          srcSet={srcSet}
+          sizes={sizes}
           loading={priority ? 'eager' : 'lazy'}
           decoding="async"
+          fetchPriority={priority ? 'high' : fetchPriority}
           className={cn('w-full h-full object-cover', imgClassName)}
         />
         {children}
@@ -94,15 +109,17 @@ export const ImageReveal: React.FC<ImageRevealProps> = ({
     >
       <motion.img
         variants={imageVariants}
+        whileHover={enableHoverZoom ? { scale: 1.04 } : undefined}
         src={src}
         alt={alt}
+        width={width}
+        height={height}
+        srcSet={srcSet}
+        sizes={sizes}
         loading={priority ? 'eager' : 'lazy'}
         decoding="async"
-        className={cn(
-          'w-full h-full object-cover',
-          enableHoverZoom ? 'group-hover:scale-105 transition-transform duration-700 ease-out' : '',
-          imgClassName
-        )}
+        fetchPriority={priority ? 'high' : fetchPriority}
+        className={cn('w-full h-full object-cover origin-center', imgClassName)}
       />
       {children}
     </motion.div>

@@ -34,7 +34,7 @@ const EditorialCounter: React.FC<EditorialCounterProps> = ({
   const [subCount, setSubCount] = useState(shouldReduceMotion && subNumber !== undefined ? subNumber : 0);
   const hasAnimated = useRef(false);
 
-  const justifyClass = align === 'right' ? 'justify-end' : 'justify-start';
+  const justifyClass = align === 'right' ? 'md:justify-end justify-start' : 'justify-start';
 
   useEffect(() => {
     if (shouldReduceMotion) {
@@ -78,7 +78,7 @@ const EditorialCounter: React.FC<EditorialCounterProps> = ({
   // Special layout for 24/7 continuous baseload
   if (subNumber !== undefined) {
     return (
-      <div className={`font-editorial text-[clamp(2.75rem,7.5vw,7.5rem)] font-bold text-earth-forest leading-[0.88] tracking-tight select-none inline-flex items-baseline w-full ${justifyClass}`}>
+      <div className={`font-editorial text-[clamp(2.75rem,7.5vw,7.5rem)] font-bold text-earth-forest leading-[0.88] tracking-tight inline-flex items-baseline w-full ${justifyClass}`}>
         <span>{count}</span>
         <span className="text-earth-sage mx-1 sm:mx-1.5 font-normal text-[0.85em]">/</span>
         <span>{subCount}</span>
@@ -87,7 +87,7 @@ const EditorialCounter: React.FC<EditorialCounterProps> = ({
   }
 
   return (
-    <div className={`font-editorial text-[clamp(2.75rem,7.5vw,7.5rem)] font-bold text-earth-forest leading-[0.88] tracking-tight select-none inline-flex items-baseline w-full ${justifyClass}`}>
+    <div className={`font-editorial text-[clamp(2.75rem,7.5vw,7.5rem)] font-bold text-earth-forest leading-[0.88] tracking-tight inline-flex items-baseline w-full ${justifyClass}`}>
       <span>{count}</span>
       <span className="text-earth-sage font-editorial font-normal text-[0.55em] ml-1.5 sm:ml-2 align-baseline tracking-normal">
         {suffix.trim()}
@@ -144,12 +144,8 @@ const MetricTimelineItem: React.FC<MetricTimelineItemProps> = ({
   const initialX = shouldReduceMotion ? 0 : isLeft ? -28 : 28;
 
   // Content alignment:
-  // Left metrics (01, 03): text-left items-start on mobile, text-right items-end on desktop
-  // Right metrics (02, 04): text-right items-end on mobile, text-left items-start on desktop
-  const mobileAlignClass = isLeft 
-    ? 'items-start text-left mr-auto' 
-    : 'items-end text-right ml-auto';
-
+  // Mobile (<768px): clean full-width left-aligned layout for optimal typography & readability
+  // Desktop (>=768px): alternating columns flanking the central vertical line
   const desktopAlignClass = isLeft 
     ? 'md:items-end md:text-right md:mr-0 md:ml-auto md:pr-10 lg:pr-16' 
     : 'md:items-start md:text-left md:ml-0 md:mr-auto md:pl-10 lg:pl-16';
@@ -196,7 +192,7 @@ const MetricTimelineItem: React.FC<MetricTimelineItemProps> = ({
             <div className="w-full">
               <div 
                 ref={contentRefCallback}
-                className={`relative z-10 flex flex-col w-[64%] sm:w-[66%] md:w-full max-w-[235px] sm:max-w-[260px] md:max-w-xl ${mobileAlignClass} ${desktopAlignClass}`}
+                className={`relative z-10 flex flex-col w-full max-w-xl items-start text-left ${desktopAlignClass}`}
               >
                 {/* Category Eyebrow - Target for Marker Baseline Alignment */}
                 <span 
@@ -238,7 +234,7 @@ const MetricTimelineItem: React.FC<MetricTimelineItemProps> = ({
                 {/* Fine Hairline Rule */}
                 <div 
                   className={`w-14 sm:w-16 h-[1px] bg-earth-border/80 my-2.5 sm:my-3 ${
-                    isLeft ? 'ml-0 md:ml-auto' : 'ml-auto md:ml-0'
+                    isLeft ? 'ml-0 md:ml-auto' : 'ml-0'
                   }`} 
                 />
 
@@ -262,7 +258,7 @@ const MetricTimelineItem: React.FC<MetricTimelineItemProps> = ({
             <div className="w-full">
               <div 
                 ref={contentRefCallback}
-                className={`relative z-10 flex flex-col w-[64%] sm:w-[66%] md:w-full max-w-[235px] sm:max-w-[260px] md:max-w-xl ${mobileAlignClass} ${desktopAlignClass}`}
+                className={`relative z-10 flex flex-col w-full max-w-xl items-start text-left ${desktopAlignClass}`}
               >
                 {/* Category Eyebrow - Target for Marker Baseline Alignment */}
                 <span 
@@ -304,7 +300,7 @@ const MetricTimelineItem: React.FC<MetricTimelineItemProps> = ({
                 {/* Fine Hairline Rule */}
                 <div 
                   className={`w-14 sm:w-16 h-[1px] bg-earth-border/80 my-2.5 sm:my-3 ${
-                    isLeft ? 'ml-0 md:ml-auto' : 'ml-auto md:ml-0'
+                    isLeft ? 'ml-0 md:ml-auto' : 'ml-0'
                   }`} 
                 />
 

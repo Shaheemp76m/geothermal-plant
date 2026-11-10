@@ -17,19 +17,25 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenObservatory }) => {
   const [activeNav, setActiveNav] = useState<string>('#origins');
 
   useEffect(() => {
+    let ticking = false;
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setIsScrolled(window.scrollY > 20);
 
-      // Simple active link detection
-      const sections = NAV_LINKS.map(link => document.querySelector(link.href));
-      const scrollPos = window.scrollY + 200;
+          // Simple active link detection
+          const scrollPos = window.scrollY + 200;
 
-      for (let i = sections.length - 1; i >= 0; i--) {
-        const section = sections[i] as HTMLElement | null;
-        if (section && section.offsetTop <= scrollPos) {
-          setActiveNav(NAV_LINKS[i].href);
-          break;
-        }
+          for (let i = NAV_LINKS.length - 1; i >= 0; i--) {
+            const section = document.querySelector(NAV_LINKS[i].href) as HTMLElement | null;
+            if (section && section.offsetTop <= scrollPos) {
+              setActiveNav(NAV_LINKS[i].href);
+              break;
+            }
+          }
+          ticking = false;
+        });
+        ticking = true;
       }
     };
 
@@ -93,7 +99,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenObservatory }) => {
           {/* Center: Navigation Links (Desktop) with LayoutId Indicator */}
           <nav 
             onMouseLeave={() => setHoveredNav(null)}
-            className="hidden lg:flex items-center space-x-7 xl:space-x-9 text-[11px] font-semibold tracking-[0.2em] text-earth-black/75"
+            className="hidden lg:flex items-center space-x-7 xl:space-x-9 font-sans text-[11px] sm:text-xs font-medium tracking-[0.22em] text-earth-black/75"
           >
             {NAV_LINKS.map((link) => {
               const isHovered = hoveredNav === link.href;
@@ -105,7 +111,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenObservatory }) => {
                   href={link.href}
                   onMouseEnter={() => setHoveredNav(link.href)}
                   onClick={(e) => handleNavClick(e, link.href)}
-                  className="hover:text-earth-forest transition-colors relative py-1.5 px-0.5 text-xs font-mono"
+                  className="hover:text-earth-forest transition-colors relative py-1.5 px-0.5 font-sans text-[11px] sm:text-xs tracking-[0.22em] font-medium uppercase"
                 >
                   <span className={isActive ? 'text-earth-forest font-bold' : ''}>
                     {link.label}

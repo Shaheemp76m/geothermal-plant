@@ -85,7 +85,7 @@ export const GEOLOGICAL_FEATURES: GeologicalFeature[] = [
     description:
       'Borehole engineered with corrosion-resistant titanium or chrome alloys that channels superheated subterranean fluid and steam upwards to the surface turbine generators.',
     physicsDetail:
-      'Hydrostatic pressure gradient propels fluid at sonic velocity without mechanical downhole pumps in high-enthalpy fields, relying on natural buoyancy and flashing physics.',
+      'Subsurface pressure differential and two-phase flashing lift propel thermal fluid upwards at 15–40 m/s without mechanical downhole pumps in high-enthalpy fields, governed by natural buoyancy and depressurization kinetics.',
     specs: [
       { label: 'FLOW RATE', value: '80 – 250 kg/second' },
       { label: 'CASING ALLOY', value: 'L-80 / 13Cr Corrosion Resistant' },
@@ -229,9 +229,9 @@ export const MYTH_QUESTIONS: MythQuestion[] = [
     isMyth: true,
     verdictTitle: 'SCIENTIFIC MYTH',
     scientificExplanation:
-      'Earth’s interior core heat is continuously replenished by the natural radioactive decay of long-lived isotopes (Uranium, Thorium, Potassium-40) in continental bedrock, generating ~47 Terawatts of heat outflow. Earth’s core has cooled by less than 500°C over 4.5 billion years. Total human energy consumption is a negligible fraction of this planetary heat engine.',
+      'Earth’s planetary heat outflow (~47 Terawatts) is driven by primordial heat from planetary accretion combined with continuous radiogenic decay of long-lived isotopes (Uranium, Thorium, Potassium-40) concentrated in the mantle and crust. Earth has cooled by less than 500°C over 4.5 billion years. Total annual human primary energy consumption is less than 0.4% of this planetary heat outflow, rendering regional geothermal extraction imperceptible to Earth’s thermal budget.',
     source: 'International Energy Agency (IEA) Geothermal Global Report',
-    keyMetric: { label: 'CRUSTAL RADIOGENIC OUTFLOW', value: '47 Terawatts Continuous' }
+    keyMetric: { label: 'PLANETARY HEAT OUTFLOW', value: '47 Terawatts Continuous' }
   },
   {
     id: 'emissions',
@@ -291,7 +291,7 @@ export const ENERGY_COMPARISONS: EnergyComparisonData[] = [
     capacityFactor: 92,
     capacityFactorDisplay: '92%',
     lifecycleEmissions: 38,
-    emissionsDisplay: '38 g CO₂/kWh',
+    emissionsDisplay: '38 g CO₂-eq/kWh',
     landFootprint: 400,
     landDisplay: '400 m² / GWh',
     dispatchProfile: '24/7 Firm Baseload',
@@ -305,7 +305,7 @@ export const ENERGY_COMPARISONS: EnergyComparisonData[] = [
     capacityFactor: 24,
     capacityFactorDisplay: '22% – 25%',
     lifecycleEmissions: 48,
-    emissionsDisplay: '48 g CO₂/kWh',
+    emissionsDisplay: '48 g CO₂-eq/kWh',
     landFootprint: 3200,
     landDisplay: '3,200 m² / GWh',
     dispatchProfile: 'Weather Intermittent',
@@ -319,7 +319,7 @@ export const ENERGY_COMPARISONS: EnergyComparisonData[] = [
     capacityFactor: 35,
     capacityFactorDisplay: '32% – 38%',
     lifecycleEmissions: 12,
-    emissionsDisplay: '12 g CO₂/kWh',
+    emissionsDisplay: '12 g CO₂-eq/kWh',
     landFootprint: 1300,
     landDisplay: '1,300 m² / GWh',
     dispatchProfile: 'Weather Intermittent',
@@ -333,7 +333,7 @@ export const ENERGY_COMPARISONS: EnergyComparisonData[] = [
     capacityFactor: 93,
     capacityFactorDisplay: '93%',
     lifecycleEmissions: 12,
-    emissionsDisplay: '12 g CO₂/kWh',
+    emissionsDisplay: '12 g CO₂-eq/kWh',
     landFootprint: 360,
     landDisplay: '360 m² / GWh',
     dispatchProfile: '24/7 Firm Baseload',
@@ -347,7 +347,7 @@ export const ENERGY_COMPARISONS: EnergyComparisonData[] = [
     capacityFactor: 58,
     capacityFactorDisplay: '55% – 60%',
     lifecycleEmissions: 490,
-    emissionsDisplay: '490 g CO₂/kWh',
+    emissionsDisplay: '490 g CO₂-eq/kWh',
     landFootprint: 600,
     landDisplay: '600 m² / GWh',
     dispatchProfile: 'Fuel Dispatched',

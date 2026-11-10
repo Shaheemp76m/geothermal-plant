@@ -25,7 +25,7 @@ const BALANCE_PAIRINGS = [
   {
     id: 'emissions',
     promise: 'Ultra-Low Lifecycle Carbon',
-    promiseContext: 'Median lifecycle emissions (~38–45 g CO₂/kWh) comparable to offshore wind, far below fossil fuels.',
+    promiseContext: 'Median lifecycle emissions (~38–45 g CO₂-eq/kWh) comparable to offshore wind, far below fossil fuels.',
     responsibility: 'Closed-Loop Fluid & Gas Containment',
     responsibilityContext: 'Modern binary power plants circulate brine through hermetic heat exchangers. In flash facilities, non-condensable gases (CO₂, H₂S) require catalytic abatement or mineralization (e.g. Carbfix).',
     metrics: '95% Less Carbon Than Coal ⇄ Hermetic Circuits'

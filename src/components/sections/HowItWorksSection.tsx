@@ -30,7 +30,7 @@ const PHASES: PhaseDetail[] = [
     title: 'Underground Heat',
     subtitle: 'Mantle Heat & Radioactive Decay',
     summary: 'Deep underground rock contains thermal energy originating from Earth\'s internal heat and radioactive decay.',
-    extended: 'Deep crystalline bedrock is continuously heated by conductive flow from the Earth\'s core and the natural decay of radioactive isotopes (uranium, thorium, potassium) within continental granites. Thermal gradients typically rise 25°C–30°C per kilometer, reaching temperatures between 150°C and 370°C+ in exploitable geothermal reservoirs.',
+    extended: 'Deep crystalline bedrock is continuously heated by conductive flow from Earth\'s mantle and the natural radiogenic decay of isotopes (uranium, thorium, potassium) within continental rock. While average continental gradients rise 25°C–30°C per kilometer, volcanic and tectonic rift zones feature elevated gradients (>60°C–100°C+/km), concentrating temperatures of 150°C to 370°C+ within accessible drilling depths of 1.5 to 5.0 kilometers.',
     thermodynamics: 'Subterranean enthalpy conductive & convective transfer',
     parameters: [
       { label: 'RESERVOIR TEMP', value: '150°C – 370°C+' },
@@ -102,6 +102,22 @@ export const HowItWorksSection: React.FC = () => {
   const [activePhase, setActivePhase] = useState(0);
   const shouldReduceMotion = useReducedMotionPreference();
 
+  const handlePhaseKeyDown = (e: React.KeyboardEvent, idx: number) => {
+    if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      const next = (idx + 1) % PHASES.length;
+      setActivePhase(next);
+      const nextBtn = document.getElementById(`phase-tab-${next}`);
+      nextBtn?.focus();
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      const prev = (idx - 1 + PHASES.length) % PHASES.length;
+      setActivePhase(prev);
+      const prevBtn = document.getElementById(`phase-tab-${prev}`);
+      prevBtn?.focus();
+    }
+  };
+
   // Custom TransitionPanel variants with vertical translation and blur as specified
   const panelVariants = {
     enter: {
@@ -167,7 +183,11 @@ export const HowItWorksSection: React.FC = () => {
             </span>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div 
+            role="tablist"
+            aria-label="Geothermal process phases"
+            className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4"
+          >
             {PHASES.map((p, idx) => {
               const IconComp = p.icon;
               const isActive = activePhase === idx;
@@ -175,9 +195,12 @@ export const HowItWorksSection: React.FC = () => {
               return (
                 <button
                   key={p.number}
+                  id={`phase-tab-${idx}`}
                   role="tab"
                   aria-selected={isActive}
                   aria-controls={`phase-panel-${idx}`}
+                  tabIndex={isActive ? 0 : -1}
+                  onKeyDown={(e) => handlePhaseKeyDown(e, idx)}
                   onClick={() => setActivePhase(idx)}
                   className={`text-left p-3.5 sm:p-5 border transition-all duration-300 relative group flex flex-col justify-between ${
                     isActive
@@ -188,7 +211,7 @@ export const HowItWorksSection: React.FC = () => {
                   {/* Active Indicator Top Line */}
                   {isActive && (
                     <motion.div
-                      layoutId="active-phase-top-bar"
+                      layoutId={shouldReduceMotion ? undefined : "active-phase-top-bar"}
                       className="absolute -top-[1px] left-0 right-0 h-[2px] bg-earth-sage"
                       transition={{ type: 'spring', stiffness: 350, damping: 30 }}
                     />
@@ -252,6 +275,7 @@ export const HowItWorksSection: React.FC = () => {
                   key={phase.number} 
                   id={`phase-panel-${idx}`}
                   role="tabpanel"
+                  aria-labelledby={`phase-tab-${idx}`}
                   className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center"
                 >
                   {/* Left Column: Comprehensive Technical Narrative */}

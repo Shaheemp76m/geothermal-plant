@@ -106,7 +106,7 @@ export const EnergyComparisonPanel: React.FC<EnergyComparisonPanelProps> = ({
         <div className="p-2.5 bg-[#151C18] border border-[#233027] rounded-lg space-y-2">
           <div className="flex items-center justify-between text-[10px] font-mono">
             <span className="text-white font-semibold uppercase tracking-wider">
-              LIFECYCLE EMISSIONS (g CO₂/kWh)
+              LIFECYCLE EMISSIONS (g CO₂-eq/kWh)
             </span>
             <span className="text-earth-sage text-[9px]">LOWER IS BETTER</span>
           </div>

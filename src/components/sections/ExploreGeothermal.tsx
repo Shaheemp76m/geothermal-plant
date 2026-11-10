@@ -110,6 +110,8 @@ export const ExploreGeothermal: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => toggleDetail(electricityApp.id)}
+                  aria-expanded={expandedId === electricityApp.id}
+                  aria-controls={`app-spec-${electricityApp.id}`}
                   className="inline-flex items-center space-x-2 text-xs font-mono tracking-wider uppercase text-earth-forest hover:text-earth-black transition-colors font-semibold"
                 >
                   <span>{expandedId === electricityApp.id ? 'Hide Specifications' : 'View Specifications'}</span>
@@ -119,20 +121,23 @@ export const ExploreGeothermal: React.FC = () => {
                 <AnimatePresence>
                   {expandedId === electricityApp.id && (
                     <motion.div
+                      id={`app-spec-${electricityApp.id}`}
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
                       transition={{ duration: shouldReduceMotion ? 0.05 : 0.3, ease: MOTION_EASINGS.editorial }}
-                      className="overflow-hidden mt-3 pt-3 border-t border-earth-border/60"
+                      className="overflow-hidden"
                     >
-                      <ul className="space-y-2 text-xs text-earth-black/75 font-sans">
-                        {electricityApp.details.map((detail, dIdx) => (
-                          <li key={dIdx} className="flex items-start space-x-2">
-                            <span className="text-earth-sage font-bold">·</span>
-                            <span>{detail}</span>
-                          </li>
-                        ))}
-                      </ul>
+                      <div className="mt-3 pt-3 border-t border-earth-border/60">
+                        <ul className="space-y-2 text-xs text-earth-black/75 font-sans">
+                          {electricityApp.details.map((detail, dIdx) => (
+                            <li key={dIdx} className="flex items-start space-x-2">
+                              <span className="text-earth-sage font-bold">·</span>
+                              <span>{detail}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -181,6 +186,8 @@ export const ExploreGeothermal: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => toggleDetail(districtApp.id)}
+                  aria-expanded={expandedId === districtApp.id}
+                  aria-controls={`app-spec-${districtApp.id}`}
                   className="inline-flex items-center space-x-2 text-xs font-mono tracking-wider uppercase text-earth-forest hover:text-earth-black transition-colors font-semibold"
                 >
                   <span>{expandedId === districtApp.id ? 'Hide Case Studies' : 'View Case Studies'}</span>
@@ -190,20 +197,23 @@ export const ExploreGeothermal: React.FC = () => {
                 <AnimatePresence>
                   {expandedId === districtApp.id && (
                     <motion.div
+                      id={`app-spec-${districtApp.id}`}
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
                       transition={{ duration: shouldReduceMotion ? 0.05 : 0.3, ease: MOTION_EASINGS.editorial }}
-                      className="overflow-hidden mt-3 pt-3 border-t border-earth-border/60"
+                      className="overflow-hidden"
                     >
-                      <ul className="space-y-2 text-xs text-earth-black/75 font-sans">
-                        {districtApp.details.map((detail, dIdx) => (
-                          <li key={dIdx} className="flex items-start space-x-2">
-                            <span className="text-earth-sage font-bold">·</span>
-                            <span>{detail}</span>
-                          </li>
-                        ))}
-                      </ul>
+                      <div className="mt-3 pt-3 border-t border-earth-border/60">
+                        <ul className="space-y-2 text-xs text-earth-black/75 font-sans">
+                          {districtApp.details.map((detail, dIdx) => (
+                            <li key={dIdx} className="flex items-start space-x-2">
+                              <span className="text-earth-sage font-bold">·</span>
+                              <span>{detail}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -243,6 +253,8 @@ export const ExploreGeothermal: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => toggleDetail(agricultureApp.id)}
+                  aria-expanded={expandedId === agricultureApp.id}
+                  aria-controls={`app-spec-${agricultureApp.id}`}
                   className="inline-flex items-center space-x-2 text-xs font-mono tracking-wider uppercase text-earth-forest hover:text-earth-black transition-colors font-semibold"
                 >
                   <span>{expandedId === agricultureApp.id ? 'Hide Applications' : 'View Mineral & Food Data'}</span>
@@ -252,20 +264,23 @@ export const ExploreGeothermal: React.FC = () => {
                 <AnimatePresence>
                   {expandedId === agricultureApp.id && (
                     <motion.div
+                      id={`app-spec-${agricultureApp.id}`}
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
                       transition={{ duration: shouldReduceMotion ? 0.05 : 0.3, ease: MOTION_EASINGS.editorial }}
-                      className="overflow-hidden mt-3 pt-3 border-t border-earth-border/60"
+                      className="overflow-hidden"
                     >
-                      <ul className="space-y-2 text-xs text-earth-black/75 font-sans">
-                        {agricultureApp.details.map((detail, dIdx) => (
-                          <li key={dIdx} className="flex items-start space-x-2">
-                            <span className="text-earth-sage font-bold">·</span>
-                            <span>{detail}</span>
-                          </li>
-                        ))}
-                      </ul>
+                      <div className="mt-3 pt-3 border-t border-earth-border/60">
+                        <ul className="space-y-2 text-xs text-earth-black/75 font-sans">
+                          {agricultureApp.details.map((detail, dIdx) => (
+                            <li key={dIdx} className="flex items-start space-x-2">
+                              <span className="text-earth-sage font-bold">·</span>
+                              <span>{detail}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -307,6 +322,8 @@ export const ExploreGeothermal: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => toggleDetail(residentialApp.id)}
+                  aria-expanded={expandedId === residentialApp.id}
+                  aria-controls={`app-spec-${residentialApp.id}`}
                   className="inline-flex items-center space-x-2 text-xs font-mono tracking-wider uppercase text-earth-forest hover:text-earth-black transition-colors font-semibold"
                 >
                   <span>{expandedId === residentialApp.id ? 'Hide Details' : 'Read COP & Seasonal Mechanism'}</span>
@@ -316,20 +333,23 @@ export const ExploreGeothermal: React.FC = () => {
                 <AnimatePresence>
                   {expandedId === residentialApp.id && (
                     <motion.div
+                      id={`app-spec-${residentialApp.id}`}
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
                       transition={{ duration: shouldReduceMotion ? 0.05 : 0.3, ease: MOTION_EASINGS.editorial }}
-                      className="overflow-hidden mt-3 pt-3 border-t border-earth-border/60"
+                      className="overflow-hidden"
                     >
-                      <ul className="space-y-1.5 text-xs text-earth-black/75 font-sans">
-                        {residentialApp.details.map((detail, dIdx) => (
-                          <li key={dIdx} className="flex items-start space-x-2">
-                            <span className="text-earth-sage font-bold">·</span>
-                            <span>{detail}</span>
-                          </li>
-                        ))}
-                      </ul>
+                      <div className="mt-3 pt-3 border-t border-earth-border/60">
+                        <ul className="space-y-1.5 text-xs text-earth-black/75 font-sans">
+                          {residentialApp.details.map((detail, dIdx) => (
+                            <li key={dIdx} className="flex items-start space-x-2">
+                              <span className="text-earth-sage font-bold">·</span>
+                              <span>{detail}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>

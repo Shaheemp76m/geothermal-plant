@@ -30,7 +30,7 @@ const TIMINGS = {
     cardDuration: 1.05, // 1050ms horizontal card transition
     easing: [0.22, 1, 0.36, 1] as const, // smooth editorial easeOutCubic
     textLockMs: 900, // 900ms input lock
-    cardLockMs: 1100, // 1100ms card transition lock
+    cardLockMs: 1550, // 1550ms card transition lock (420ms exit + 1050ms enter + buffer)
   },
   up: {
     // Fast, responsive, snappy backward review
@@ -40,7 +40,7 @@ const TIMINGS = {
     cardDuration: 0.38, // 380ms horizontal card transition
     easing: [0.16, 1, 0.3, 1] as const,
     textLockMs: 360, // 360ms fast reverse lock
-    cardLockMs: 440, // 440ms card reverse lock
+    cardLockMs: 720, // 720ms card reverse lock
   },
 };
 
@@ -275,11 +275,11 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
       const isAtEnd = cardIndex === NEXT_GEN_TECH.length - 1 && checkpoint === 3;
       const isAtStart = cardIndex === 0 && checkpoint === 0;
 
-      if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') {
+      if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ' || e.key === 'ArrowRight') {
         if (isAtEnd) return;
         e.preventDefault();
         advanceCheckpoint();
-      } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+      } else if (e.key === 'ArrowUp' || e.key === 'PageUp' || e.key === 'ArrowLeft') {
         if (isAtStart) return;
         e.preventDefault();
         previousCheckpoint();
@@ -508,6 +508,7 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
                   key={idx}
                   onClick={() => jumpToCard(idx)}
                   aria-label={`Jump to technology 0${idx + 1}`}
+                  aria-current={idx === activeCardIndex ? 'step' : undefined}
                   className={`w-5 h-5 rounded text-[9px] font-mono font-semibold flex items-center justify-center transition-all ${
                     idx === activeCardIndex
                       ? 'bg-earth-forest text-earth-ivory shadow-sm'
@@ -602,7 +603,7 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
                       duration: activeTimings.textDuration,
                       ease: activeTimings.easing,
                     }}
-                    className={activeCheckpoint >= 1 ? 'pointer-events-auto' : 'pointer-events-none select-none invisible'}
+                    className={activeCheckpoint >= 1 ? 'pointer-events-auto' : 'pointer-events-none select-none'}
                   >
                     <p className="font-editorial italic text-lg sm:text-2xl md:text-3xl text-earth-forest/85 leading-snug">
                       &ldquo;{currentTech.subtitle}&rdquo;
@@ -626,7 +627,7 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
                       delay: scrollDirection === 'down' ? activeTimings.staggerDelay : 0,
                       ease: activeTimings.easing,
                     }}
-                    className={activeCheckpoint >= 2 ? 'pointer-events-auto' : 'pointer-events-none select-none invisible'}
+                    className={activeCheckpoint >= 2 ? 'pointer-events-auto' : 'pointer-events-none select-none'}
                   >
                     <p
                       className="font-sans text-earth-black/80 max-w-3xl leading-relaxed border-l-2 border-earth-forest/30 pl-4 sm:pl-6"
@@ -653,7 +654,7 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
                       ease: activeTimings.easing,
                     }}
                     className={`w-full ${
-                      activeCheckpoint >= 3 ? 'pointer-events-auto' : 'pointer-events-none select-none invisible'
+                      activeCheckpoint >= 3 ? 'pointer-events-auto' : 'pointer-events-none select-none'
                     }`}
                   >
                     <div className="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-earth-border/40">
@@ -662,7 +663,7 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
                         <span className="font-semibold text-earth-forest">FIELD METRICS:</span>
                         <span>
                           {activeCardIndex === 0 && 'DOE FORGE UTAH TEST SITE · 2,700M GRANITE BEDROCK'}
-                          {activeCardIndex === 1 && 'HERMETIC SUBSURFACE RADIATOR · 100% RECIRCULATING CO₂'}
+                          {activeCardIndex === 1 && 'HERMETIC SUBSURFACE RADIATOR · 100% SEALED WORKING FLUID (WATER / sCO₂)'}
                           {activeCardIndex === 2 && 'SUPERCRITICAL WATER PHASE · 10× ENERGY DENSITY'}
                           {activeCardIndex === 3 && 'GYROTRON MILLIMETER-WAVE BEAM · 10–20 KM BASAL DRILLING'}
                         </span>

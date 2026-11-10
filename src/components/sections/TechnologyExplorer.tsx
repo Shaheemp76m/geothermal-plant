@@ -30,6 +30,22 @@ export const TechnologyExplorer: React.FC = () => {
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent, currentIdx: number) => {
+    if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      const next = (currentIdx + 1) % TECHNOLOGY_EXPLORER_DATA.length;
+      handleTabClick(next);
+      const nextBtn = document.getElementById(`tech-tab-${TECHNOLOGY_EXPLORER_DATA[next].id}`);
+      nextBtn?.focus();
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      const prev = (currentIdx - 1 + TECHNOLOGY_EXPLORER_DATA.length) % TECHNOLOGY_EXPLORER_DATA.length;
+      handleTabClick(prev);
+      const prevBtn = document.getElementById(`tech-tab-${TECHNOLOGY_EXPLORER_DATA[prev].id}`);
+      prevBtn?.focus();
+    }
+  };
+
   // Motion variants for active content transition with restrained blur and vertical glide
   const contentVariants = {
     initial: {
@@ -131,7 +147,7 @@ export const TechnologyExplorer: React.FC = () => {
           <div className="hidden md:block absolute top-[28px] left-[6%] right-[6%] h-[1px] bg-[#262824] z-0" aria-hidden="true">
             {/* Active Highlight Segment across spectrum */}
             <motion.div
-              className="h-[2px] bg-gradient-to-r from-earth-forest via-earth-sage to-earth-sage/80"
+              className="absolute top-0 h-[2px] bg-gradient-to-r from-earth-forest via-earth-sage to-earth-sage/80"
               initial={false}
               animate={{
                 left: `${(activeIdx / 3) * 85}%`,
@@ -163,6 +179,8 @@ export const TechnologyExplorer: React.FC = () => {
                   id={`tech-tab-${tech.id}`}
                   aria-selected={isActive}
                   aria-controls={`tech-panel-${tech.id}`}
+                  tabIndex={isActive ? 0 : -1}
+                  onKeyDown={(e) => handleKeyDown(e, idx)}
                   onClick={() => handleTabClick(idx)}
                   className={`group relative text-left p-4 sm:p-5 border transition-all duration-300 min-w-[230px] sm:min-w-[260px] md:min-w-0 shrink-0 md:shrink snap-start flex flex-col justify-between ${
                     isActive
@@ -173,7 +191,7 @@ export const TechnologyExplorer: React.FC = () => {
                   {/* Active Indicator Top Edge Bar */}
                   {isActive && (
                     <motion.div
-                      layoutId="active-tech-spectrum-bar"
+                      layoutId={shouldReduceMotion ? undefined : "active-tech-spectrum-bar"}
                       className="absolute -top-[1px] left-0 right-0 h-[2px] bg-earth-sage"
                       transition={{ type: 'spring', stiffness: 350, damping: 30 }}
                     />

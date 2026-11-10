@@ -86,7 +86,7 @@ export const GeothermalExplorerPanel: React.FC = () => {
         {/* Technical Preview Specimen */}
         <div className="relative rounded-2xl overflow-hidden bg-[#101915] border border-[#23352B] p-3 flex items-center justify-between group">
           {/* Miniature Geological & System Graphic */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 min-w-0 flex-1 mr-2">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-b from-[#182B21] via-[#2A4335] to-[#B33919] p-1 flex flex-col justify-between overflow-hidden shadow-inner border border-white/10 shrink-0">
               <div className="h-1.5 bg-[#466052] rounded-xs opacity-75" />
               <div className="h-2 bg-[#2D4638] rounded-xs opacity-80" />
@@ -95,14 +95,14 @@ export const GeothermalExplorerPanel: React.FC = () => {
               </div>
             </div>
 
-            <div className="space-y-0.5 text-left">
+            <div className="space-y-0.5 text-left min-w-0 flex-1">
               <span className="font-mono text-[9px] tracking-wider text-earth-sage uppercase block font-semibold">
                 {currentView.tag}
               </span>
-              <span className="text-xs font-editorial text-white font-medium block truncate max-w-[170px]">
+              <span className="text-xs font-editorial text-white font-medium block truncate">
                 {currentView.title}
               </span>
-              <span className="text-[10px] font-mono text-[#A3A199] block truncate max-w-[170px]">
+              <span className="text-[10px] font-mono text-[#A3A199] block truncate">
                 {currentView.detail}
               </span>
             </div>

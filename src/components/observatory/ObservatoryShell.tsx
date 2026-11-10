@@ -288,7 +288,7 @@ export const ObservatoryShell: React.FC<ObservatoryShellProps> = ({ onOpenArchiv
                   <div className="p-2 bg-[#141B16] border border-[#212C24] rounded space-y-1 text-[10px] font-mono text-[#829388]">
                     <div className="text-earth-sage font-semibold">ATTRIBUTES ASSESSED</div>
                     <div>1. Annual Capacity Factor (%)</div>
-                    <div>2. Lifecycle Carbon Intensity (g CO₂/kWh)</div>
+                    <div>2. Lifecycle Carbon Intensity (g CO₂-eq/kWh)</div>
                     <div>3. Surface Footprint (m²/GWh over 30y)</div>
                     <div>4. Rotational Synchronous Inertia</div>
                   </div>
