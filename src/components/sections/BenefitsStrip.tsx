@@ -18,7 +18,7 @@ interface EditorialCounterProps {
   duration?: number;
   isInView: boolean;
   shouldReduceMotion: boolean;
-  align?: 'left' | 'right';
+  isLeft: boolean;
 }
 
 const EditorialCounter: React.FC<EditorialCounterProps> = ({
@@ -28,13 +28,21 @@ const EditorialCounter: React.FC<EditorialCounterProps> = ({
   duration = 1600,
   isInView,
   shouldReduceMotion,
-  align = 'left',
+  isLeft,
 }) => {
   const [count, setCount] = useState(shouldReduceMotion ? value : 0);
   const [subCount, setSubCount] = useState(shouldReduceMotion && subNumber !== undefined ? subNumber : 0);
   const hasAnimated = useRef(false);
 
-  const justifyClass = align === 'right' ? 'md:justify-end justify-start' : 'justify-start';
+  // When isLeft is true (Metric 01, 03):
+  // Mobile (<768px): text is on left side of rope -> justify-start
+  // Desktop (>=768px): left column faces central timeline -> md:justify-end
+  // When isLeft is false (Metric 02, 04):
+  // Mobile (<768px): text is on right side of rope -> justify-end
+  // Desktop (>=768px): right column faces central timeline -> md:justify-start
+  const justifyClass = isLeft 
+    ? 'justify-start md:justify-end' 
+    : 'justify-end md:justify-start';
 
   useEffect(() => {
     if (shouldReduceMotion) {
@@ -78,7 +86,7 @@ const EditorialCounter: React.FC<EditorialCounterProps> = ({
   // Special layout for 24/7 continuous baseload
   if (subNumber !== undefined) {
     return (
-      <div className={`font-editorial text-[clamp(2.75rem,7.5vw,7.5rem)] font-bold text-earth-forest leading-[0.88] tracking-tight inline-flex items-baseline w-full ${justifyClass}`}>
+      <div className={`font-editorial text-[clamp(2.4rem,6.5vw,7.5rem)] font-bold text-earth-forest leading-[0.88] tracking-tight inline-flex items-baseline w-full ${justifyClass}`}>
         <span>{count}</span>
         <span className="text-earth-sage mx-1 sm:mx-1.5 font-normal text-[0.85em]">/</span>
         <span>{subCount}</span>
@@ -87,7 +95,7 @@ const EditorialCounter: React.FC<EditorialCounterProps> = ({
   }
 
   return (
-    <div className={`font-editorial text-[clamp(2.75rem,7.5vw,7.5rem)] font-bold text-earth-forest leading-[0.88] tracking-tight inline-flex items-baseline w-full ${justifyClass}`}>
+    <div className={`font-editorial text-[clamp(2.4rem,6.5vw,7.5rem)] font-bold text-earth-forest leading-[0.88] tracking-tight inline-flex items-baseline w-full ${justifyClass}`}>
       <span>{count}</span>
       <span className="text-earth-sage font-editorial font-normal text-[0.55em] ml-1.5 sm:ml-2 align-baseline tracking-normal">
         {suffix.trim()}
@@ -144,8 +152,16 @@ const MetricTimelineItem: React.FC<MetricTimelineItemProps> = ({
   const initialX = shouldReduceMotion ? 0 : isLeft ? -28 : 28;
 
   // Content alignment:
-  // Mobile (<768px): clean full-width left-aligned layout for optimal typography & readability
-  // Desktop (>=768px): alternating columns flanking the central vertical line
+  // Mobile (<768px): Alternating left/right of the continuous S-curve rope
+  // - Even index (01, 03): Left side of rope -> items-start text-left mr-auto
+  // - Odd index (02, 04): Right side of rope -> items-end text-right ml-auto
+  // Desktop (>=768px): Balanced 2-column alternating grid flanking the central vertical line
+  // - Even index (01, 03): Column 1 (Left column), facing central line -> md:items-end md:text-right md:mr-0 md:ml-auto md:pr-10 lg:pr-16
+  // - Odd index (02, 04): Column 2 (Right column), facing central line -> md:items-start md:text-left md:ml-0 md:mr-auto md:pl-10 lg:pl-16
+  const mobileAlignClass = isLeft 
+    ? 'items-start text-left mr-auto' 
+    : 'items-end text-right ml-auto';
+
   const desktopAlignClass = isLeft 
     ? 'md:items-end md:text-right md:mr-0 md:ml-auto md:pr-10 lg:pr-16' 
     : 'md:items-start md:text-left md:ml-0 md:mr-auto md:pl-10 lg:pl-16';
@@ -178,8 +194,8 @@ const MetricTimelineItem: React.FC<MetricTimelineItemProps> = ({
       {/* Desktop: 2-column alternating grid | Mobile: Single-column outer   */}
       {/* ------------------------------------------------------------------ */}
       <motion.div
-        initial={{ opacity: 0, x: initialX, y: 16 }}
-        animate={isInView ? { opacity: 1, x: 0, y: 0 } : { opacity: 0, x: initialX, y: 16 }}
+        initial={{ opacity: 0, x: initialX }}
+        animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: initialX }}
         transition={{
           duration: 0.75,
           ease: MOTION_EASINGS.editorial,
@@ -192,7 +208,7 @@ const MetricTimelineItem: React.FC<MetricTimelineItemProps> = ({
             <div className="w-full">
               <div 
                 ref={contentRefCallback}
-                className={`relative z-10 flex flex-col w-full max-w-xl items-start text-left ${desktopAlignClass}`}
+                className={`relative z-10 flex flex-col w-[64%] sm:w-[66%] md:w-full max-w-[240px] sm:max-w-[260px] md:max-w-xl ${mobileAlignClass} ${desktopAlignClass}`}
               >
                 {/* Category Eyebrow - Target for Marker Baseline Alignment */}
                 <span 
@@ -210,7 +226,7 @@ const MetricTimelineItem: React.FC<MetricTimelineItemProps> = ({
                     subNumber={stat.subNumber}
                     isInView={isInView}
                     shouldReduceMotion={shouldReduceMotion}
-                    align={isLeft ? 'left' : 'right'}
+                    isLeft={isLeft}
                   />
                 </div>
 
@@ -234,7 +250,7 @@ const MetricTimelineItem: React.FC<MetricTimelineItemProps> = ({
                 {/* Fine Hairline Rule */}
                 <div 
                   className={`w-14 sm:w-16 h-[1px] bg-earth-border/80 my-2.5 sm:my-3 ${
-                    isLeft ? 'ml-0 md:ml-auto' : 'ml-0'
+                    isLeft ? 'ml-0 mr-auto md:ml-auto md:mr-0' : 'ml-auto mr-0 md:ml-0 md:mr-auto'
                   }`} 
                 />
 
@@ -258,7 +274,7 @@ const MetricTimelineItem: React.FC<MetricTimelineItemProps> = ({
             <div className="w-full">
               <div 
                 ref={contentRefCallback}
-                className={`relative z-10 flex flex-col w-full max-w-xl items-start text-left ${desktopAlignClass}`}
+                className={`relative z-10 flex flex-col w-[64%] sm:w-[66%] md:w-full max-w-[240px] sm:max-w-[260px] md:max-w-xl ${mobileAlignClass} ${desktopAlignClass}`}
               >
                 {/* Category Eyebrow - Target for Marker Baseline Alignment */}
                 <span 
@@ -276,7 +292,7 @@ const MetricTimelineItem: React.FC<MetricTimelineItemProps> = ({
                     subNumber={stat.subNumber}
                     isInView={isInView}
                     shouldReduceMotion={shouldReduceMotion}
-                    align={isLeft ? 'left' : 'right'}
+                    isLeft={isLeft}
                   />
                 </div>
 
@@ -300,7 +316,7 @@ const MetricTimelineItem: React.FC<MetricTimelineItemProps> = ({
                 {/* Fine Hairline Rule */}
                 <div 
                   className={`w-14 sm:w-16 h-[1px] bg-earth-border/80 my-2.5 sm:my-3 ${
-                    isLeft ? 'ml-0 md:ml-auto' : 'ml-0'
+                    isLeft ? 'ml-0 mr-auto md:ml-auto md:mr-0' : 'ml-auto mr-0 md:ml-0 md:mr-auto'
                   }`} 
                 />
 
