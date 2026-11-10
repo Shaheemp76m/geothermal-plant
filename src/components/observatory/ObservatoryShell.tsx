@@ -54,10 +54,6 @@ export const ObservatoryShell: React.FC<ObservatoryShellProps> = ({ onOpenArchiv
 
   const handleSelectFeature = (id: string) => {
     setSelectedFeatureId(id);
-    // On mobile, auto-open bottom sheet when a feature is selected
-    if (window.innerWidth < 768) {
-      setMobileSheetOpen(true);
-    }
   };
 
   const handleModeChange = (mode: ObservatoryMode) => {
@@ -66,21 +62,21 @@ export const ObservatoryShell: React.FC<ObservatoryShellProps> = ({ onOpenArchiv
   };
 
   return (
-    <div className="relative w-full h-screen h-[100dvh] max-h-[100dvh] overflow-hidden bg-[#0C0D0B] text-[#F3F0E6] flex flex-col font-sans select-none">
+    <div className="fixed inset-0 w-full h-[100dvh] overflow-hidden bg-[#0B100E] text-[#F0EEE3] flex flex-col font-sans select-none z-50 overscroll-none">
       {/* ========================================================= */}
-      {/* 1. TOP HEADER (COMPACT APPLICATION APPARATUS)             */}
+      {/* 1. TOP HEADER (SCIENTIFIC BRAND & ACTIONS)                */}
       {/* ========================================================= */}
-      <header className="h-11 sm:h-12 border-b border-[#1E2621] bg-[#0E1310]/95 backdrop-blur-md px-3 sm:px-5 flex items-center justify-between shrink-0 z-30">
+      <header className="h-11 sm:h-12 border-b border-[#1F2722] bg-[#0E1310] px-3 sm:px-5 flex items-center justify-between shrink-0 z-30">
         {/* Left: Brand Identity */}
         <div className="flex items-center space-x-2.5 sm:space-x-3 min-w-0">
           <div className="flex items-center space-x-1.5">
-            <span className="w-2 h-2 rounded-full bg-earth-sage shadow-[0_0_8px_#8BAF91]" />
-            <h1 className="font-editorial text-sm sm:text-base font-semibold tracking-tight text-white uppercase truncate">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34D399]" />
+            <h1 className="font-editorial text-sm sm:text-base font-semibold tracking-tight text-[#F0EEE3] uppercase truncate">
               Geothermal Green
             </h1>
           </div>
           <span className="text-[#323E36] font-mono text-xs">/</span>
-          <span className="font-mono text-[9px] sm:text-[10px] tracking-widest uppercase text-earth-sage/90 font-semibold truncate hidden xs:inline">
+          <span className="font-mono text-[9px] sm:text-[10px] tracking-widest uppercase text-earth-sage font-semibold truncate hidden xs:inline">
             Subsurface Observatory
           </span>
         </div>
@@ -106,7 +102,7 @@ export const ObservatoryShell: React.FC<ObservatoryShellProps> = ({ onOpenArchiv
           {onOpenArchive && (
             <button
               onClick={onOpenArchive}
-              className="px-2.5 sm:px-3 py-1 rounded bg-[#16201A] border border-earth-sage/50 hover:bg-earth-forest text-earth-ivory font-mono text-[9px] sm:text-[10px] tracking-wider transition-all flex items-center space-x-1.5 shadow-sm active:scale-95"
+              className="px-2.5 sm:px-3 py-1 rounded bg-[#15231B] border border-earth-sage/50 hover:bg-earth-forest text-[#F0EEE3] font-mono text-[9px] sm:text-[10px] tracking-wider transition-all flex items-center space-x-1.5 shadow-sm active:scale-95"
               title="Return to full scrolling website"
             >
               <ArrowLeft className="w-3 h-3 text-earth-sage" />
@@ -116,7 +112,7 @@ export const ObservatoryShell: React.FC<ObservatoryShellProps> = ({ onOpenArchiv
 
           <button
             onClick={() => setReferencesOpen(true)}
-            className="px-2.5 py-1 rounded bg-[#18241D] border border-earth-sage/40 hover:bg-earth-forest text-earth-sage hover:text-white font-mono text-[9px] sm:text-[10px] tracking-wider transition-all flex items-center space-x-1"
+            className="px-2.5 py-1 rounded bg-[#15231B] border border-earth-sage/40 hover:bg-earth-forest text-earth-sage hover:text-[#F0EEE3] font-mono text-[9px] sm:text-[10px] tracking-wider transition-all flex items-center space-x-1"
             title="Scientific peer-reviewed references"
           >
             <Info className="w-3 h-3" />
@@ -126,13 +122,38 @@ export const ObservatoryShell: React.FC<ObservatoryShellProps> = ({ onOpenArchiv
       </header>
 
       {/* ========================================================= */}
-      {/* 2. MAIN SINGLE-VIEWPORT WORKSPACE (DESKTOP 3-COL / MOBILE) */}
+      {/* 2. COMPACT INSTRUMENT STATUS & TELEMETRY STRIP            */}
       {/* ========================================================= */}
-      <main className="flex-1 min-h-0 w-full overflow-hidden flex flex-col md:flex-row relative">
+      <div className="h-7 sm:h-8 border-b border-[#1F2722] bg-[#0A0E0C] px-3 sm:px-5 flex items-center justify-between shrink-0 z-20 text-[9px] sm:text-[10px] font-mono tracking-wider overflow-hidden">
+        <div className="flex items-center space-x-2 truncate min-w-0">
+          <span className="px-1.5 py-0.5 bg-[#15231B] border border-earth-sage/40 rounded text-earth-sage font-bold uppercase shrink-0">
+            {MODES.find((m) => m.id === activeMode)?.index} {MODES.find((m) => m.id === activeMode)?.name}
+          </span>
+          <span className="text-[#8C9E93] truncate hidden xs:inline">
+            {activeMode === 'underground' && 'STRATA & CONVEYANCE PROFILES (0–6,000M)'}
+            {activeMode === 'temperature' && `ENTHALPY SPECTRUM: ${temperature}°C · ${activeTempZone.techName}`}
+            {activeMode === 'myths' && 'HYPOTHESIS ASSESSMENT & EMPIRICAL GEOLOGY'}
+            {activeMode === 'comparison' && 'HEAD-TO-HEAD CLEAN ENERGY LCA'}
+          </span>
+        </div>
+
+        <div className="flex items-center space-x-2.5 sm:space-x-4 text-[#75887C] shrink-0 font-mono text-[9px]">
+          <span className="hidden sm:inline">CRUST: <span className="text-[#A2B5A8]">0 – 6,000M</span></span>
+          <span className="text-[#2C3831] hidden sm:inline">|</span>
+          <span>PRESSURE: <span className="text-[#A2B5A8]">10 – 35 MPa</span></span>
+          <span className="text-[#2C3831] hidden xs:inline">|</span>
+          <span className="hidden xs:inline">STATUS: <span className="text-earth-sage">HERMETIC CLOSED LOOP</span></span>
+        </div>
+      </div>
+
+      {/* ========================================================= */}
+      {/* 3. MAIN WORKSPACE (DESKTOP 3-COL / UNIFIED MOBILE VIEW)    */}
+      {/* ========================================================= */}
+      <main className="flex-1 min-h-0 w-full overflow-hidden flex flex-col md:flex-row relative bg-[#0B100E]">
         {/* ------------------------------------------------------- */}
         {/* DESKTOP LEFT COLUMN: NAVIGATION & TELEMETRY OVERVIEW    */}
         {/* ------------------------------------------------------- */}
-        <aside className="hidden md:flex flex-col w-[270px] lg:w-[290px] xl:w-[310px] border-r border-[#1B231D] bg-[#0E1310] shrink-0 p-3 lg:p-3.5 space-y-3.5 min-h-0 overflow-y-auto scrollbar-none">
+        <aside className="hidden md:flex flex-col w-[270px] lg:w-[290px] xl:w-[310px] border-r border-[#1F2722] bg-[#0E1310] shrink-0 p-3 lg:p-3.5 space-y-3 min-h-0 overflow-y-auto scrollbar-none">
           {/* Mode Navigation */}
           <ObservatoryNavigation
             activeMode={activeMode}
@@ -141,9 +162,8 @@ export const ObservatoryShell: React.FC<ObservatoryShellProps> = ({ onOpenArchiv
             shouldReduceMotion={shouldReduceMotion}
           />
 
-          {/* Contextual Mode Assistant Box */}
+          {/* Contextual Mode Left Column Content */}
           <div className="flex-1 min-h-0 flex flex-col justify-between space-y-3 pt-1">
-            {/* Mode-specific Left Panel Content */}
             <AnimatePresence mode="wait">
               {activeMode === 'underground' && (
                 <motion.div
@@ -156,7 +176,7 @@ export const ObservatoryShell: React.FC<ObservatoryShellProps> = ({ onOpenArchiv
                 >
                   <div className="flex items-center space-x-1.5 text-earth-sage font-mono text-[9px] tracking-widest uppercase font-semibold">
                     <Layers className="w-3 h-3" />
-                    <span>STRATA PROFILE (0–6,000M)</span>
+                    <span>STRATA &amp; CONVEYANCE (8 COMPONENTS)</span>
                   </div>
 
                   <div className="space-y-1">
@@ -168,12 +188,12 @@ export const ObservatoryShell: React.FC<ObservatoryShellProps> = ({ onOpenArchiv
                           onClick={() => handleSelectFeature(feat.id)}
                           className={`w-full text-left px-2.5 py-1.5 rounded border transition-all text-xs flex items-center justify-between ${
                             isSel
-                              ? 'bg-[#18251E] border-earth-sage/60 text-white font-medium'
-                              : 'bg-[#121614] border-[#1D2520] text-[#7E8F84] hover:text-[#C5D4CB] hover:bg-[#161B18]'
+                              ? 'bg-[#15231B] border-earth-sage/60 text-[#F0EEE3] font-medium shadow-sm'
+                              : 'bg-[#111714] border-[#1F2722] text-[#7E8F84] hover:text-[#C5D4CB] hover:bg-[#16201A]'
                           }`}
                         >
                           <div className="flex items-center space-x-2 truncate">
-                            <span className="font-mono text-[9px] text-earth-sage/90">
+                            <span className="font-mono text-[9px] text-earth-sage font-semibold">
                               0{idx + 1}
                             </span>
                             <span className="truncate">{feat.name}</span>
@@ -187,7 +207,7 @@ export const ObservatoryShell: React.FC<ObservatoryShellProps> = ({ onOpenArchiv
                   </div>
 
                   <p className="font-sans text-[11px] text-[#8C9E92] leading-relaxed pt-1">
-                    Click any geological layer or subterranean wellbore in the central cross-section to inspect measured thermodynamic parameters.
+                    Click any geological stratum or wellbore in the central cross-section to inspect measured thermodynamic parameters.
                   </p>
                 </motion.div>
               )}
@@ -206,7 +226,7 @@ export const ObservatoryShell: React.FC<ObservatoryShellProps> = ({ onOpenArchiv
                     <span>THERMODYNAMIC EQUILIBRIUM</span>
                   </div>
 
-                  <div className="p-2.5 bg-[#141B16] border border-[#212C24] rounded space-y-1.5 text-xs">
+                  <div className="p-2.5 bg-[#111714] border border-[#1F2722] rounded space-y-1.5 text-xs">
                     <div className="font-mono text-[9px] text-earth-sage uppercase">
                       GEOTHERMAL GRADIENT
                     </div>
@@ -218,15 +238,15 @@ export const ObservatoryShell: React.FC<ObservatoryShellProps> = ({ onOpenArchiv
                   <div className="space-y-1 text-[11px] font-mono">
                     <div className="flex justify-between py-1 border-b border-[#1A221C] text-[#7F9185]">
                       <span>SHALLOW GEO-EXCHANGE</span>
-                      <span className="text-white">10°C – 25°C</span>
+                      <span className="text-[#F0EEE3]">10°C – 25°C</span>
                     </div>
                     <div className="flex justify-between py-1 border-b border-[#1A221C] text-[#7F9185]">
                       <span>BINARY CYCLE (ORC)</span>
-                      <span className="text-white">100°C – 180°C</span>
+                      <span className="text-[#F0EEE3]">100°C – 180°C</span>
                     </div>
                     <div className="flex justify-between py-1 border-b border-[#1A221C] text-[#7F9185]">
                       <span>FLASH STEAM TURBINE</span>
-                      <span className="text-white">180°C – 260°C</span>
+                      <span className="text-[#F0EEE3]">180°C – 260°C</span>
                     </div>
                     <div className="flex justify-between py-1 border-b border-[#1A221C] text-[#7F9185]">
                       <span>SUPERCRITICAL FLUID</span>
@@ -254,7 +274,7 @@ export const ObservatoryShell: React.FC<ObservatoryShellProps> = ({ onOpenArchiv
                     Evaluating public perceptions against empirical geology, peer-reviewed thermodynamics, and international energy benchmarks.
                   </p>
 
-                  <div className="p-2.5 bg-[#141B16] border border-[#212C24] rounded space-y-1 text-[11px]">
+                  <div className="p-2.5 bg-[#111714] border border-[#1F2722] rounded space-y-1 text-[11px]">
                     <div className="font-mono text-[9px] text-earth-sage uppercase">
                       STANDARDS BENCHMARKED
                     </div>
@@ -285,7 +305,7 @@ export const ObservatoryShell: React.FC<ObservatoryShellProps> = ({ onOpenArchiv
                     Head-to-head metrics evaluate lifecycle cradle-to-grave emissions, physical land footprints, and real-world capacity factors across generation types.
                   </p>
 
-                  <div className="p-2 bg-[#141B16] border border-[#212C24] rounded space-y-1 text-[10px] font-mono text-[#829388]">
+                  <div className="p-2 bg-[#111714] border border-[#1F2722] rounded space-y-1 text-[10px] font-mono text-[#829388]">
                     <div className="text-earth-sage font-semibold">ATTRIBUTES ASSESSED</div>
                     <div>1. Annual Capacity Factor (%)</div>
                     <div>2. Lifecycle Carbon Intensity (g CO₂-eq/kWh)</div>
@@ -297,7 +317,7 @@ export const ObservatoryShell: React.FC<ObservatoryShellProps> = ({ onOpenArchiv
             </AnimatePresence>
 
             {/* Reservoir Thermodynamic Parameters */}
-            <div className="p-2.5 bg-[#121814] border border-[#1E2721] rounded-lg text-[10px] font-mono text-[#76877D] space-y-1">
+            <div className="p-2.5 bg-[#111714] border border-[#1F2722] rounded-lg text-[10px] font-mono text-[#76877D] space-y-1">
               <div className="flex items-center justify-between text-earth-sage font-semibold">
                 <span>RESERVOIR EQUILIBRIUM</span>
                 <span className="text-[#A2B5A8]">MASS BALANCED</span>
@@ -319,21 +339,10 @@ export const ObservatoryShell: React.FC<ObservatoryShellProps> = ({ onOpenArchiv
         {/* ------------------------------------------------------- */}
         <section
           aria-label="Interactive Subterranean Cross-Section"
-          className="flex-1 min-w-0 min-h-0 h-full relative flex flex-col items-center justify-center p-1 sm:p-2 lg:p-3 overflow-hidden bg-gradient-to-b from-[#0E1210] to-[#0A0D0B]"
+          className="flex-1 min-w-0 min-h-0 h-full relative flex flex-col items-center justify-between overflow-hidden bg-gradient-to-b from-[#0E1210] to-[#0A0D0B]"
         >
-          {/* Active Mode Mobile Indicator Bar (Mobile Only) */}
-          <div className="w-full flex md:hidden items-center justify-between px-2 pt-1 pb-1 z-20 text-[9px] font-mono text-[#7C8B82]">
-            <div className="flex items-center space-x-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-earth-sage" />
-              <span className="text-white font-semibold uppercase">
-                {MODES.find((m) => m.id === activeMode)?.name}
-              </span>
-            </div>
-            <span className="text-earth-sage">TAP ANY COMPONENT TO INSPECT</span>
-          </div>
-
-          {/* Central Geological SVG Cross Section (Permanently Mounted) */}
-          <div className="w-full h-full flex items-center justify-center min-h-0 relative">
+          {/* Central Geological SVG Cross Section (Enlarged Centerpiece) */}
+          <div className="w-full flex-1 min-h-0 flex items-center justify-center relative p-1 sm:p-2">
             <GeologicalCrossSection
               activeMode={activeMode}
               selectedFeatureId={selectedFeatureId}
@@ -344,29 +353,40 @@ export const ObservatoryShell: React.FC<ObservatoryShellProps> = ({ onOpenArchiv
             />
           </div>
 
-          {/* Mobile Bottom Quick Action Pill Floating Over Center */}
-          <div className="w-full md:hidden px-3 pb-2 z-20">
-            <div className="bg-[#121915]/90 backdrop-blur-md border border-[#243329] rounded-xl p-2.5 flex items-center justify-between shadow-xl">
+          {/* ======================================================= */}
+          {/* INTEGRATED ACTIVE COMPONENT INFORMATION BAR (MOBILE)    */}
+          {/* ======================================================= */}
+          <div className="w-full md:hidden shrink-0 border-t border-[#1F2722] bg-[#111714] px-3 py-2 z-20">
+            <div className="flex items-center justify-between">
               <div className="min-w-0 pr-2">
-                <div className="text-[9px] font-mono text-earth-sage uppercase">
-                  {activeMode === 'underground' && 'Active Component'}
-                  {activeMode === 'temperature' && `${temperature}°C Subsurface`}
-                  {activeMode === 'myths' && 'Hypothesis Challenge'}
-                  {activeMode === 'comparison' && 'Head-to-Head LCA'}
+                <div className="flex items-center space-x-1.5 text-[9px] font-mono text-[#8C9E93]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-earth-sage shrink-0" />
+                  <span className="px-1.5 py-0.2 bg-[#15231B] border border-earth-sage/30 rounded text-earth-sage uppercase font-semibold shrink-0">
+                    {activeMode === 'underground' && activeFeature.category}
+                    {activeMode === 'temperature' && 'THERMAL SPECTRUM'}
+                    {activeMode === 'myths' && 'HYPOTHESIS CHECK'}
+                    {activeMode === 'comparison' && 'LCA BENCHMARK'}
+                  </span>
+                  <span className="text-[#6C7E74] truncate">
+                    {activeMode === 'underground' && activeFeature.depth}
+                    {activeMode === 'temperature' && `${temperature}°C`}
+                    {activeMode === 'myths' && 'EMPIRICAL GEOLOGY'}
+                    {activeMode === 'comparison' && 'g CO₂-eq/kWh'}
+                  </span>
                 </div>
-                <div className="font-editorial text-sm font-medium text-white truncate">
+                <div className="font-editorial text-sm font-medium text-[#F0EEE3] truncate mt-0.5">
                   {activeMode === 'underground' && activeFeature.name}
                   {activeMode === 'temperature' && activeTempZone.techName}
-                  {activeMode === 'myths' && '4 Scientific Hypotheses'}
-                  {activeMode === 'comparison' && 'Clean Energy LCA Benchmark'}
+                  {activeMode === 'myths' && 'Scientific Hypotheses'}
+                  {activeMode === 'comparison' && 'Clean Energy Lifecycle Benchmark'}
                 </div>
               </div>
 
               <button
                 onClick={() => setMobileSheetOpen(true)}
-                className="px-3 py-1.5 rounded-lg bg-earth-forest border border-earth-sage/50 text-earth-ivory font-mono text-[10px] tracking-wider uppercase font-semibold flex items-center space-x-1 shrink-0 active:scale-95 transition-all shadow-md"
+                className="px-2.5 py-1.5 rounded bg-[#15231B] border border-earth-sage/50 text-[#F0EEE3] font-mono text-[9px] tracking-wider uppercase font-semibold flex items-center space-x-1 shrink-0 active:scale-95 transition-all shadow-sm"
               >
-                <span>DETAILS</span>
+                <span>INSPECT</span>
                 <ChevronUp className="w-3.5 h-3.5 text-earth-sage" />
               </button>
             </div>
@@ -376,7 +396,7 @@ export const ObservatoryShell: React.FC<ObservatoryShellProps> = ({ onOpenArchiv
         {/* ------------------------------------------------------- */}
         {/* DESKTOP RIGHT COLUMN: CONTEXTUAL INTERACTIVE INSPECTOR   */}
         {/* ------------------------------------------------------- */}
-        <aside className="hidden md:flex flex-col w-[320px] lg:w-[350px] xl:w-[370px] border-l border-[#1B231D] bg-[#0F1411] shrink-0 p-3 lg:p-3.5 min-h-0 overflow-y-auto scrollbar-none">
+        <aside className="hidden md:flex flex-col w-[320px] lg:w-[350px] xl:w-[370px] border-l border-[#1F2722] bg-[#0E1310] shrink-0 p-3 lg:p-3.5 min-h-0 overflow-y-auto scrollbar-none">
           <AnimatePresence mode="wait">
             {activeMode === 'underground' && (
               <motion.div
@@ -443,9 +463,9 @@ export const ObservatoryShell: React.FC<ObservatoryShellProps> = ({ onOpenArchiv
       </main>
 
       {/* ========================================================= */}
-      {/* 3. MOBILE FIXED BOTTOM NAVIGATION BAR                      */}
+      {/* 4. MOBILE ANCHORED BOTTOM NAVIGATION BAR                   */}
       {/* ========================================================= */}
-      <div className="md:hidden shrink-0 z-40">
+      <div className="md:hidden shrink-0 z-40 w-full bg-[#0E1310]">
         <ObservatoryNavigation
           activeMode={activeMode}
           onSelectMode={handleModeChange}
@@ -455,7 +475,7 @@ export const ObservatoryShell: React.FC<ObservatoryShellProps> = ({ onOpenArchiv
       </div>
 
       {/* ========================================================= */}
-      {/* 4. MOBILE BOTTOM SHEET INSPECTOR                           */}
+      {/* 5. MOBILE BOTTOM SHEET INSPECTOR                           */}
       {/* ========================================================= */}
       <SubsurfaceBottomSheet
         isOpen={mobileSheetOpen}
@@ -509,7 +529,7 @@ export const ObservatoryShell: React.FC<ObservatoryShellProps> = ({ onOpenArchiv
       </SubsurfaceBottomSheet>
 
       {/* ========================================================= */}
-      {/* 5. SCIENTIFIC REFERENCES MODAL                             */}
+      {/* 6. SCIENTIFIC REFERENCES MODAL                             */}
       {/* ========================================================= */}
       <ReferencesModal
         isOpen={referencesOpen}

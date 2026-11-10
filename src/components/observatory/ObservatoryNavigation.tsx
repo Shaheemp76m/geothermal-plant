@@ -59,7 +59,7 @@ export const ObservatoryNavigation: React.FC<ObservatoryNavigationProps> = ({
     return (
       <nav
         aria-label="Subsurface Observatory Mobile Navigation"
-        className="w-full bg-[#0E1310]/95 backdrop-blur-md border-t border-[#1F2722] px-2 py-1.5 flex items-center justify-around z-40 select-none pb-[calc(0.375rem+env(safe-area-inset-bottom,0px))]"
+        className="w-full bg-[#0E1310] border-t border-[#1F2722] px-2 pt-2 flex items-center justify-around z-40 select-none pb-[calc(0.5rem+env(safe-area-inset-bottom,0px))]"
       >
         {MODES.map((mode) => {
           const isActive = activeMode === mode.id;
@@ -68,14 +68,14 @@ export const ObservatoryNavigation: React.FC<ObservatoryNavigationProps> = ({
             <button
               key={mode.id}
               onClick={() => onSelectMode(mode.id)}
-              className={`flex-1 flex flex-col items-center justify-center py-1 px-1 rounded-md transition-all relative ${
-                isActive ? 'text-white' : 'text-[#7B8B82] hover:text-[#B2C2B8]'
+              className={`flex-1 flex flex-col items-center justify-center py-1.5 px-1 rounded-lg transition-all relative ${
+                isActive ? 'text-[#F0EEE3]' : 'text-[#7B8B82] hover:text-[#B2C2B8]'
               }`}
             >
               {isActive && (
                 <motion.div
                   layoutId={shouldReduceMotion ? undefined : 'activeNavPillMobile'}
-                  className="absolute inset-0 bg-[#16221B] border border-earth-sage/40 rounded-md -z-10"
+                  className="absolute inset-0 bg-[#15231B] border border-earth-sage/50 rounded-lg -z-10 shadow-sm"
                   transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                 />
               )}
@@ -85,7 +85,7 @@ export const ObservatoryNavigation: React.FC<ObservatoryNavigationProps> = ({
                   {mode.index}
                 </span>
               </div>
-              <span className="font-mono text-[9px] tracking-tight uppercase truncate max-w-[70px] mt-0.5">
+              <span className="font-mono text-[9.5px] tracking-tight uppercase truncate max-w-[76px] mt-0.5">
                 {mode.name.split(' ')[0]}
               </span>
             </button>

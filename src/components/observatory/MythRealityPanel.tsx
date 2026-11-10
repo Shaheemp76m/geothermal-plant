@@ -50,13 +50,13 @@ export const MythRealityPanel: React.FC<MythRealityPanelProps> = ({ shouldReduce
 
       {/* Main Interactive Statement Card */}
       <div className="flex-1 min-h-0 overflow-y-auto scrollbar-none space-y-3 pr-1">
-        <div className="p-3 bg-[#151C18] border border-[#233027] rounded-lg space-y-2">
+        <div className="p-3 bg-[#111714] border border-[#1F2722] rounded-lg space-y-2">
           <div className="flex items-center justify-between text-[9px] font-mono text-[#829287]">
             <span>HYPOTHESIS ASSESSMENT</span>
-            <span className="font-bold text-white">0{currentIdx + 1}</span>
+            <span className="font-bold text-[#F0EEE3]">0{currentIdx + 1}</span>
           </div>
 
-          <p className="font-editorial text-base sm:text-lg text-white font-medium leading-snug">
+          <p className="font-editorial text-base sm:text-lg text-[#F0EEE3] font-medium leading-snug">
             &ldquo;{currentQ.statement}&rdquo;
           </p>
 
@@ -67,9 +67,9 @@ export const MythRealityPanel: React.FC<MythRealityPanelProps> = ({ shouldReduce
               className={`py-2 px-3 rounded font-mono text-xs uppercase tracking-wider font-semibold transition-all border ${
                 currentAnswer === true
                   ? currentQ.isMyth
-                    ? 'bg-emerald-900/60 border-emerald-500 text-emerald-200'
-                    : 'bg-rose-900/60 border-rose-500 text-rose-200'
-                  : 'bg-[#19221C] text-[#C2CDC5] border-[#2B3830] hover:border-earth-sage hover:text-white'
+                    ? 'bg-emerald-950/70 border-emerald-500 text-emerald-200'
+                    : 'bg-rose-950/70 border-rose-500 text-rose-200'
+                  : 'bg-[#15231B] text-[#C2CDC5] border-[#1F2722] hover:border-earth-sage hover:text-[#F0EEE3]'
               }`}
             >
               MYTH
@@ -79,9 +79,9 @@ export const MythRealityPanel: React.FC<MythRealityPanelProps> = ({ shouldReduce
               className={`py-2 px-3 rounded font-mono text-xs uppercase tracking-wider font-semibold transition-all border ${
                 currentAnswer === false
                   ? !currentQ.isMyth
-                    ? 'bg-emerald-900/60 border-emerald-500 text-emerald-200'
-                    : 'bg-rose-900/60 border-rose-500 text-rose-200'
-                  : 'bg-[#19221C] text-[#C2CDC5] border-[#2B3830] hover:border-earth-sage hover:text-white'
+                    ? 'bg-emerald-950/70 border-emerald-500 text-emerald-200'
+                    : 'bg-rose-950/70 border-rose-500 text-rose-200'
+                  : 'bg-[#15231B] text-[#C2CDC5] border-[#1F2722] hover:border-earth-sage hover:text-[#F0EEE3]'
               }`}
             >
               REALITY

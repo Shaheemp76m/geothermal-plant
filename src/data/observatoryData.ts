@@ -5,7 +5,7 @@ export interface GeologicalFeature {
   name: string;
   depth: string;
   temperature: string;
-  category: 'SURFACE' | 'OVERBURDEN' | 'CONVEYANCE' | 'RESERVOIR' | 'HEAT SOURCE';
+  category: 'SURFACE' | 'OVERBURDEN' | 'CONVEYANCE' | 'RESERVOIR' | 'BASEMENT' | 'HEAT SOURCE';
   headline: string;
   description: string;
   physicsDetail: string;
@@ -20,15 +20,15 @@ export interface GeologicalFeature {
 export const GEOLOGICAL_FEATURES: GeologicalFeature[] = [
   {
     id: 'surface-plant',
-    name: 'Surface Power Plant & Substation',
-    depth: '0 meters (Surface)',
-    temperature: 'Ambient (15°C – 25°C)',
+    name: 'Surface Power Plant & Shallow Aquifer',
+    depth: '0 – 100 meters (Surface)',
+    temperature: 'Ambient (10°C – 25°C)',
     category: 'SURFACE',
     headline: 'High-Efficiency Thermodynamic Conversion Hall',
     description:
-      'Houses synchronous steam turbines or binary Organic Rankine Cycle heat exchangers. Vapor expansion drives generators producing clean electricity for the regional transmission grid.',
+      'Houses synchronous steam turbines or binary Organic Rankine Cycle heat exchangers. Vapor expansion drives generators producing clean baseload electricity for the regional transmission grid while strictly isolating the shallow potable water table.',
     physicsDetail:
-      'Turbine exhaust steam is condensed via air-cooled condenser arrays or cooling towers. 100% of the cooled geothermal brine is directed immediately into the reinjection manifold.',
+      'Turbine exhaust steam is condensed via air-cooled condenser arrays or cooling towers. 100% of the cooled geothermal brine is directed immediately into the reinjection manifold in a closed, hermetically sealed hydraulic circuit.',
     specs: [
       { label: 'CONVERSION CYCLE', value: 'Closed-Loop Organic Rankine / Flash Steam' },
       { label: 'GRID INERTIA', value: 'Physical Rotating Synchronous Inertia' },
@@ -38,10 +38,29 @@ export const GEOLOGICAL_FEATURES: GeologicalFeature[] = [
     highlightRegion: { yStart: 10, yEnd: 110, color: '#8BAF91' }
   },
   {
+    id: 'sedimentary-overburden',
+    name: 'Sedimentary Overburden Strata',
+    depth: '100 – 1,200 meters',
+    temperature: '25°C – 60°C',
+    category: 'OVERBURDEN',
+    headline: 'Porous Bedding Sequences & Groundwater Isolation',
+    description:
+      'Interbedded sandstone, siltstone, and mudstone formations deposited across geological epochs. Acts as a protective geological buffer between shallow surface hydrological systems and deeper geothermal regimes.',
+    physicsDetail:
+      'Multi-layer casing strings with pressurized cement sheaths physically decouple the circulating geothermal wellbore fluids from potable groundwater reservoirs in this interval.',
+    specs: [
+      { label: 'STRATA COMPOSITION', value: 'Sandstone, Siltstone, Alluvial Clays' },
+      { label: 'AQUIFER ISOLATION', value: 'Dual-Barrier Cemented Steel Casing' },
+      { label: 'THERMAL CONDUCTIVITY', value: '1.5 – 2.2 W/(m·K)' },
+      { label: 'PRESSURE GRADIENT', value: 'Hydrostatic (~9.8 kPa/meter)' }
+    ],
+    highlightRegion: { yStart: 110, yEnd: 215, color: '#3A423B' }
+  },
+  {
     id: 'impermeable-caprock',
-    name: 'Impermeable Caprock Shale',
-    depth: '0 – 1,500 meters',
-    temperature: '25°C – 90°C',
+    name: 'Impermeable Caprock Shale Seal',
+    depth: '1,200 – 2,000 meters',
+    temperature: '60°C – 120°C',
     category: 'OVERBURDEN',
     headline: 'Natural Thermal Insulation & Hydrostatic Seal',
     description:
@@ -54,12 +73,12 @@ export const GEOLOGICAL_FEATURES: GeologicalFeature[] = [
       { label: 'AQUIFER PROTECTION', value: 'Multi-Barrier Cemented Steel Casing' },
       { label: 'FORMATION AGE', value: 'Cenozoic – Mesozoic Marine Strata' }
     ],
-    highlightRegion: { yStart: 110, yEnd: 240, color: '#3A423B' }
+    highlightRegion: { yStart: 215, yEnd: 335, color: '#4A574E' }
   },
   {
     id: 'injection-well',
-    name: 'Closed-Loop Injection Well',
-    depth: '1,800 – 3,200 meters',
+    name: 'Closed-Loop Injection Wellbore',
+    depth: '0 – 3,200 meters',
     temperature: '65°C – 95°C (Cooled Brine)',
     category: 'CONVEYANCE',
     headline: 'Sustainable Subterranean Pressure Restoration',
@@ -73,12 +92,12 @@ export const GEOLOGICAL_FEATURES: GeologicalFeature[] = [
       { label: 'DOWNHOLE PRESSURE', value: '12 – 22 Megapascals' },
       { label: 'FLUID MEDIUM', value: 'Degassed Mineralized Brine' }
     ],
-    highlightRegion: { yStart: 110, yEnd: 540, color: '#5B8C7B' }
+    highlightRegion: { yStart: 110, yEnd: 520, color: '#5B8C7B' }
   },
   {
     id: 'production-well',
-    name: 'Pressurized Production Well',
-    depth: '2,000 – 3,500 meters',
+    name: 'Pressurized Production Wellbore',
+    depth: '0 – 3,500 meters',
     temperature: '180°C – 320°C (Thermal Fluid)',
     category: 'CONVEYANCE',
     headline: 'High-Velocity Hydrodynamic Energy Extraction',
@@ -92,12 +111,12 @@ export const GEOLOGICAL_FEATURES: GeologicalFeature[] = [
       { label: 'WELLHEAD PRESSURE', value: '0.8 – 2.5 MPa (Flash Steam)' },
       { label: 'OPERATIONAL LIFE', value: '30 – 50 Years per Wellbore' }
     ],
-    highlightRegion: { yStart: 110, yEnd: 540, color: '#C97A4A' }
+    highlightRegion: { yStart: 110, yEnd: 520, color: '#C97A4A' }
   },
   {
     id: 'hydrothermal-reservoir',
     name: 'Permeable Hydrothermal Reservoir',
-    depth: '2,200 – 3,800 meters',
+    depth: '2,000 – 3,500 meters',
     temperature: '200°C – 340°C',
     category: 'RESERVOIR',
     headline: 'Fractured High-Enthalpy Geothermal Aquifer',
@@ -111,26 +130,45 @@ export const GEOLOGICAL_FEATURES: GeologicalFeature[] = [
       { label: 'MINERAL CONTENT', value: 'Silica, Sodium, Potassium, Trace Lithium' },
       { label: 'RECHARGE RATE', value: 'Decades to Millennia Natural Balance' }
     ],
-    highlightRegion: { yStart: 340, yEnd: 540, color: '#A04D2D' }
+    highlightRegion: { yStart: 335, yEnd: 520, color: '#A04D2D' }
   },
   {
     id: 'crystalline-basement',
-    name: 'Crystalline Basement & Heat Plume',
-    depth: '4,000 – 6,000+ meters',
-    temperature: '350°C – 500°C+',
+    name: 'Crystalline Basement Strata',
+    depth: '3,500 – 5,000 meters',
+    temperature: '320°C – 450°C',
+    category: 'BASEMENT',
+    headline: 'Deep Impermeable Crystalline Continental Crust',
+    description:
+      'Dense granitic and metamorphic basement rocks with minimal natural porosity. Target of next-generation Enhanced Geothermal Systems (EGS) utilizing controlled permeability enhancement.',
+    physicsDetail:
+      'Thermal conduction through crystalline rock transfers massive thermal energy from deep magmatic and mantle heat upward toward permeable hydrothermal reservoirs.',
+    specs: [
+      { label: 'ROCK MATRIX', value: 'Granite, Granodiorite, Gneiss' },
+      { label: 'HEAT TRANSFER', value: 'Dominantly Conductive (~2.8 W/m·K)' },
+      { label: 'EGS POTENTIAL', value: 'Closed-Loop Supercritical Harvesting' },
+      { label: 'STRESS REGIME', value: 'Tectonic Strike-Slip / Extensional' }
+    ],
+    highlightRegion: { yStart: 520, yEnd: 630, color: '#7E361D' }
+  },
+  {
+    id: 'deep-heat-source',
+    name: 'Deep Mantle Heat & Magmatic Engine',
+    depth: '5,000 – 6,000+ meters',
+    temperature: '400°C – 600°C+',
     category: 'HEAT SOURCE',
     headline: 'Inexhaustible Primordial & Radiogenic Thermal Engine',
     description:
-      'Deep continental bedrock continuously energized by conductive heat transfer from Earth’s mantle and the radioactive decay of uranium, thorium, and potassium isotopes.',
+      'Deep continental root continuously energized by conductive heat transfer from Earth’s mantle and the radioactive decay of uranium, thorium, and potassium isotopes.',
     physicsDetail:
       'Represents Earth’s internal thermodynamic engine. Global crustal heat flux totals 47 Terawatts—conductive heat flow that has operated uninterrupted for 4.5 billion years.',
     specs: [
       { label: 'PLANETARY CORE HEAT', value: '4,000°C – 6,000°C Origin' },
       { label: 'GLOBAL HEAT FLUX', value: '47 Terawatts Continuous Outflow' },
       { label: 'HEAT MECHANISM', value: 'Primordial Accretion + Isotope Decay' },
-      { label: 'FUTURE POTENTIAL', value: 'Supercritical EGS (10x Power Density)' }
+      { label: 'DEPLETION RISK', value: 'Zero (Planetary Timescale Thermal Mass)' }
     ],
-    highlightRegion: { yStart: 540, yEnd: 690, color: '#D95C32' }
+    highlightRegion: { yStart: 630, yEnd: 720, color: '#D95C32' }
   }
 ];
 

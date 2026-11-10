@@ -46,8 +46,8 @@ export const EnergyComparisonPanel: React.FC<EnergyComparisonPanelProps> = ({
               onClick={() => setSelectedTargetId(source.id)}
               className={`px-2.5 py-1 rounded text-[10px] font-mono tracking-wider transition-all whitespace-nowrap shrink-0 border ${
                 isSelected
-                  ? 'bg-earth-forest text-white border-earth-sage font-bold'
-                  : 'bg-[#161B18] text-[#86958C] border-[#252E28] hover:text-white hover:border-[#38463D]'
+                  ? 'bg-[#15231B] text-[#F0EEE3] border-earth-sage font-bold'
+                  : 'bg-[#111714] text-[#86958C] border-[#1F2722] hover:text-[#F0EEE3] hover:border-[#2F3D34]'
               }`}
             >
               {source.name}
@@ -59,7 +59,7 @@ export const EnergyComparisonPanel: React.FC<EnergyComparisonPanelProps> = ({
       {/* Main Comparison Metrics Stream */}
       <div className="flex-1 min-h-0 overflow-y-auto scrollbar-none space-y-3 pr-1">
         {/* Metric 1: Capacity Factor (Higher is Better) */}
-        <div className="p-2.5 bg-[#151C18] border border-[#233027] rounded-lg space-y-2">
+        <div className="p-2.5 bg-[#111714] border border-[#1F2722] rounded-lg space-y-2">
           <div className="flex items-center justify-between text-[10px] font-mono">
             <span className="text-white font-semibold uppercase tracking-wider">
               CAPACITY FACTOR (AVAILABILITY)

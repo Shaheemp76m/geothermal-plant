@@ -36,17 +36,34 @@ export const UndergroundExplorerPanel: React.FC<UndergroundExplorerPanelProps> =
       <div className="shrink-0 flex space-x-1.5 overflow-x-auto scrollbar-none pb-1">
         {GEOLOGICAL_FEATURES.map((feat, idx) => {
           const isSelected = feat.id === selectedFeatureId;
+          const shortName =
+            feat.id === 'surface-plant'
+              ? 'Plant'
+              : feat.id === 'sedimentary-overburden'
+              ? 'Overburden'
+              : feat.id === 'impermeable-caprock'
+              ? 'Caprock'
+              : feat.id === 'injection-well'
+              ? 'Injection'
+              : feat.id === 'production-well'
+              ? 'Production'
+              : feat.id === 'hydrothermal-reservoir'
+              ? 'Reservoir'
+              : feat.id === 'crystalline-basement'
+              ? 'Basement'
+              : 'Heat Source';
+
           return (
             <button
               key={feat.id}
               onClick={() => onSelectFeature(feat.id)}
-              className={`px-2.5 py-1 rounded text-[10px] font-mono tracking-wider transition-all whitespace-nowrap shrink-0 border ${
+              className={`px-2 py-1 rounded text-[10px] font-mono tracking-wider transition-all whitespace-nowrap shrink-0 border ${
                 isSelected
-                  ? 'bg-earth-forest text-earth-ivory border-earth-sage font-bold'
-                  : 'bg-[#161B18] text-[#86958C] border-[#252E28] hover:text-white hover:border-[#3A483F]'
+                  ? 'bg-[#15231B] text-[#F0EEE3] border-earth-sage font-bold'
+                  : 'bg-[#111714] text-[#86958C] border-[#1F2722] hover:text-[#F0EEE3] hover:border-[#2F3D34]'
               }`}
             >
-              0{idx + 1} // {feat.name.split(' ')[0]}
+              0{idx + 1} · {shortName}
             </button>
           );
         })}

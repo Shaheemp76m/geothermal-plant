@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { GEOLOGICAL_FEATURES, ObservatoryMode, TemperatureZone } from '../../data/observatoryData';
+import { ObservatoryMode, TemperatureZone } from '../../data/observatoryData';
 
 interface GeologicalCrossSectionProps {
   activeMode: ObservatoryMode;
@@ -19,284 +19,373 @@ export const GeologicalCrossSection: React.FC<GeologicalCrossSectionProps> = ({
   activeTempZone,
   shouldReduceMotion,
 }) => {
-  // Find active feature
-  const activeFeature = GEOLOGICAL_FEATURES.find((f) => f.id === selectedFeatureId);
-
   // Depth marker calculation based on temperature in Mode 02
   const tempNormalized = Math.min(1, Math.max(0, (temperature - 10) / 390));
-  const activeThermalY = 120 + tempNormalized * 530; // Between 120px (surface) and 650px (deep basement)
+  const activeThermalY = 110 + tempNormalized * 570; // Maps 10°C–400°C across depth (110px surface to 680px deep)
 
   return (
-    <div className="relative w-full h-full flex flex-col items-center justify-center p-2 sm:p-3 overflow-hidden select-none">
-      {/* Visual Top Bar / Telemetry Stamp */}
-      <div className="absolute top-2 left-3 right-3 z-20 flex items-center justify-between text-[9px] sm:text-[10px] font-mono tracking-widest text-[#7C8B82] uppercase pointer-events-none">
-        <div className="flex items-center space-x-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-earth-sage" />
-          <span className="text-earth-sage font-semibold">GEOLOGICAL STRATA 0 – 6,000M</span>
-        </div>
-        <div className="flex items-center space-x-3 text-[9px]">
-          <span>PRESSURE: 10–35 MPa</span>
-          <span className="hidden sm:inline">THERMAL GRADIENT: 30°C/km</span>
-        </div>
-      </div>
-
+    <div className="relative w-full h-full flex flex-col items-center justify-center p-1 sm:p-2 overflow-hidden select-none">
       {/* SVG Canvas */}
       <svg
-        viewBox="0 0 900 720"
-        className="w-full h-full max-h-[100%] max-w-[100%] object-contain"
+        viewBox="0 0 960 720"
+        className="w-full h-full max-h-full max-w-full object-contain"
         preserveAspectRatio="xMidYMid meet"
         role="img"
         aria-label="Geological Cross-Section of Subterranean Geothermal Energy System"
       >
         <defs>
-          {/* Thermal Chamber Glow Gradient */}
-          <radialGradient id="magmaGlow" cx="50%" cy="100%" r="70%">
+          {/* Deep Magmatic Heat Plume Radial Gradient */}
+          <radialGradient id="magmaGlow" cx="50%" cy="100%" r="75%">
             <stop offset="0%" stopColor="#FF4A1C" stopOpacity="0.95" />
-            <stop offset="40%" stopColor="#D94B18" stopOpacity="0.65" />
-            <stop offset="75%" stopColor="#9E3210" stopOpacity="0.25" />
-            <stop offset="100%" stopColor="#1E1410" stopOpacity="0" />
+            <stop offset="35%" stopColor="#D94B18" stopOpacity="0.75" />
+            <stop offset="70%" stopColor="#8C2C0E" stopOpacity="0.35" />
+            <stop offset="100%" stopColor="#1E100B" stopOpacity="0" />
           </radialGradient>
 
-          {/* Reservoir Hydrothermal Heat */}
-          <radialGradient id="reservoirHeat" cx="50%" cy="50%" r="55%">
-            <stop offset="0%" stopColor="#E06D3B" stopOpacity="0.6" />
-            <stop offset="60%" stopColor="#C95928" stopOpacity="0.3" />
-            <stop offset="100%" stopColor="#141916" stopOpacity="0" />
+          {/* Concentrated Reservoir Hydrothermal Heat */}
+          <radialGradient id="reservoirHeat" cx="50%" cy="50%" r="60%">
+            <stop offset="0%" stopColor="#E06D3B" stopOpacity="0.7" />
+            <stop offset="45%" stopColor="#C95928" stopOpacity="0.45" />
+            <stop offset="80%" stopColor="#7A3418" stopOpacity="0.2" />
+            <stop offset="100%" stopColor="#181512" stopOpacity="0" />
           </radialGradient>
 
-          {/* Impermeable Caprock Texture Pattern */}
-          <pattern id="caprockPattern" width="40" height="20" patternUnits="userSpaceOnUse">
-            <line x1="0" y1="5" x2="40" y2="5" stroke="#252A26" strokeWidth="1" strokeDasharray="3 3" />
-            <line x1="0" y1="15" x2="40" y2="15" stroke="#252A26" strokeWidth="1" strokeDasharray="2 4" />
+          {/* Sedimentary Bedding Pattern */}
+          <pattern id="sedimentaryPattern" width="60" height="24" patternUnits="userSpaceOnUse">
+            <line x1="0" y1="6" x2="60" y2="6" stroke="#2B362F" strokeWidth="1" strokeDasharray="6 4" />
+            <line x1="0" y1="18" x2="60" y2="18" stroke="#243028" strokeWidth="0.8" strokeDasharray="3 5" />
           </pattern>
 
-          {/* Bedrock Fracture Pattern */}
-          <pattern id="fracturePattern" width="60" height="60" patternUnits="userSpaceOnUse">
-            <path d="M5 10 L25 35 L45 20 L55 50" stroke="#3D2920" strokeWidth="1.2" fill="none" opacity="0.65" />
-            <path d="M10 50 L30 40 L50 55" stroke="#4A3025" strokeWidth="0.8" fill="none" opacity="0.45" />
+          {/* Impermeable Caprock Shale Dense Laminations */}
+          <pattern id="caprockPattern" width="40" height="18" patternUnits="userSpaceOnUse">
+            <line x1="0" y1="4" x2="40" y2="4" stroke="#2A352E" strokeWidth="1.2" strokeDasharray="4 2" />
+            <line x1="0" y1="9" x2="40" y2="9" stroke="#1D2721" strokeWidth="1" strokeDasharray="2 4" />
+            <line x1="0" y1="14" x2="40" y2="14" stroke="#2A352E" strokeWidth="1.2" strokeDasharray="4 2" />
           </pattern>
 
-          {/* Production Fluid Linear Gradient */}
+          {/* Reservoir Fractured Joint Network Pattern */}
+          <pattern id="fracturePattern" width="80" height="80" patternUnits="userSpaceOnUse">
+            <path d="M10 15 L35 45 L65 25 L75 65" stroke="#E06D3B" strokeWidth="1.4" fill="none" opacity="0.4" />
+            <path d="M15 65 L40 50 L65 70" stroke="#FF7A3D" strokeWidth="1" fill="none" opacity="0.3" />
+            <path d="M5 40 L30 20 L55 35" stroke="#C95928" strokeWidth="0.8" fill="none" opacity="0.35" />
+          </pattern>
+
+          {/* Crystalline Basement Joint Pattern */}
+          <pattern id="basementPattern" width="70" height="70" patternUnits="userSpaceOnUse">
+            <path d="M10 20 L30 10 L50 35 L65 15" stroke="#5E2310" strokeWidth="1.2" fill="none" opacity="0.5" />
+            <path d="M15 55 L35 40 L55 60" stroke="#7A2D16" strokeWidth="1" fill="none" opacity="0.4" />
+          </pattern>
+
+          {/* Production Fluid Linear Gradient (Ascending Steam/Brine) */}
           <linearGradient id="productionFluid" x1="0" y1="1" x2="0" y2="0">
             <stop offset="0%" stopColor="#FF4A1C" />
-            <stop offset="60%" stopColor="#E06D3B" />
-            <stop offset="100%" stopColor="#FFB38A" />
+            <stop offset="40%" stopColor="#E06D3B" />
+            <stop offset="85%" stopColor="#FFA67A" />
+            <stop offset="100%" stopColor="#FFF2EB" />
           </linearGradient>
 
-          {/* Injection Fluid Linear Gradient */}
+          {/* Injection Fluid Linear Gradient (Descending Cooled Brine) */}
           <linearGradient id="injectionFluid" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#6EE7B7" />
-            <stop offset="60%" stopColor="#3B82F6" />
+            <stop offset="0%" stopColor="#60A5FA" />
+            <stop offset="50%" stopColor="#3B82F6" />
             <stop offset="100%" stopColor="#1D4ED8" />
           </linearGradient>
-
-          {/* Active Highlight Glow Filter */}
-          <filter id="activeGlow" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="6" result="blur" />
-            <feComposite in="SourceGraphic" in2="blur" operator="over" />
-          </filter>
         </defs>
 
-        {/* ---------------------------------------------------------- */}
-        {/* 1. SKY & SURFACE LEVEL (Y: 0 – 110)                        */}
-        {/* ---------------------------------------------------------- */}
-        <g id="sky-surface">
+        {/* ========================================================== */}
+        {/* STRATA 1: SURFACE POWER PLANT & SHALLOW AQUIFER (Y: 0–105) */}
+        {/* ========================================================== */}
+        <g
+          id="surface-plant-group"
+          className="cursor-pointer group"
+          onClick={() => onSelectFeature('surface-plant')}
+        >
           {/* Atmospheric Sky Backdrop */}
-          <rect x="0" y="0" width="900" height="110" fill="#0E1210" />
+          <rect x="0" y="0" width="960" height="105" fill="#0A0E0C" />
 
           {/* Distant Mountain Silhouettes */}
-          <polygon points="0,110 80,75 160,95 250,60 380,100 480,70 620,95 740,65 850,90 900,80 900,110" fill="#141A17" />
-          <polygon points="0,110 120,85 220,100 320,80 440,105 560,85 700,105 820,80 900,100 900,110" fill="#1B241F" />
+          <polygon
+            points="0,105 70,72 150,90 240,58 370,95 470,68 610,92 730,62 840,88 920,75 960,82 960,105"
+            fill="#121815"
+          />
+          <polygon
+            points="0,105 110,82 210,96 310,76 430,100 550,82 690,100 810,78 900,96 960,90 960,105"
+            fill="#18221D"
+          />
 
           {/* Surface Ground Line */}
-          <line x1="0" y1="110" x2="900" y2="110" stroke="#3D4A41" strokeWidth="2" />
-          <rect x="0" y="106" width="900" height="4" fill="#25322A" />
+          <line x1="0" y1="105" x2="960" y2="105" stroke="#3D4E43" strokeWidth="2" />
+          <rect x="0" y="101" width="960" height="4" fill="#25352B" />
 
-          {/* Surface Plant Building & Turbine Complex */}
-          <g 
-            id="surface-plant-group" 
-            className="cursor-pointer group"
-            onClick={() => onSelectFeature('surface-plant')}
+          {/* Turbine Generation Hall */}
+          <rect
+            x="450"
+            y="56"
+            width="135"
+            height="49"
+            rx="3"
+            fill={selectedFeatureId === 'surface-plant' ? '#1D3025' : '#141E18'}
+            stroke={selectedFeatureId === 'surface-plant' ? '#8BAF91' : '#2F4034'}
+            strokeWidth={selectedFeatureId === 'surface-plant' ? '2.5' : '1.5'}
+          />
+          {/* Industrial Pitched Roof */}
+          <polygon
+            points="445,56 517,36 590,56"
+            fill="#1C2720"
+            stroke={selectedFeatureId === 'surface-plant' ? '#8BAF91' : '#344539'}
+            strokeWidth="1.5"
+          />
+
+          {/* Turbine Hall Generator Status Windows */}
+          <rect x="465" y="66" width="18" height="22" rx="1" fill="#8BAF91" fillOpacity="0.85" />
+          <rect x="495" y="66" width="18" height="22" rx="1" fill="#8BAF91" fillOpacity="0.85" />
+          <rect x="525" y="66" width="18" height="22" rx="1" fill="#8BAF91" fillOpacity="0.85" />
+          <rect x="555" y="66" width="14" height="39" rx="1" fill="#233128" />
+
+          {/* Cooling Tower / Air-Cooled Condensers */}
+          <path
+            d="M 605 105 L 616 60 L 650 60 L 661 105 Z"
+            fill="#1A241E"
+            stroke="#344539"
+            strokeWidth="1.5"
+          />
+          <ellipse cx="633" cy="60" rx="17" ry="5" fill="#24332A" stroke="#3D5043" strokeWidth="1" />
+
+          {/* Condensation Steam Plume */}
+          <motion.path
+            d="M 625 57 Q 617 32 630 12 Q 643 -2 653 8 Q 647 32 640 57"
+            fill="white"
+            fillOpacity={shouldReduceMotion ? 0.35 : 0.45}
+            animate={
+              shouldReduceMotion
+                ? {}
+                : {
+                    d: [
+                      'M 625 57 Q 617 32 630 12 Q 643 -2 653 8 Q 647 32 640 57',
+                      'M 627 57 Q 640 35 625 10 Q 615 -2 633 6 Q 650 30 637 57',
+                      'M 625 57 Q 617 32 630 12 Q 643 -2 653 8 Q 647 32 640 57',
+                    ],
+                    opacity: [0.35, 0.55, 0.35],
+                  }
+            }
+            transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
+          />
+
+          {/* High-Voltage Grid Substation & Pylon */}
+          <path
+            d="M 700 105 L 715 35 L 730 105 M 705 60 L 725 60 M 698 80 L 732 80"
+            stroke="#3B4B40"
+            strokeWidth="1.5"
+            fill="none"
+          />
+          <line
+            x1="725"
+            y1="40"
+            x2="950"
+            y2="35"
+            stroke="#4A5C50"
+            strokeWidth="1.2"
+            strokeDasharray="4 4"
+          />
+
+          {/* Interactive Badge 01 */}
+          <circle
+            cx="517"
+            cy="36"
+            r="12"
+            fill="#0F241A"
+            stroke={selectedFeatureId === 'surface-plant' ? '#A3C7A9' : '#8BAF91'}
+            strokeWidth="2"
+          />
+          <text
+            x="517"
+            y="40"
+            textAnchor="middle"
+            fill="#8BAF91"
+            fontSize="9"
+            fontWeight="bold"
+            fontFamily="monospace"
           >
-            {/* Turbine Generation Hall */}
-            <rect 
-              x="420" 
-              y="62" 
-              width="130" 
-              height="48" 
-              rx="3" 
-              fill={selectedFeatureId === 'surface-plant' ? '#1D3025' : '#17201B'} 
-              stroke={selectedFeatureId === 'surface-plant' ? '#8BAF91' : '#2D3B31'} 
-              strokeWidth={selectedFeatureId === 'surface-plant' ? '2' : '1.5'} 
-            />
-            {/* Industrial Slanted Roof */}
-            <polygon points="415,62 485,42 555,62" fill="#202A24" stroke="#344339" strokeWidth="1.5" />
-
-            {/* Generator Hall Windows / Status LEDs */}
-            <rect x="435" y="72" width="18" height="22" rx="1" fill="#8BAF91" fillOpacity="0.8" />
-            <rect x="465" y="72" width="18" height="22" rx="1" fill="#8BAF91" fillOpacity="0.8" />
-            <rect x="495" y="72" width="18" height="22" rx="1" fill="#8BAF91" fillOpacity="0.8" />
-            <rect x="525" y="72" width="12" height="38" rx="1" fill="#232C26" />
-
-            {/* Cooling Towers / Air-Cooled Condensers */}
-            <path d="M 570 110 L 580 65 L 615 65 L 625 110 Z" fill="#1B221E" stroke="#344339" strokeWidth="1.5" />
-            <ellipse cx="597.5" cy="65" rx="17.5" ry="5" fill="#25302A" stroke="#3D4E43" strokeWidth="1" />
-
-            {/* Rising Condensation Steam Plumes */}
-            <motion.path
-              d="M 590 62 Q 582 35 595 15 Q 608 0 618 10 Q 612 35 605 62"
-              fill="white"
-              fillOpacity={shouldReduceMotion ? 0.35 : 0.45}
-              animate={
-                shouldReduceMotion
-                  ? {}
-                  : {
-                      d: [
-                        'M 590 62 Q 582 35 595 15 Q 608 0 618 10 Q 612 35 605 62',
-                        'M 592 62 Q 605 38 590 12 Q 580 0 598 8 Q 615 32 602 62',
-                        'M 590 62 Q 582 35 595 15 Q 608 0 618 10 Q 612 35 605 62',
-                      ],
-                      opacity: [0.35, 0.55, 0.35],
-                    }
-              }
-              transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
-            />
-
-            {/* Electrical Transmission Pylon */}
-            <path d="M 660 110 L 675 40 L 690 110 M 665 65 L 685 65 M 658 85 L 692 85" stroke="#3A483E" strokeWidth="1.5" fill="none" />
-            <line x1="685" y1="45" x2="890" y2="40" stroke="#4A5C50" strokeWidth="1" strokeDasharray="4 4" />
-
-            {/* Interactive Badge on Surface Plant */}
-            <circle cx="485" cy="40" r="12" fill="#10251C" stroke="#8BAF91" strokeWidth="1.5" />
-            <text x="485" y="44" textAnchor="middle" fill="#8BAF91" fontSize="9" fontWeight="bold" fontFamily="monospace">
-              01
-            </text>
-            <text x="485" y="22" textAnchor="middle" fill="#E8E6DF" fontSize="11" fontWeight="600" fontFamily="sans-serif">
-              POWER PLANT
-            </text>
-          </g>
-        </g>
-
-        {/* ---------------------------------------------------------- */}
-        {/* 2. STRATIGRAPHIC LAYER 1: UPPER SEDIMENTARY (Y: 110 – 220) */}
-        {/* ---------------------------------------------------------- */}
-        <g 
-          id="layer-sedimentary" 
-          className="cursor-pointer"
-          onClick={() => onSelectFeature('impermeable-caprock')}
-        >
-          <rect 
-            x="0" 
-            y="110" 
-            width="900" 
-            height="110" 
-            fill={selectedFeatureId === 'impermeable-caprock' ? '#1F2420' : '#141815'} 
-            stroke="#242B26" 
-            strokeWidth="1" 
-          />
-          <rect x="0" y="110" width="900" height="110" fill="url(#caprockPattern)" opacity="0.4" />
-
-          {/* Depth Callout Left */}
-          <text x="14" y="130" fill="#6A776F" fontSize="9" fontFamily="monospace" letterSpacing="0.1em">
-            0 M · SHALLOW WATER TABLE
+            01
           </text>
-          <text x="14" y="215" fill="#6A776F" fontSize="9" fontFamily="monospace" letterSpacing="0.1em">
-            -800 M · SEDIMENTARY OVERBURDEN
+          <text
+            x="517"
+            y="20"
+            textAnchor="middle"
+            fill="#F0EEE3"
+            fontSize="11"
+            fontWeight="600"
+            fontFamily="sans-serif"
+          >
+            01 · SURFACE CONVERSION PLANT
           </text>
         </g>
 
-        {/* ---------------------------------------------------------- */}
-        {/* 3. STRATIGRAPHIC LAYER 2: IMPERMEABLE CAPROCK (Y: 220 – 350)*/}
-        {/* ---------------------------------------------------------- */}
-        <g 
-          id="layer-caprock" 
+        {/* ========================================================== */}
+        {/* STRATA 2: SEDIMENTARY OVERBURDEN (Y: 105–215, 100–1,200M)  */}
+        {/* ========================================================== */}
+        <g
+          id="layer-sedimentary"
           className="cursor-pointer"
-          onClick={() => onSelectFeature('impermeable-caprock')}
+          onClick={() => onSelectFeature('sedimentary-overburden')}
         >
-          <rect 
-            x="0" 
-            y="220" 
-            width="900" 
-            height="130" 
-            fill={selectedFeatureId === 'impermeable-caprock' ? '#252B26' : '#1A1F1B'} 
-            stroke={selectedFeatureId === 'impermeable-caprock' ? '#8BAF91' : '#2D352E'} 
-            strokeWidth={selectedFeatureId === 'impermeable-caprock' ? '1.5' : '1'} 
+          <rect
+            x="0"
+            y="105"
+            width="960"
+            height="110"
+            fill={selectedFeatureId === 'sedimentary-overburden' ? '#1C251F' : '#121714'}
+            stroke={selectedFeatureId === 'sedimentary-overburden' ? '#8BAF91' : '#222B25'}
+            strokeWidth={selectedFeatureId === 'sedimentary-overburden' ? '2' : '1'}
           />
-          <rect x="0" y="220" width="900" height="130" fill="url(#caprockPattern)" opacity="0.8" />
+          <rect x="0" y="105" width="960" height="110" fill="url(#sedimentaryPattern)" opacity="0.6" />
 
-          {/* Caprock Label */}
-          <text x="50" y="275" fill="#9BA69F" fontSize="12" fontWeight="600" fontFamily="sans-serif">
-            IMPERMEABLE CAPROCK SHALE FORMATION
-          </text>
-          <text x="50" y="295" fill="#6E7B73" fontSize="10" fontFamily="monospace">
-            Thermal seal · Hydraulic conductivity &lt;10⁻¹² m/s · Isolates aquifers
-          </text>
+          {/* Shallow Potable Water Table Horizon Indicator */}
+          <rect x="0" y="105" width="960" height="24" fill="#2E4A62" fillOpacity="0.15" />
+          <line x1="0" y1="129" x2="960" y2="129" stroke="#3B658A" strokeWidth="1" strokeDasharray="4 4" opacity="0.6" />
 
-          {/* Interactive Badge */}
-          <circle cx="28" cy="275" r="10" fill="#17221B" stroke="#8BAF91" strokeWidth="1.5" />
-          <text x="28" y="278.5" textAnchor="middle" fill="#8BAF91" fontSize="8" fontWeight="bold" fontFamily="monospace">
+          {/* Interactive Badge 02 */}
+          <circle
+            cx="32"
+            cy="158"
+            r="11"
+            fill="#14211A"
+            stroke={selectedFeatureId === 'sedimentary-overburden' ? '#A3C7A9' : '#8BAF91'}
+            strokeWidth="1.75"
+          />
+          <text
+            x="32"
+            y="162"
+            textAnchor="middle"
+            fill="#8BAF91"
+            fontSize="9"
+            fontWeight="bold"
+            fontFamily="monospace"
+          >
             02
           </text>
 
+          {/* Strata Title & Subtitle */}
+          <text x="54" y="154" fill="#BAC8BE" fontSize="11" fontWeight="600" fontFamily="sans-serif">
+            02 · SEDIMENTARY OVERBURDEN &amp; SHALLOW AQUIFERS (0 – 1,200M)
+          </text>
+          <text x="54" y="170" fill="#75887C" fontSize="9.5" fontFamily="monospace">
+            Potable groundwater table · Cement-cased well isolation · Sandstone &amp; mudstone
+          </text>
+
           {/* Depth Callout */}
-          <text x="14" y="340" fill="#6A776F" fontSize="9" fontFamily="monospace">
-            -1,500 M · BASAL CAPROCK SEAL
+          <text x="940" y="205" textAnchor="end" fill="#5F7366" fontSize="9" fontFamily="monospace">
+            -1,200 M · BASAL OVERBURDEN
           </text>
         </g>
 
-        {/* ---------------------------------------------------------- */}
-        {/* 4. STRATIGRAPHIC LAYER 3: HYDROTHERMAL RESERVOIR (350–540) */}
-        {/* ---------------------------------------------------------- */}
-        <g 
-          id="layer-reservoir" 
+        {/* ========================================================== */}
+        {/* STRATA 3: IMPERMEABLE CAPROCK SEAL (Y: 215–335, 1,200–2,000M)*/}
+        {/* ========================================================== */}
+        <g
+          id="layer-caprock"
+          className="cursor-pointer"
+          onClick={() => onSelectFeature('impermeable-caprock')}
+        >
+          <rect
+            x="0"
+            y="215"
+            width="960"
+            height="120"
+            fill={selectedFeatureId === 'impermeable-caprock' ? '#222C25' : '#161C18'}
+            stroke={selectedFeatureId === 'impermeable-caprock' ? '#8BAF91' : '#2A362D'}
+            strokeWidth={selectedFeatureId === 'impermeable-caprock' ? '2' : '1'}
+          />
+          <rect x="0" y="215" width="960" height="120" fill="url(#caprockPattern)" opacity="0.85" />
+
+          {/* Interactive Badge 03 */}
+          <circle
+            cx="32"
+            cy="270"
+            r="11"
+            fill="#17261D"
+            stroke={selectedFeatureId === 'impermeable-caprock' ? '#A3C7A9' : '#8BAF91'}
+            strokeWidth="1.75"
+          />
+          <text
+            x="32"
+            y="274"
+            textAnchor="middle"
+            fill="#8BAF91"
+            fontSize="9"
+            fontWeight="bold"
+            fontFamily="monospace"
+          >
+            03
+          </text>
+
+          {/* Caprock Label */}
+          <text x="54" y="266" fill="#D2DCD4" fontSize="11" fontWeight="600" fontFamily="sans-serif">
+            03 · IMPERMEABLE CAPROCK SHALE SEAL (1,200 – 2,000M)
+          </text>
+          <text x="54" y="282" fill="#84998C" fontSize="9.5" fontFamily="monospace">
+            Thermal seal · Hydraulic conductivity &lt;10⁻¹² m/s · Hydrothermal pressure containment
+          </text>
+
+          {/* Depth Callout */}
+          <text x="940" y="325" textAnchor="end" fill="#697D71" fontSize="9" fontFamily="monospace">
+            -2,000 M · BASAL CAPROCK SEAL
+          </text>
+        </g>
+
+        {/* ========================================================== */}
+        {/* STRATA 4: HYDROTHERMAL RESERVOIR (Y: 335–520, 2,000–3,500M)*/}
+        {/* ========================================================== */}
+        <g
+          id="layer-reservoir"
           className="cursor-pointer"
           onClick={() => onSelectFeature('hydrothermal-reservoir')}
         >
-          <rect 
-            x="0" 
-            y="350" 
-            width="900" 
-            height="190" 
-            fill={selectedFeatureId === 'hydrothermal-reservoir' ? '#2D201A' : '#1A1715'} 
-            stroke={selectedFeatureId === 'hydrothermal-reservoir' ? '#E06D3B' : '#33241D'} 
-            strokeWidth={selectedFeatureId === 'hydrothermal-reservoir' ? '2' : '1'} 
-          />
-          
-          {/* Reservoir Ambient Thermal Heat Glow */}
-          <ellipse cx="480" cy="445" rx="360" ry="85" fill="url(#reservoirHeat)" />
-          <rect x="0" y="350" width="900" height="190" fill="url(#fracturePattern)" opacity="0.6" />
-
-          {/* Naturally Fractured Fissure Network */}
-          <path 
-            d="M 330 460 Q 380 430 440 455 Q 490 475 550 440 Q 600 425 640 450" 
-            stroke="#E06D3B" 
-            strokeWidth="2.5" 
-            fill="none" 
-            strokeDasharray="6 3" 
-            opacity="0.85" 
-          />
-          <path 
-            d="M 350 420 Q 400 440 460 415 Q 520 400 580 430 Q 620 460 670 435" 
-            stroke="#FF7A3D" 
-            strokeWidth="1.75" 
-            fill="none" 
-            strokeDasharray="4 4" 
-            opacity="0.75" 
-          />
-          <path 
-            d="M 360 490 Q 420 470 480 495 Q 540 510 610 480" 
-            stroke="#C95928" 
-            strokeWidth="2" 
-            fill="none" 
-            strokeDasharray="5 4" 
-            opacity="0.7" 
+          <rect
+            x="0"
+            y="335"
+            width="960"
+            height="185"
+            fill={selectedFeatureId === 'hydrothermal-reservoir' ? '#2F1E16' : '#1A1411'}
+            stroke={selectedFeatureId === 'hydrothermal-reservoir' ? '#E06D3B' : '#382218'}
+            strokeWidth={selectedFeatureId === 'hydrothermal-reservoir' ? '2.5' : '1'}
           />
 
-          {/* Subterranean Convective Circulation Loop (Between Wells) */}
-          <motion.path
-            d="M 360 450 C 410 510, 520 510, 580 460"
+          {/* Concentrated Reservoir Ambient Thermal Glow */}
+          <ellipse cx="490" cy="425" rx="420" ry="85" fill="url(#reservoirHeat)" />
+          <rect x="0" y="335" width="960" height="185" fill="url(#fracturePattern)" opacity="0.6" />
+
+          {/* Permeable Fractured Fissure Network */}
+          <path
+            d="M 340 440 Q 400 410 470 435 Q 530 455 600 420 Q 660 405 700 430"
             stroke="#E06D3B"
+            strokeWidth="2.5"
+            fill="none"
+            strokeDasharray="6 4"
+            opacity="0.85"
+          />
+          <path
+            d="M 370 400 Q 430 420 500 395 Q 570 380 630 410 Q 680 440 730 415"
+            stroke="#FF7A3D"
+            strokeWidth="1.75"
+            fill="none"
+            strokeDasharray="4 4"
+            opacity="0.75"
+          />
+          <path
+            d="M 380 470 Q 450 450 520 475 Q 590 490 660 460"
+            stroke="#C95928"
             strokeWidth="2"
+            fill="none"
+            strokeDasharray="5 4"
+            opacity="0.7"
+          />
+
+          {/* Convective Hydrodynamic Flow Loop (Reinjection -> Production) */}
+          <motion.path
+            d="M 380 430 C 440 490, 550 490, 610 440"
+            stroke="#FFA67A"
+            strokeWidth="2.5"
             fill="none"
             strokeDasharray="8 6"
             animate={
@@ -309,100 +398,199 @@ export const GeologicalCrossSection: React.FC<GeologicalCrossSectionProps> = ({
             transition={{ duration: 1.8, repeat: Infinity, ease: 'linear' }}
           />
 
-          {/* Reservoir Callout & Label */}
-          <text x="50" y="385" fill="#E8B595" fontSize="12" fontWeight="600" fontFamily="sans-serif">
-            PERMEABLE HYDROTHERMAL RESERVOIR (180°C – 320°C)
-          </text>
-          <text x="50" y="405" fill="#B38066" fontSize="10" fontFamily="monospace">
-            Naturally fractured basalt &amp; granite · High-pressure mineralized brine
+          {/* Directional Flow Chevrons along Convective Loop */}
+          <g fill="#FFA67A" opacity="0.8">
+            <polygon points="460,470 472,467 465,477" />
+            <polygon points="530,477 542,470 535,463" />
+          </g>
+
+          {/* Interactive Badge 06 */}
+          <circle
+            cx="32"
+            cy="365"
+            r="11"
+            fill="#32160C"
+            stroke={selectedFeatureId === 'hydrothermal-reservoir' ? '#FF905A' : '#E06D3B'}
+            strokeWidth="1.75"
+          />
+          <text
+            x="32"
+            y="369"
+            textAnchor="middle"
+            fill="#E06D3B"
+            fontSize="9"
+            fontWeight="bold"
+            fontFamily="monospace"
+          >
+            06
           </text>
 
-          {/* Interactive Badge */}
-          <circle cx="28" cy="385" r="10" fill="#2A1710" stroke="#E06D3B" strokeWidth="1.5" />
-          <text x="28" y="388.5" textAnchor="middle" fill="#E06D3B" fontSize="8" fontWeight="bold" fontFamily="monospace">
-            05
+          {/* Reservoir Label */}
+          <text x="54" y="361" fill="#FFCDB5" fontSize="11" fontWeight="600" fontFamily="sans-serif">
+            06 · PERMEABLE HYDROTHERMAL RESERVOIR (2,000 – 3,500M)
+          </text>
+          <text x="54" y="377" fill="#C98970" fontSize="9.5" fontFamily="monospace">
+            180°C – 320°C+ · Naturally fractured basalt &amp; granite · Pressurized mineralized brine
           </text>
 
           {/* Depth Callout */}
-          <text x="14" y="530" fill="#8C6350" fontSize="9" fontFamily="monospace">
+          <text x="940" y="508" textAnchor="end" fill="#9C5A40" fontSize="9" fontFamily="monospace">
             -3,500 M · BASAL RESERVOIR BOUNDARY
           </text>
         </g>
 
-        {/* ---------------------------------------------------------- */}
-        {/* 5. STRATIGRAPHIC LAYER 4: CRYSTALLINE BASEMENT (540–720)   */}
-        {/* ---------------------------------------------------------- */}
-        <g 
-          id="layer-basement" 
+        {/* ========================================================== */}
+        {/* STRATA 5: CRYSTALLINE BASEMENT STRATA (Y: 520–630, 3,500–5,000M)*/}
+        {/* ========================================================== */}
+        <g
+          id="layer-basement"
           className="cursor-pointer"
           onClick={() => onSelectFeature('crystalline-basement')}
         >
-          <rect 
-            x="0" 
-            y="540" 
-            width="900" 
-            height="180" 
-            fill={selectedFeatureId === 'crystalline-basement' ? '#3B180E' : '#1F0F09'} 
-            stroke={selectedFeatureId === 'crystalline-basement' ? '#FF4A1C' : '#42170B'} 
-            strokeWidth={selectedFeatureId === 'crystalline-basement' ? '2' : '1'} 
+          <rect
+            x="0"
+            y="520"
+            width="960"
+            height="110"
+            fill={selectedFeatureId === 'crystalline-basement' ? '#35160E' : '#1C0D08'}
+            stroke={selectedFeatureId === 'crystalline-basement' ? '#FF7A3D' : '#3E180E'}
+            strokeWidth={selectedFeatureId === 'crystalline-basement' ? '2' : '1'}
           />
+          <rect x="0" y="520" width="960" height="110" fill="url(#basementPattern)" opacity="0.6" />
 
-          {/* Deep Thermal Magma Plume Conduction Glow */}
-          <rect x="0" y="540" width="900" height="180" fill="url(#magmaGlow)" />
-
-          {/* Radiating Heat Arrows (Upward Conduction) */}
-          <g opacity="0.65" stroke="#FFA380" strokeWidth="1.5" fill="none">
-            <path d="M 280 660 L 280 600 M 275 610 L 280 600 L 285 610" />
-            <path d="M 470 650 L 470 580 M 465 590 L 470 580 L 475 590" />
-            <path d="M 660 660 L 660 600 M 655 610 L 660 600 L 665 610" />
+          {/* Upward Conductive Thermal Arrows */}
+          <g opacity="0.6" stroke="#FF8C5A" strokeWidth="1.4" fill="none">
+            <path d="M 260 610 L 260 550 M 255 560 L 260 550 L 265 560" />
+            <path d="M 500 605 L 500 545 M 495 555 L 500 545 L 505 555" />
+            <path d="M 740 610 L 740 550 M 735 560 L 740 550 L 745 560" />
           </g>
 
-          {/* Basement Label */}
-          <text x="50" y="580" fill="#FFC2AD" fontSize="12" fontWeight="600" fontFamily="sans-serif">
-            CRYSTALLINE BASEMENT &amp; MANTLE HEAT CONDUCTION (350°C – 500°C+)
-          </text>
-          <text x="50" y="600" fill="#D98A72" fontSize="10" fontFamily="monospace">
-            Radiogenic isotopic decay (U, Th, K-40) · Primordial Earth Core heat flux: 47 TW
+          {/* Interactive Badge 07 */}
+          <circle
+            cx="32"
+            cy="550"
+            r="11"
+            fill="#3B140A"
+            stroke={selectedFeatureId === 'crystalline-basement' ? '#FFA67A' : '#FF7A3D'}
+            strokeWidth="1.75"
+          />
+          <text
+            x="32"
+            y="554"
+            textAnchor="middle"
+            fill="#FF7A3D"
+            fontSize="9"
+            fontWeight="bold"
+            fontFamily="monospace"
+          >
+            07
           </text>
 
-          {/* Interactive Badge */}
-          <circle cx="28" cy="580" r="10" fill="#42140A" stroke="#FF4A1C" strokeWidth="1.5" />
-          <text x="28" y="583.5" textAnchor="middle" fill="#FF4A1C" fontSize="8" fontWeight="bold" fontFamily="monospace">
-            06
+          {/* Basement Label */}
+          <text x="54" y="546" fill="#FFD1C2" fontSize="11" fontWeight="600" fontFamily="sans-serif">
+            07 · CRYSTALLINE BASEMENT STRATA (3,500 – 5,000M)
+          </text>
+          <text x="54" y="562" fill="#D4866F" fontSize="9.5" fontFamily="monospace">
+            320°C – 450°C · Continental granitic basement · Next-gen Enhanced Geothermal (EGS)
           </text>
 
           {/* Depth Callout */}
-          <text x="14" y="700" fill="#D96E52" fontSize="9" fontFamily="monospace">
-            -5,000 M+ · DEEP SUPERCRITICAL CRUST
+          <text x="940" y="618" textAnchor="end" fill="#B05C42" fontSize="9" fontFamily="monospace">
+            -5,000 M · DEEP CONTINENTAL CRUST
           </text>
         </g>
 
-        {/* ---------------------------------------------------------- */}
-        {/* 6. WELLBORES: INJECTION & PRODUCTION CASINGS               */}
-        {/* ---------------------------------------------------------- */}
-        
-        {/* INJECTION WELL (Left Wellbore) */}
-        <g 
-          id="injection-well-group" 
+        {/* ========================================================== */}
+        {/* STRATA 6: DEEP MANTLE HEAT & MAGMATIC ENGINE (Y: 630–720)   */}
+        {/* ========================================================== */}
+        <g
+          id="layer-deep-heat"
+          className="cursor-pointer"
+          onClick={() => onSelectFeature('deep-heat-source')}
+        >
+          <rect
+            x="0"
+            y="630"
+            width="960"
+            height="90"
+            fill={selectedFeatureId === 'deep-heat-source' ? '#4A1509' : '#220804'}
+            stroke={selectedFeatureId === 'deep-heat-source' ? '#FF4A1C' : '#561405'}
+            strokeWidth={selectedFeatureId === 'deep-heat-source' ? '2.5' : '1'}
+          />
+
+          {/* Radiant Mantle Plume Glow */}
+          <rect x="0" y="630" width="960" height="90" fill="url(#magmaGlow)" />
+
+          {/* Conduction Heat Wave vectors */}
+          <g opacity="0.75" stroke="#FFB08C" strokeWidth="1.5" fill="none">
+            <path d="M 380 710 L 380 655 M 374 667 L 380 655 L 386 667" />
+            <path d="M 580 710 L 580 655 M 574 667 L 580 655 L 586 667" />
+          </g>
+
+          {/* Interactive Badge 08 */}
+          <circle
+            cx="32"
+            cy="660"
+            r="11"
+            fill="#521307"
+            stroke={selectedFeatureId === 'deep-heat-source' ? '#FFD4C2' : '#FF4A1C'}
+            strokeWidth="1.75"
+          />
+          <text
+            x="32"
+            y="664"
+            textAnchor="middle"
+            fill="#FF4A1C"
+            fontSize="9"
+            fontWeight="bold"
+            fontFamily="monospace"
+          >
+            08
+          </text>
+
+          {/* Deep Heat Label */}
+          <text x="54" y="656" fill="#FFE2D6" fontSize="11" fontWeight="600" fontFamily="sans-serif">
+            08 · DEEP MANTLE HEAT &amp; MAGMATIC ENGINE (&gt;5,000M)
+          </text>
+          <text x="54" y="672" fill="#E8967D" fontSize="9.5" fontFamily="monospace">
+            &gt;400°C – 600°C+ · Inexhaustible 47 TW planetary heat flux · Primordial &amp; radiogenic decay
+          </text>
+
+          {/* Depth Callout */}
+          <text x="940" y="705" textAnchor="end" fill="#FF8460" fontSize="9" fontFamily="monospace">
+            -6,000 M+ · PLANETARY ENGINE (47 TW)
+          </text>
+        </g>
+
+        {/* ========================================================== */}
+        {/* WELLBORE CONVEYANCE: INJECTION & PRODUCTION WELLS          */}
+        {/* ========================================================== */}
+
+        {/* INJECTION WELL (04, Left Borehole - Controlled Blue) */}
+        <g
+          id="injection-well-group"
           className="cursor-pointer"
           onClick={() => onSelectFeature('injection-well')}
         >
-          {/* Wellhead Casing Outer Pipe */}
-          <path 
-            d="M 450 110 L 360 450" 
-            stroke={selectedFeatureId === 'injection-well' ? '#6EE7B7' : '#2A4D6C'} 
-            strokeWidth="11" 
-            strokeLinecap="round" 
+          {/* Wellhead Casing Outer Steel */}
+          <path
+            d="M 470 105 L 380 430"
+            stroke={selectedFeatureId === 'injection-well' ? '#93C5FD' : '#1E3A5F'}
+            strokeWidth="12"
+            strokeLinecap="round"
           />
-          {/* Cement Barrier Casing */}
-          <path d="M 450 110 L 360 450" stroke="#10253B" strokeWidth="7" />
+          {/* Inner Protective Cement Barrier */}
+          <path d="M 470 105 L 380 430" stroke="#0D1B2A" strokeWidth="8" />
 
-          {/* Flowing Cooled Fluid Particles (Descending Blue/Cyan) */}
+          {/* Cooled Brine Fluid Column (Blue/Cyan Gradient) */}
+          <path d="M 470 105 L 380 430" stroke="url(#injectionFluid)" strokeWidth="4.5" />
+
+          {/* Downward Fluid Flow Dash Animation */}
           <motion.path
-            d="M 450 110 L 360 450"
-            stroke="url(#injectionFluid)"
-            strokeWidth="3.5"
-            strokeDasharray="8 6"
+            d="M 470 105 L 380 430"
+            stroke="#93C5FD"
+            strokeWidth="3"
+            strokeDasharray="6 8"
             animate={
               shouldReduceMotion
                 ? {}
@@ -410,45 +598,85 @@ export const GeologicalCrossSection: React.FC<GeologicalCrossSectionProps> = ({
                     strokeDashoffset: [0, -28],
                   }
             }
-            transition={{ duration: 1.4, repeat: Infinity, ease: 'linear' }}
+            transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
           />
 
-          {/* Wellhead Perforations at Depth */}
-          <circle cx="360" cy="450" r="7" fill="#3B82F6" opacity="0.8" />
-          <circle cx="360" cy="450" r="15" fill="none" stroke="#60A5FA" strokeWidth="1.5" strokeDasharray="3 3" />
+          {/* Downward Fluid Direction Arrows */}
+          <g fill="#93C5FD" opacity="0.9">
+            <polygon points="440,210 448,220 434,220" />
+            <polygon points="410,320 418,330 404,330" />
+          </g>
 
-          {/* Wellhead Label & Marker Top */}
-          <circle cx="395" cy="190" r="10" fill="#0C251C" stroke="#6EE7B7" strokeWidth="1.5" />
-          <text x="395" y="193.5" textAnchor="middle" fill="#6EE7B7" fontSize="8" fontWeight="bold" fontFamily="monospace">
-            03
+          {/* Downhole Injection Diffuser Screen */}
+          <circle cx="380" cy="430" r="7" fill="#3B82F6" />
+          <circle
+            cx="380"
+            cy="430"
+            r="16"
+            fill="none"
+            stroke="#60A5FA"
+            strokeWidth="1.5"
+            strokeDasharray="3 3"
+          />
+
+          {/* Interactive Badge 04 & Label */}
+          <circle
+            cx="418"
+            cy="175"
+            r="11"
+            fill="#0B2035"
+            stroke={selectedFeatureId === 'injection-well' ? '#93C5FD' : '#3B82F6'}
+            strokeWidth="1.75"
+          />
+          <text
+            x="418"
+            y="179"
+            textAnchor="middle"
+            fill="#60A5FA"
+            fontSize="9"
+            fontWeight="bold"
+            fontFamily="monospace"
+          >
+            04
           </text>
-          <text x="345" y="180" textAnchor="end" fill="#6EE7B7" fontSize="10" fontWeight="600" fontFamily="monospace">
-            INJECTION WELL (100% MASS REINJECTED)
+          <text
+            x="370"
+            y="170"
+            textAnchor="end"
+            fill="#93C5FD"
+            fontSize="10"
+            fontWeight="600"
+            fontFamily="monospace"
+          >
+            04 · INJECTION WELL (100% REINJECTED)
           </text>
         </g>
 
-        {/* PRODUCTION WELL (Right Wellbore) */}
-        <g 
-          id="production-well-group" 
+        {/* PRODUCTION WELL (05, Right Borehole - Controlled Orange/Red) */}
+        <g
+          id="production-well-group"
           className="cursor-pointer"
           onClick={() => onSelectFeature('production-well')}
         >
-          {/* Wellhead Casing Outer Pipe */}
-          <path 
-            d="M 580 460 L 510 110" 
-            stroke={selectedFeatureId === 'production-well' ? '#FFA380' : '#6E2D18'} 
-            strokeWidth="11" 
-            strokeLinecap="round" 
+          {/* Wellhead Casing Outer High-Alloy Steel */}
+          <path
+            d="M 610 440 L 530 105"
+            stroke={selectedFeatureId === 'production-well' ? '#FFB08C' : '#6A2A14'}
+            strokeWidth="12"
+            strokeLinecap="round"
           />
-          {/* Cement Barrier Casing */}
-          <path d="M 580 460 L 510 110" stroke="#2B1008" strokeWidth="7" />
+          {/* Inner Protective Cement Barrier */}
+          <path d="M 610 440 L 530 105" stroke="#260C05" strokeWidth="8" />
 
-          {/* Flowing Superheated Fluid (Ascending Orange/Red) */}
+          {/* Superheated Steam/Fluid Column (Vibrant Orange/Red) */}
+          <path d="M 610 440 L 530 105" stroke="url(#productionFluid)" strokeWidth="4.5" />
+
+          {/* Upward Fluid Flashing Dash Animation */}
           <motion.path
-            d="M 580 460 L 510 110"
-            stroke="url(#productionFluid)"
-            strokeWidth="3.5"
-            strokeDasharray="8 6"
+            d="M 610 440 L 530 105"
+            stroke="#FFF2EB"
+            strokeWidth="3"
+            strokeDasharray="6 8"
             animate={
               shouldReduceMotion
                 ? {}
@@ -456,76 +684,102 @@ export const GeologicalCrossSection: React.FC<GeologicalCrossSectionProps> = ({
                     strokeDashoffset: [-28, 0],
                   }
             }
-            transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
+            transition={{ duration: 1.1, repeat: Infinity, ease: 'linear' }}
           />
 
-          {/* Downhole Intake Screen */}
-          <circle cx="580" cy="460" r="7" fill="#FF4A1C" opacity="0.8" />
-          <circle cx="580" cy="460" r="15" fill="none" stroke="#FFA380" strokeWidth="1.5" strokeDasharray="3 3" />
+          {/* Upward Fluid Direction Arrows */}
+          <g fill="#FFA67A" opacity="0.9">
+            <polygon points="585,340 577,330 591,330" />
+            <polygon points="555,230 547,220 561,220" />
+          </g>
 
-          {/* Wellhead Label & Marker Top */}
-          <circle cx="550" cy="240" r="10" fill="#2E0E05" stroke="#FF7A3D" strokeWidth="1.5" />
-          <text x="550" y="243.5" textAnchor="middle" fill="#FF7A3D" fontSize="8" fontWeight="bold" fontFamily="monospace">
-            04
+          {/* Downhole Intake Screen */}
+          <circle cx="610" cy="440" r="7" fill="#FF4A1C" />
+          <circle
+            cx="610"
+            cy="440"
+            r="16"
+            fill="none"
+            stroke="#FFA67A"
+            strokeWidth="1.5"
+            strokeDasharray="3 3"
+          />
+
+          {/* Interactive Badge 05 & Label */}
+          <circle
+            cx="578"
+            cy="235"
+            r="11"
+            fill="#361006"
+            stroke={selectedFeatureId === 'production-well' ? '#FFD4C2' : '#FF7A3D'}
+            strokeWidth="1.75"
+          />
+          <text
+            x="578"
+            y="239"
+            textAnchor="middle"
+            fill="#FF7A3D"
+            fontSize="9"
+            fontWeight="bold"
+            fontFamily="monospace"
+          >
+            05
           </text>
-          <text x="570" y="235" textAnchor="start" fill="#FFA380" fontSize="10" fontWeight="600" fontFamily="monospace">
-            PRODUCTION WELL (200°C–320°C+)
+          <text
+            x="600"
+            y="230"
+            textAnchor="start"
+            fill="#FFB08C"
+            fontSize="10"
+            fontWeight="600"
+            fontFamily="monospace"
+          >
+            05 · PRODUCTION WELL (200°C–320°C+)
           </text>
         </g>
 
-        {/* ---------------------------------------------------------- */}
-        {/* 7. MODE 02 DYNAMIC THERMAL DEPTH HIGHLIGHT OVERLAY        */}
-        {/* ---------------------------------------------------------- */}
+        {/* ========================================================== */}
+        {/* MODE 02 DYNAMIC THERMAL DEPTH HIGHLIGHT OVERLAY            */}
+        {/* ========================================================== */}
         {activeMode === 'temperature' && (
           <g id="thermal-depth-marker" className="pointer-events-none transition-all duration-300">
-            {/* Glowing Scan Line Across Diagram */}
+            {/* Horizontal Dynamic Scan Line */}
             <line
               x1="0"
               y1={activeThermalY}
-              x2="900"
+              x2="960"
               y2={activeThermalY}
               stroke={activeTempZone.activeColor}
               strokeWidth="2.5"
               strokeDasharray="6 4"
-              opacity="0.9"
+              opacity="0.95"
             />
 
             {/* Thermal Beam Band Highlight */}
             <rect
               x="0"
-              y={Math.max(110, activeThermalY - 35)}
-              width="900"
+              y={Math.max(105, activeThermalY - 35)}
+              width="960"
               height="70"
               fill={activeTempZone.activeColor}
               opacity="0.12"
             />
 
             {/* Depth Marker Bead on Left Margin */}
-            <circle cx="20" cy={activeThermalY} r="7" fill={activeTempZone.activeColor} />
-            <text x="35" y={activeThermalY + 4} fill={activeTempZone.activeColor} fontSize="11" fontWeight="bold" fontFamily="monospace">
+            <circle cx="25" cy={activeThermalY} r="7" fill={activeTempZone.activeColor} />
+            <text
+              x="42"
+              y={activeThermalY + 4}
+              fill={activeTempZone.activeColor}
+              fontSize="11"
+              fontWeight="bold"
+              fontFamily="monospace"
+            >
               {temperature}°C · {activeTempZone.techName}
             </text>
           </g>
         )}
       </svg>
-
-      {/* Floating Active Selection Indicator Tooltip at Diagram Bottom */}
-      {activeFeature && (
-        <div className="absolute bottom-3 left-4 right-4 z-20 bg-[#121714]/90 backdrop-blur-md border border-[#2D3B31] px-3.5 py-2 rounded-lg flex items-center justify-between text-xs shadow-lg">
-          <div className="flex items-center space-x-2.5 truncate">
-            <span className="w-2 h-2 rounded-full bg-earth-sage shrink-0" />
-            <span className="font-mono text-[10px] text-earth-sage uppercase tracking-wider shrink-0">
-              {activeFeature.category}:
-            </span>
-            <span className="font-sans font-medium text-white truncate">
-              {activeFeature.name}
-            </span>
-          </div>
-          <span className="font-mono text-[10px] text-earth-sage/90 font-semibold shrink-0 ml-2">
-            {activeFeature.depth} · {activeFeature.temperature}
-          </span>
-        </div>
-      )}
     </div>
   );
 };

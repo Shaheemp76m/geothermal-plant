@@ -34,8 +34,23 @@ export function App() {
     const handleHash = () => {
       if (window.location.hash === '#observatory') {
         setViewMode('observatory');
+        document.documentElement.style.backgroundColor = '#0B100E';
+        document.body.style.backgroundColor = '#0B100E';
+        let themeMeta = document.querySelector('meta[name="theme-color"]');
+        if (!themeMeta) {
+          themeMeta = document.createElement('meta');
+          themeMeta.setAttribute('name', 'theme-color');
+          document.head.appendChild(themeMeta);
+        }
+        themeMeta.setAttribute('content', '#0B100E');
       } else {
         setViewMode('website');
+        document.documentElement.style.backgroundColor = '';
+        document.body.style.backgroundColor = '';
+        const themeMeta = document.querySelector('meta[name="theme-color"]');
+        if (themeMeta) {
+          themeMeta.setAttribute('content', '#F3F0E6');
+        }
         if (!window.location.hash || window.location.hash === '#top') {
           window.scrollTo(0, 0);
         }
@@ -44,7 +59,11 @@ export function App() {
 
     handleHash();
     window.addEventListener('hashchange', handleHash);
-    return () => window.removeEventListener('hashchange', handleHash);
+    return () => {
+      window.removeEventListener('hashchange', handleHash);
+      document.documentElement.style.backgroundColor = '';
+      document.body.style.backgroundColor = '';
+    };
   }, []);
 
   const handleOpenObservatory = () => {

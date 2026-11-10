@@ -54,7 +54,7 @@ export const SubsurfaceBottomSheet: React.FC<SubsurfaceBottomSheetProps> = ({
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: shouldReduceMotion ? 0 : '100%', opacity: shouldReduceMotion ? 0 : 1 }}
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-            className="relative w-full max-h-[75dvh] bg-[#111713] border-t border-[#232F26] rounded-t-2xl shadow-2xl flex flex-col pointer-events-auto pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] overflow-hidden"
+            className="relative w-full max-h-[75dvh] bg-[#111714] border-t border-[#1F2722] rounded-t-2xl shadow-2xl flex flex-col pointer-events-auto pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] overflow-hidden"
           >
             {/* Drag Handle Bar */}
             <div
@@ -65,24 +65,24 @@ export const SubsurfaceBottomSheet: React.FC<SubsurfaceBottomSheetProps> = ({
             </div>
 
             {/* Header */}
-            <div className="px-4 py-2 border-b border-[#1E2821] flex items-center justify-between shrink-0">
+            <div className="px-4 py-2 border-b border-[#1F2722] flex items-center justify-between shrink-0">
               <div className="min-w-0 pr-2">
                 <div className="flex items-center space-x-2 text-[9px] font-mono text-earth-sage uppercase">
                   {category && (
-                    <span className="px-1.5 py-0.5 bg-earth-forest/70 border border-earth-sage/30 rounded font-semibold">
+                    <span className="px-1.5 py-0.5 bg-[#15231B] border border-earth-sage/30 rounded font-semibold">
                       {category}
                     </span>
                   )}
                   {depthOrTag && <span className="text-[#9BAAA0] truncate">{depthOrTag}</span>}
                 </div>
-                <h3 className="font-editorial text-base font-medium text-white truncate mt-0.5">
+                <h3 className="font-editorial text-base font-medium text-[#F0EEE3] truncate mt-0.5">
                   {title}
                 </h3>
               </div>
 
               <button
                 onClick={onClose}
-                className="p-1.5 rounded-full bg-[#1A231C] text-[#93A598] hover:text-white hover:bg-[#253229] transition-colors shrink-0"
+                className="p-1.5 rounded-full bg-[#15231B] text-[#93A598] hover:text-[#F0EEE3] hover:bg-[#1E2E24] transition-colors shrink-0"
                 aria-label="Close bottom sheet"
               >
                 <X className="w-4 h-4" />

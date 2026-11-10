@@ -32,12 +32,12 @@ export const TemperatureControls: React.FC<TemperatureControlsProps> = ({
       </div>
 
       {/* Main Temperature Slider & Gauge */}
-      <div className="p-3 bg-[#151C18] border border-[#233027] rounded-lg shrink-0 space-y-2.5">
+      <div className="p-3 bg-[#111714] border border-[#1F2722] rounded-lg shrink-0 space-y-2.5">
         <div className="flex items-center justify-between">
           <span className="font-mono text-[9px] uppercase tracking-wider text-[#8A9C90]">
             SUBTERRANEAN FLUID TEMPERATURE
           </span>
-          <span className="font-mono text-xs font-bold text-white px-2 py-0.5 rounded bg-black/40 border border-white/10">
+          <span className="font-mono text-xs font-bold text-[#F0EEE3] px-2 py-0.5 rounded bg-black/40 border border-white/10">
             {temperature}°C
           </span>
         </div>
@@ -51,7 +51,7 @@ export const TemperatureControls: React.FC<TemperatureControlsProps> = ({
             step="5"
             value={temperature}
             onChange={(e) => onTemperatureChange(Number(e.target.value))}
-            className="w-full h-2 bg-[#202923] rounded-lg appearance-none cursor-pointer accent-[#8BAF91]"
+            className="w-full h-2 bg-[#1B241E] rounded-lg appearance-none cursor-pointer accent-earth-sage"
             aria-label="Subterranean Fluid Temperature in Celsius"
           />
         </div>
@@ -70,8 +70,8 @@ export const TemperatureControls: React.FC<TemperatureControlsProps> = ({
               onClick={() => onTemperatureChange(preset.temp)}
               className={`py-1 text-[9px] font-mono rounded transition-colors text-center border ${
                 Math.abs(temperature - preset.temp) < 40
-                  ? 'bg-earth-forest text-white border-earth-sage font-bold'
-                  : 'bg-[#19221C] text-[#86958B] border-[#29362D] hover:text-white'
+                  ? 'bg-[#15231B] text-[#F0EEE3] border-earth-sage font-bold'
+                  : 'bg-[#111714] text-[#86958B] border-[#1F2722] hover:text-[#F0EEE3]'
               }`}
             >
               {preset.label}
