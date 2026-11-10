@@ -12,11 +12,10 @@ import {
 export const ANNOUNCEMENT_TEXT = "ENERGY FROM THE EARTH · POWER FOR THE FUTURE";
 
 export const NAV_LINKS = [
-  { label: "ORIGINS", href: "#origins" },
-  { label: "HOW IT WORKS", href: "#how-it-works" },
+  { label: "ENERGY", href: "#origins" },
+  { label: "TECHNOLOGY", href: "#how-it-works" },
   { label: "APPLICATIONS", href: "#applications" },
-  { label: "IMPACT", href: "#impact" },
-  { label: "INNOVATION", href: "#innovation" },
+  { label: "ABOUT", href: "#impact" },
 ];
 
 export const HERO_CONTENT = {

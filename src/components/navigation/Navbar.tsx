@@ -69,11 +69,27 @@ export const Navbar: React.FC = () => {
             : 'bg-earth-ivory border-b border-earth-border/70'
         }`}
       >
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12 h-16 sm:h-20 flex items-center justify-between">
-          {/* Left: Navigation Links (Desktop) with LayoutId Indicator */}
+        <div className="w-[92vw] max-w-[1600px] mx-auto px-2 sm:px-4 lg:px-6 h-16 sm:h-20 flex items-center justify-between">
+          {/* Left: Brand Wordmark & Subtitle */}
+          <div className="shrink-0 text-left min-w-0 pr-4">
+            <a
+              href="#top"
+              onClick={(e) => handleNavClick(e, '#top')}
+              className="inline-block group max-w-full"
+            >
+              <span className="font-editorial text-[17px] sm:text-[20px] md:text-[22px] font-bold tracking-[0.16em] sm:tracking-[0.18em] text-earth-forest uppercase block leading-tight truncate group-hover:text-earth-black transition-colors">
+                GEOTHERMAL GREEN
+              </span>
+              <span className="block text-[8px] sm:text-[9px] tracking-[0.25em] sm:tracking-[0.3em] text-earth-muted uppercase mt-0.5 font-sans font-medium text-left truncate">
+                EARTH'S BASELOAD POWER
+              </span>
+            </a>
+          </div>
+
+          {/* Center: Navigation Links (Desktop) with LayoutId Indicator */}
           <nav 
             onMouseLeave={() => setHoveredNav(null)}
-            className="hidden lg:flex items-center space-x-6 xl:space-x-8 text-[11px] font-semibold tracking-[0.2em] text-earth-black/75"
+            className="hidden lg:flex items-center space-x-7 xl:space-x-9 text-[11px] font-semibold tracking-[0.2em] text-earth-black/75"
           >
             {NAV_LINKS.map((link) => {
               const isHovered = hoveredNav === link.href;
@@ -85,7 +101,7 @@ export const Navbar: React.FC = () => {
                   href={link.href}
                   onMouseEnter={() => setHoveredNav(link.href)}
                   onClick={(e) => handleNavClick(e, link.href)}
-                  className="hover:text-earth-forest transition-colors relative py-1.5 px-0.5"
+                  className="hover:text-earth-forest transition-colors relative py-1.5 px-0.5 text-xs font-mono"
                 >
                   <span className={isActive ? 'text-earth-forest font-bold' : ''}>
                     {link.label}
@@ -107,22 +123,6 @@ export const Navbar: React.FC = () => {
             })}
           </nav>
 
-          {/* Center: Brand Wordmark */}
-          <div className="flex-1 lg:flex-none text-left lg:text-center min-w-0 pr-2 sm:pr-0">
-            <a
-              href="#top"
-              onClick={(e) => handleNavClick(e, '#top')}
-              className="inline-block group max-w-full"
-            >
-              <span className="font-editorial text-[18px] sm:text-[22px] md:text-[26px] font-bold tracking-[0.18em] sm:tracking-[0.22em] text-earth-forest uppercase block leading-tight truncate group-hover:text-earth-black transition-colors">
-                GEOTHERMAL GREEN
-              </span>
-              <span className="block text-[8px] sm:text-[9px] tracking-[0.28em] sm:tracking-[0.35em] text-earth-muted uppercase mt-0.5 sm:mt-1 font-sans font-medium text-left lg:text-center truncate">
-                Earth's Baseload Power
-              </span>
-            </a>
-          </div>
-
           {/* Right: Action CTA & Mobile Toggle */}
           <div className="flex items-center space-x-2 sm:space-x-4 shrink-0">
             <div className="hidden sm:block">
@@ -130,7 +130,7 @@ export const Navbar: React.FC = () => {
                 as="a"
                 href="#how-it-works"
                 onClick={(e: React.MouseEvent<any>) => handleNavClick(e, '#how-it-works')}
-                className="items-center space-x-2 text-[11px] font-semibold tracking-[0.2em] uppercase px-4 sm:px-5 py-2 sm:py-2.5 border border-earth-forest text-earth-forest hover:bg-earth-forest hover:text-earth-ivory transition-all duration-300"
+                className="items-center space-x-2 text-[11px] font-semibold tracking-[0.2em] uppercase px-4 sm:px-5 py-2 sm:py-2.5 border border-earth-forest text-earth-forest hover:bg-earth-forest hover:text-earth-ivory transition-all duration-300 rounded-full"
               >
                 <span>EXPLORE</span>
                 <ArrowUpRight className="w-3.5 h-3.5" />
