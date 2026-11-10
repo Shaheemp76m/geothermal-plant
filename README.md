@@ -51,8 +51,11 @@ Rather than relying on vague environmental slogans or presenting clean energy as
 
 ### 3. The Power of Proof — Symmetrical Alternating Metrics Timeline
 * **No Boxes, No Card Grids**: Eliminates generic rectangular containers in favor of monumental numerical typography where the data itself becomes the graphic design.
-* **Central Vertical Timeline**: Continuous hairline axis running down the exact horizontal center (`left-1/2`), with scroll-synchronized progress gradient fill.
-* **Numbered Circular Markers (`01`–`04`)**: Symmetrical circular nodes that illuminate dynamically from muted stone to deep forest green as the visitor scrolls through each benchmark.
+* **Flowing S-Shaped Bezier Timeline Connector**: Replaces rigid straight lines with a continuous, responsive SVG Bezier curve path that weaves organically around each metric composition.
+  - On **Mobile**: The line leaves Marker 01, sweeps outward toward the right perimeter, travels completely around Metric 01's descriptions and citations, curves inward through the vertical whitespace gap into Marker 02, and continues this alternating loop for all four metrics with zero text collision.
+  - On **Desktop**: The curve sweeps gracefully through the open whitespace column opposite each metric, maintaining flawless visual balance.
+* **Scroll-Driven SVG Dash Animation**: Progressive drawing of the muted-sage stroke (`#8BAF91`) synchronized with scroll progress via `stroke-dasharray` / `stroke-dashoffset` (`pathLength`), paired with a faint dashed guide track.
+* **Numbered Circular Markers (`01`–`04`)**: Fixed circular nodes that illuminate dynamically from muted stone to deep forest green as the visitor scrolls through each benchmark.
 * **Symmetrical Left-Right Alternation**:
   - **`01` / ENERGY AVAILABILITY (LEFT)**: **`92%`** Capacity Factor — Continuous baseload power independent of meteorological conditions (US Department of Energy).
   - **`02` / ENVIRONMENTAL IMPACT (RIGHT)**: **`38 g`** CO₂-eq/kWh — Median lifecycle greenhouse gas footprint across closed-loop binary facilities (National Renewable Energy Laboratory).
