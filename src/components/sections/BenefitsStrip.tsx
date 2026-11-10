@@ -186,7 +186,7 @@ const MetricTimelineItem: React.FC<MetricTimelineItemProps> = ({
             <div className="w-full">
               <div 
                 ref={contentRefCallback}
-                className={`relative z-10 flex flex-col w-[72%] sm:w-[68%] md:w-full max-w-[270px] sm:max-w-[290px] md:max-w-xl ${mobileAlignClass} ${desktopAlignClass}`}
+                className={`relative z-10 flex flex-col w-[64%] sm:w-[66%] md:w-full max-w-[245px] sm:max-w-[270px] md:max-w-xl ${mobileAlignClass} ${desktopAlignClass}`}
               >
                 {/* Category Eyebrow - Stable Reference for Marker Vertical Alignment */}
                 <span 
@@ -252,7 +252,7 @@ const MetricTimelineItem: React.FC<MetricTimelineItemProps> = ({
             <div className="w-full">
               <div 
                 ref={contentRefCallback}
-                className={`relative z-10 flex flex-col w-[72%] sm:w-[68%] md:w-full max-w-[270px] sm:max-w-[290px] md:max-w-xl ${mobileAlignClass} ${desktopAlignClass}`}
+                className={`relative z-10 flex flex-col w-[64%] sm:w-[66%] md:w-full max-w-[245px] sm:max-w-[270px] md:max-w-xl ${mobileAlignClass} ${desktopAlignClass}`}
               >
                 {/* Category Eyebrow - Stable Reference for Marker Vertical Alignment */}
                 <span 
@@ -353,8 +353,8 @@ export const BenefitsStrip: React.FC = () => {
     });
   }, []);
 
-  // Calculate the smooth S-curve timeline on mobile screens (<768px)
-  // Ensures the curve passes through the exact center coordinates of markers 01, 02, 03, 04
+  // Calculate the pronounced, organic S-curve timeline on mobile screens (<768px)
+  // Generates large, flowing alternating bends between left and right sides
   const calculateMobilePath = useCallback(() => {
     if (!metricsListRef.current) return;
     const container = metricsListRef.current;
@@ -384,14 +384,14 @@ export const BenefitsStrip: React.FC = () => {
       const lRect = labelEl.getBoundingClientRect();
       const cRect = contentEl.getBoundingClientRect();
 
-      // Explicit marker center calculated directly from its corresponding category label
+      // Marker center calculated directly from its corresponding category label
       const labelCenterY = (lRect.top + lRect.bottom) / 2 - containerRect.top;
       const isLeft = i % 2 === 0;
 
-      // Clearance of 22px ensures:
-      // Marker circle (radius 14px) has 8px (~2.1mm) of clear space from the text boundary
-      // Timeline path (width 1.75px) has 22px (~5.8mm) of clear space from all content
-      const clearance = 22;
+      // Clearance of 20px ensures:
+      // Marker circle (radius 14px) has 6px (~2.5mm) of clear space from text
+      // Timeline path (width 1.75px) has 20px (~5mm) of clear space from all content
+      const clearance = 20;
 
       let markerX: number;
       if (isLeft) {
@@ -416,35 +416,47 @@ export const BenefitsStrip: React.FC = () => {
     // Single source of truth: Markers and SVG path share the exact same coordinates
     setMobileMarkers(markers);
 
-    // Build the continuous, smooth cubic Bezier S-curve
+    // Build the continuous, pronounced, organic cubic Bezier S-curve
     // 1. Lead-in: enters Marker 01 vertically
-    let d = `M ${markers[0].x.toFixed(1)} ${(markers[0].y - 20).toFixed(1)} L ${markers[0].x.toFixed(1)} ${markers[0].y.toFixed(1)}`;
+    let d = `M ${markers[0].x.toFixed(1)} ${(markers[0].y - 24).toFixed(1)} L ${markers[0].x.toFixed(1)} ${markers[0].y.toFixed(1)}`;
 
-    // 2. Continuous S-curve flowing around each metric composition and through each marker
+    // 2. Continuous flowing S-curve with large alternating bends
     for (let i = 0; i < 4; i++) {
       const b = bounds[i];
       const m = markers[i];
+      const isLeft = i % 2 === 0;
 
-      // Down along the inner boundary of the current metric to its bottom
-      d += ` L ${m.x.toFixed(1)} ${b.bottom.toFixed(1)}`;
+      // Bow gently outward around the metric's numbers and headings
+      const midY = (m.y + b.bottom) / 2;
+      const apexX = isLeft 
+        ? Math.min(width - 16, m.x + 8) 
+        : Math.max(16, m.x - 8);
 
-      // S-curve transition across to the next marker (for i < 3)
+      // Arc A: from marker down around apex
+      const h1 = (midY - m.y) * 0.50;
+      d += ` C ${m.x.toFixed(1)} ${(m.y + h1).toFixed(1)}, ${apexX.toFixed(1)} ${(midY - h1).toFixed(1)}, ${apexX.toFixed(1)} ${midY.toFixed(1)}`;
+
+      // Arc B: from apex down toward metric bottom
+      const h2 = (b.bottom - midY) * 0.50;
+      d += ` C ${apexX.toFixed(1)} ${(midY + h2).toFixed(1)}, ${m.x.toFixed(1)} ${(b.bottom - h2).toFixed(1)}, ${m.x.toFixed(1)} ${b.bottom.toFixed(1)}`;
+
+      // Grand S-Curve sweep across to the next marker (for i < 3)
       if (i < 3) {
         const nextM = markers[i + 1];
         const deltaY = nextM.y - b.bottom;
         
-        // Vertical control point tangents guarantee C1 smooth transitions
+        // Long control handles produce a wide, sweeping, dramatic S-curve across the screen
         const cp1x = m.x;
-        const cp1y = b.bottom + deltaY * 0.52;
+        const cp1y = b.bottom + deltaY * 0.50;
         const cp2x = nextM.x;
-        const cp2y = nextM.y - deltaY * 0.48;
+        const cp2y = nextM.y - deltaY * 0.50;
 
         d += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${nextM.x.toFixed(1)} ${nextM.y.toFixed(1)}`;
       }
     }
 
-    // 3. Timeline ends gracefully at Metric 04 — zero drift into footer
-    d += ` L ${markers[3].x.toFixed(1)} ${(bounds[3].bottom + 16).toFixed(1)}`;
+    // 3. Timeline ends gracefully below Metric 04 — zero drift into footer
+    d += ` L ${markers[3].x.toFixed(1)} ${(bounds[3].bottom + 20).toFixed(1)}`;
 
     setPathD(d);
   }, []);
@@ -562,8 +574,8 @@ export const BenefitsStrip: React.FC = () => {
           </div>
 
           {/* ============================================================ */}
-          {/* 2. MOBILE TIMELINE (< 768px): Continuous S-Shaped Bezier Path */}
-          {/* Synchronized directly with mobileMarkers                     */}
+          {/* 2. MOBILE TIMELINE (< 768px): Pronounced S-Curve Bezier Path   */}
+          {/* Large flowing bends alternating around metric compositions   */}
           {/* ============================================================ */}
           {pathD && (
             <svg
