@@ -20,7 +20,7 @@ const CHECKPOINT_NAMES = [
   'STAGE D // SPECIFICATIONS',
 ] as const;
 
-// Precision Animation & Gesture Timing Tokens
+// Precision Timing Tokens
 const TIMINGS = {
   down: {
     // Slower, cinematic & deliberate forward progression
@@ -29,8 +29,8 @@ const TIMINGS = {
     supportingDuration: 0.80, // 800ms
     cardDuration: 1.05, // 1050ms horizontal card transition
     easing: [0.22, 1, 0.36, 1] as const, // smooth editorial easeOutCubic
-    textLockMs: 950, // 850ms + 100ms settling
-    cardLockMs: 1200, // 1050ms + 150ms settling
+    textLockMs: 900, // 900ms input lock
+    cardLockMs: 1100, // 1100ms card transition lock
   },
   up: {
     // Fast, responsive, snappy backward review
@@ -39,8 +39,8 @@ const TIMINGS = {
     supportingDuration: 0.30, // 300ms
     cardDuration: 0.38, // 380ms horizontal card transition
     easing: [0.16, 1, 0.3, 1] as const,
-    textLockMs: 380, // 320ms + 60ms settling
-    cardLockMs: 460, // 380ms + 80ms settling
+    textLockMs: 360, // 360ms fast reverse lock
+    cardLockMs: 440, // 440ms card reverse lock
   },
 };
 
@@ -48,156 +48,164 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
   const containerRef = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotionPreference();
 
-  // State Machine
+  // Storytelling State Machine
   const [activeCardIndex, setActiveCardIndex] = useState<number>(0);
   const [activeCheckpoint, setActiveCheckpoint] = useState<CheckpointStage>(0);
   const [scrollDirection, setScrollDirection] = useState<'down' | 'up'>('down');
   const [isLocked, setIsLocked] = useState<boolean>(false);
 
-  // Synchronous refs for event listeners
+  // Synchronous ref to prevent stale closure reads during rapid events
   const stateRef = useRef({
     cardIndex: 0,
     checkpoint: 0 as CheckpointStage,
-    isLocked: false,
     scrollDirection: 'down' as 'down' | 'up',
   });
 
-  useEffect(() => {
-    stateRef.current.cardIndex = activeCardIndex;
-    stateRef.current.checkpoint = activeCheckpoint;
-    stateRef.current.isLocked = isLocked;
-    stateRef.current.scrollDirection = scrollDirection;
-  }, [activeCardIndex, activeCheckpoint, isLocked, scrollDirection]);
-
-  // Lock & Cooldown Timers
+  const isLockedRef = useRef<boolean>(false);
   const lockTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const wheelSilenceTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const gestureActiveRef = useRef<boolean>(false);
 
+  // Safe Lock mechanism: Always releases automatically via timeout, never deadlocks
   const applyLock = useCallback((durationMs: number) => {
+    isLockedRef.current = true;
     setIsLocked(true);
-    stateRef.current.isLocked = true;
     if (lockTimerRef.current) clearTimeout(lockTimerRef.current);
     lockTimerRef.current = setTimeout(() => {
+      isLockedRef.current = false;
       setIsLocked(false);
-      stateRef.current.isLocked = false;
     }, durationMs);
   }, []);
 
-  // Check if pinned canvas is currently docked in the viewport
-  const isDockedInViewport = useCallback(() => {
+  // Check if section is visibly active in the viewport
+  const isSectionActive = useCallback(() => {
     if (!containerRef.current) return false;
     const rect = containerRef.current.getBoundingClientRect();
     const vh = window.innerHeight;
-    // Section fills the screen (top docked near 0, bottom near viewport height)
-    return rect.top <= 12 && rect.bottom >= vh - 12;
+    // Section is active when its top has reached the viewport top (<= 50px)
+    // and its bottom hasn't scrolled completely off the screen (>= half viewport)
+    return rect.top <= 50 && rect.bottom >= vh * 0.4;
   }, []);
 
   // =========================================================================
-  // UNIFIED NAVIGATION ACTIONS (Shared by Scroll, Touch, Keys & Arrows)
+  // UNIFIED NAVIGATION LOGIC (Single Source of Truth)
+  // Used identically by Mouse Wheel, Trackpad, Touch, Keyboard, & Arrow Buttons
   // =========================================================================
 
-  // Advance by EXACTLY ONE checkpoint (Forward / Downward)
   const advanceCheckpoint = useCallback(() => {
-    const { cardIndex, checkpoint, isLocked: locked } = stateRef.current;
-    if (locked) return;
+    if (isLockedRef.current) return;
 
-    // Checkpoint A -> B -> C -> D
+    const { cardIndex, checkpoint } = stateRef.current;
+
+    // Checkpoint A -> B -> C -> D within the same card
     if (checkpoint < 3) {
+      const nextCp = (checkpoint + 1) as CheckpointStage;
+      stateRef.current.checkpoint = nextCp;
+      stateRef.current.scrollDirection = 'down';
       setScrollDirection('down');
-      setActiveCheckpoint((prev) => (prev + 1) as CheckpointStage);
+      setActiveCheckpoint(nextCp);
       applyLock(TIMINGS.down.textLockMs);
       return;
     }
 
     // Checkpoint D -> Next Card Checkpoint A (Horizontal Slide)
     if (cardIndex < NEXT_GEN_TECH.length - 1) {
+      const nextCard = cardIndex + 1;
+      stateRef.current.cardIndex = nextCard;
+      stateRef.current.checkpoint = 0;
+      stateRef.current.scrollDirection = 'down';
       setScrollDirection('down');
-      setActiveCardIndex((prev) => prev + 1);
+      setActiveCardIndex(nextCard);
       setActiveCheckpoint(0);
       applyLock(TIMINGS.down.cardLockMs);
     }
   }, [applyLock]);
 
-  // Reverse by EXACTLY ONE checkpoint (Backward / Upward)
   const previousCheckpoint = useCallback(() => {
-    const { cardIndex, checkpoint, isLocked: locked } = stateRef.current;
-    if (locked) return;
+    if (isLockedRef.current) return;
 
-    // Checkpoint D -> C -> B -> A
+    const { cardIndex, checkpoint } = stateRef.current;
+
+    // Checkpoint D -> C -> B -> A within the same card
     if (checkpoint > 0) {
+      const prevCp = (checkpoint - 1) as CheckpointStage;
+      stateRef.current.checkpoint = prevCp;
+      stateRef.current.scrollDirection = 'up';
       setScrollDirection('up');
-      setActiveCheckpoint((prev) => (prev - 1) as CheckpointStage);
+      setActiveCheckpoint(prevCp);
       applyLock(TIMINGS.up.textLockMs);
       return;
     }
 
     // Checkpoint A -> Previous Card Checkpoint D (Horizontal Slide)
     if (cardIndex > 0) {
+      const prevCard = cardIndex - 1;
+      stateRef.current.cardIndex = prevCard;
+      stateRef.current.checkpoint = 3;
+      stateRef.current.scrollDirection = 'up';
       setScrollDirection('up');
-      setActiveCardIndex((prev) => prev - 1);
+      setActiveCardIndex(prevCard);
       setActiveCheckpoint(3);
       applyLock(TIMINGS.up.cardLockMs);
     }
   }, [applyLock]);
 
-  // Jump directly to card tab (01 - 04)
-  const jumpToCard = (targetCardIdx: number) => {
-    if (targetCardIdx === activeCardIndex || isLocked) return;
-    const dir = targetCardIdx > activeCardIndex ? 'down' : 'up';
+  const jumpToCard = useCallback((targetCardIdx: number) => {
+    if (isLockedRef.current || targetCardIdx === stateRef.current.cardIndex) return;
+    const dir = targetCardIdx > stateRef.current.cardIndex ? 'down' : 'up';
+    stateRef.current.cardIndex = targetCardIdx;
+    stateRef.current.checkpoint = 0;
+    stateRef.current.scrollDirection = dir;
     setScrollDirection(dir);
     setActiveCardIndex(targetCardIdx);
     setActiveCheckpoint(0);
     applyLock(dir === 'down' ? TIMINGS.down.cardLockMs : TIMINGS.up.cardLockMs);
-  };
+  }, [applyLock]);
 
   // =========================================================================
-  // GESTURE INPUT PROTECTION (Wheel, Trackpad & Mobile Touch)
+  // SCROLL & TOUCH INPUT HANDLERS
   // =========================================================================
   const touchStartY = useRef<number>(0);
   const touchStartX = useRef<number>(0);
-  const touchConsumed = useRef<boolean>(false);
+  const touchHandled = useRef<boolean>(false);
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container || shouldReduceMotion) return;
 
-    // 1. Wheel & Trackpad Listener with Momentum Isolation
+    // 1. Mouse Wheel & Trackpad
     const handleWheel = (e: WheelEvent) => {
-      // If canvas is not filling viewport, allow natural document scrolling
-      if (!isDockedInViewport()) return;
+      if (!isSectionActive()) return;
 
-      const { cardIndex, checkpoint, isLocked: locked } = stateRef.current;
+      const { cardIndex, checkpoint } = stateRef.current;
       const isAtEnd = cardIndex === NEXT_GEN_TECH.length - 1 && checkpoint === 3;
       const isAtStart = cardIndex === 0 && checkpoint === 0;
 
-      // Downward at the final checkpoint -> allow natural scroll to next section
+      // Natural release boundaries:
       if (e.deltaY > 0 && isAtEnd) {
+        // At the very end, allow normal downward scroll to the next section
         return;
       }
-      // Upward at the initial checkpoint -> allow natural scroll back to intro
       if (e.deltaY < 0 && isAtStart) {
+        // At the very start, allow normal upward scroll back to intro
         return;
       }
 
-      // Inside pinned presentation: prevent document scrolling
+      // Intercept scroll within the section
       e.preventDefault();
 
-      // Reset wheel silence timer on every wheel event
-      if (wheelSilenceTimerRef.current) clearTimeout(wheelSilenceTimerRef.current);
-      wheelSilenceTimerRef.current = setTimeout(() => {
-        // 170ms of silence confirms trackpad momentum has completely decayed
-        gestureActiveRef.current = false;
-      }, 170);
+      // If locked during animation, ignore subsequent wheel events
+      if (isLockedRef.current) return;
 
-      // If animation is in progress or this continuous swipe was already consumed, ignore
-      if (locked || gestureActiveRef.current) return;
+      // Filter micro-trackpad noise
+      if (Math.abs(e.deltaY) < 15) return;
 
-      // Intentional gesture threshold to filter out tiny trackpad micro-jitters
-      if (Math.abs(e.deltaY) < 16) return;
-
-      // Mark this gesture as consumed
-      gestureActiveRef.current = true;
+      // Snap alignment to top if slightly offset
+      const rect = container.getBoundingClientRect();
+      if (Math.abs(rect.top) > 4) {
+        window.scrollTo({
+          top: container.offsetTop,
+          behavior: 'instant' as ScrollBehavior,
+        });
+      }
 
       if (e.deltaY > 0) {
         advanceCheckpoint();
@@ -206,38 +214,37 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
       }
     };
 
-    // 2. Mobile Touch Event Listeners (Strict One-Swipe-One-Checkpoint)
+    // 2. Mobile Touch (One Swipe = Exactly One Checkpoint)
     const handleTouchStart = (e: TouchEvent) => {
       touchStartY.current = e.touches[0].clientY;
       touchStartX.current = e.touches[0].clientX;
-      touchConsumed.current = false;
+      touchHandled.current = false;
     };
 
     const handleTouchMove = (e: TouchEvent) => {
-      if (!isDockedInViewport()) return;
+      if (!isSectionActive()) return;
 
       const currentY = e.touches[0].clientY;
       const currentX = e.touches[0].clientX;
       const deltaY = touchStartY.current - currentY; // positive = swipe up = scroll down
       const deltaX = touchStartX.current - currentX;
 
-      const { cardIndex, checkpoint, isLocked: locked } = stateRef.current;
+      const { cardIndex, checkpoint } = stateRef.current;
       const isAtEnd = cardIndex === NEXT_GEN_TECH.length - 1 && checkpoint === 3;
       const isAtStart = cardIndex === 0 && checkpoint === 0;
 
-      // Release boundaries: allow natural scroll out
+      // Release boundaries
       if (deltaY > 0 && isAtEnd) return;
       if (deltaY < 0 && isAtStart) return;
 
-      // Pinned mode: prevent native scroll
+      // Prevent native page scroll while actively interacting
       e.preventDefault();
 
-      // If animation is running or this swipe gesture has already been consumed:
-      if (locked || touchConsumed.current) return;
+      if (isLockedRef.current || touchHandled.current) return;
 
-      // Deliberate vertical swipe threshold (32px)
-      if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 32) {
-        touchConsumed.current = true; // One swipe = exactly one action
+      // Vertical swipe threshold (28px)
+      if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 28) {
+        touchHandled.current = true; // Consume this swipe gesture
         if (deltaY > 0) {
           advanceCheckpoint();
         } else {
@@ -247,12 +254,12 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
     };
 
     const handleTouchEnd = () => {
-      touchConsumed.current = false;
+      touchHandled.current = false;
     };
 
     // 3. Keyboard Arrow Keys
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (!isDockedInViewport()) return;
+      if (!isSectionActive()) return;
 
       const { cardIndex, checkpoint } = stateRef.current;
       const isAtEnd = cardIndex === NEXT_GEN_TECH.length - 1 && checkpoint === 3;
@@ -270,21 +277,20 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
     };
 
     window.addEventListener('wheel', handleWheel, { passive: false });
+    window.addEventListener('keydown', handleKeyDown);
     container.addEventListener('touchstart', handleTouchStart, { passive: true });
     container.addEventListener('touchmove', handleTouchMove, { passive: false });
     container.addEventListener('touchend', handleTouchEnd, { passive: true });
-    window.addEventListener('keydown', handleKeyDown);
 
     return () => {
       window.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('keydown', handleKeyDown);
       container.removeEventListener('touchstart', handleTouchStart);
       container.removeEventListener('touchmove', handleTouchMove);
       container.removeEventListener('touchend', handleTouchEnd);
-      window.removeEventListener('keydown', handleKeyDown);
       if (lockTimerRef.current) clearTimeout(lockTimerRef.current);
-      if (wheelSilenceTimerRef.current) clearTimeout(wheelSilenceTimerRef.current);
     };
-  }, [advanceCheckpoint, previousCheckpoint, isDockedInViewport, shouldReduceMotion]);
+  }, [advanceCheckpoint, previousCheckpoint, isSectionActive, shouldReduceMotion]);
 
   // Reduced motion accessible fallback (clean vertical layout)
   if (shouldReduceMotion) {
@@ -683,7 +689,7 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
             <div className="flex items-center space-x-1">
               <button
                 onClick={previousCheckpoint}
-                disabled={activeCardIndex === 0 && activeCheckpoint === 0}
+                disabled={(activeCardIndex === 0 && activeCheckpoint === 0) || isLocked}
                 className="p-1.5 rounded-full border border-earth-border text-earth-forest hover:bg-earth-forest/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                 title="Previous Checkpoint"
                 aria-label="Previous Checkpoint"
@@ -692,7 +698,7 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
               </button>
               <button
                 onClick={advanceCheckpoint}
-                disabled={activeCardIndex === NEXT_GEN_TECH.length - 1 && activeCheckpoint === 3}
+                disabled={(activeCardIndex === NEXT_GEN_TECH.length - 1 && activeCheckpoint === 3) || isLocked}
                 className="p-1.5 rounded-full border border-earth-border text-earth-forest hover:bg-earth-forest/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                 title="Next Checkpoint"
                 aria-label="Next Checkpoint"
