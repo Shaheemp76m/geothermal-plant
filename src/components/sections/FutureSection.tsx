@@ -11,13 +11,14 @@ interface FutureSectionProps {
   onOpenReferences: () => void;
 }
 
-type CheckpointStage = 0 | 1 | 2 | 3;
+export type CheckpointStage = 0 | 1 | 2 | 3 | 4;
 
 const CHECKPOINT_NAMES = [
   'STAGE A · HEADING',
   'STAGE B · SUBHEADING',
   'STAGE C · DESCRIPTION',
   'STAGE D · SPECIFICATIONS',
+  'STAGE E · ROADMAP & CITATIONS',
 ] as const;
 
 // Precision Timing Tokens
@@ -29,8 +30,8 @@ const TIMINGS = {
     supportingDuration: 0.80, // 800ms
     cardDuration: 1.05, // 1050ms horizontal card transition
     easing: [0.22, 1, 0.36, 1] as const, // smooth editorial easeOutCubic
-    textLockMs: 900, // 900ms input lock
-    cardLockMs: 1550, // 1550ms card transition lock (420ms exit + 1050ms enter + buffer)
+    textLockMs: 850, // 850ms input lock
+    cardLockMs: 1400, // 1400ms card transition lock
   },
   up: {
     // Fast, responsive, snappy backward review
@@ -39,8 +40,8 @@ const TIMINGS = {
     supportingDuration: 0.30, // 300ms
     cardDuration: 0.38, // 380ms horizontal card transition
     easing: [0.16, 1, 0.3, 1] as const,
-    textLockMs: 360, // 360ms fast reverse lock
-    cardLockMs: 720, // 720ms card reverse lock
+    textLockMs: 340, // 340ms fast reverse lock
+    cardLockMs: 650, // 650ms card reverse lock
   },
 };
 
@@ -63,6 +64,8 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
 
   const isLockedRef = useRef<boolean>(false);
   const lockTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const armTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const isFinalArmedRef = useRef<boolean>(false);
 
   // Safe Lock mechanism: Always releases automatically via timeout, never deadlocks
   const applyLock = useCallback((durationMs: number) => {
@@ -79,11 +82,22 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
   const isSectionActive = useCallback(() => {
     if (!containerRef.current) return false;
     const rect = containerRef.current.getBoundingClientRect();
-    const vh = window.innerHeight;
-    // Section is active when its top is at or near the viewport top (within 100px)
-    // and its canvas occupies the viewport
-    return rect.top <= 100 && rect.bottom >= vh * 0.35;
+    // Section is active when its top is at or near the viewport top (within 70px)
+    // and its canvas has not fully scrolled past the top
+    return rect.top <= 70 && rect.bottom >= 80;
   }, []);
+
+  // Smooth release to the next website section (ClosingSection)
+  const releaseToNextSection = useCallback(() => {
+    if (isLockedRef.current) return;
+    applyLock(800);
+    const closingSection = document.getElementById('closing-section');
+    if (closingSection) {
+      closingSection.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      window.scrollBy({ top: window.innerHeight * 0.9, behavior: 'smooth' });
+    }
+  }, [applyLock]);
 
   // =========================================================================
   // UNIFIED NAVIGATION LOGIC (Single Source of Truth)
@@ -94,15 +108,28 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
     if (isLockedRef.current) return;
 
     const { cardIndex, checkpoint } = stateRef.current;
+    const maxCheckpoint = cardIndex === 3 ? 4 : 3;
 
-    // Checkpoint A -> B -> C -> D within the same card
-    if (checkpoint < 3) {
+    // Checkpoint A -> B -> C -> D (and E on final card) within the same card
+    if (checkpoint < maxCheckpoint) {
       const nextCp = (checkpoint + 1) as CheckpointStage;
       stateRef.current.checkpoint = nextCp;
       stateRef.current.scrollDirection = 'down';
       setScrollDirection('down');
       setActiveCheckpoint(nextCp);
-      applyLock(TIMINGS.down.textLockMs);
+
+      // On final card: when reaching Checkpoint 4 (Stage E - Final CTA),
+      // arm release only AFTER the entrance animation lock finishes!
+      if (cardIndex === 3 && nextCp === 4) {
+        isFinalArmedRef.current = false;
+        applyLock(TIMINGS.down.textLockMs);
+        if (armTimerRef.current) clearTimeout(armTimerRef.current);
+        armTimerRef.current = setTimeout(() => {
+          isFinalArmedRef.current = true;
+        }, TIMINGS.down.textLockMs + 50);
+      } else {
+        applyLock(TIMINGS.down.textLockMs);
+      }
       return;
     }
 
@@ -115,35 +142,47 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
       setScrollDirection('down');
       setActiveCardIndex(nextCard);
       setActiveCheckpoint(0);
+      isFinalArmedRef.current = false;
       applyLock(TIMINGS.down.cardLockMs);
+      return;
     }
-  }, [applyLock]);
+
+    // Final Checkpoint (Card 3, Checkpoint 4) reached & armed:
+    // Next intentional downward gesture releases the section
+    if (cardIndex === 3 && checkpoint === 4 && isFinalArmedRef.current) {
+      releaseToNextSection();
+    }
+  }, [applyLock, releaseToNextSection]);
 
   const previousCheckpoint = useCallback(() => {
     if (isLockedRef.current) return;
 
     const { cardIndex, checkpoint } = stateRef.current;
 
-    // Checkpoint D -> C -> B -> A within the same card
+    // Step backward within the same card
     if (checkpoint > 0) {
       const prevCp = (checkpoint - 1) as CheckpointStage;
       stateRef.current.checkpoint = prevCp;
       stateRef.current.scrollDirection = 'up';
       setScrollDirection('up');
       setActiveCheckpoint(prevCp);
+      isFinalArmedRef.current = false;
       applyLock(TIMINGS.up.textLockMs);
       return;
     }
 
-    // Checkpoint A -> Previous Card Checkpoint D (Horizontal Slide)
+    // Checkpoint A -> Previous Card Checkpoint D (Horizontal Slide backward)
     if (cardIndex > 0) {
       const prevCard = cardIndex - 1;
+      // Cards 0, 1, 2 max checkpoint is 3
+      const maxCp = 3 as CheckpointStage;
       stateRef.current.cardIndex = prevCard;
-      stateRef.current.checkpoint = 3;
+      stateRef.current.checkpoint = maxCp;
       stateRef.current.scrollDirection = 'up';
       setScrollDirection('up');
       setActiveCardIndex(prevCard);
-      setActiveCheckpoint(3);
+      setActiveCheckpoint(maxCp);
+      isFinalArmedRef.current = false;
       applyLock(TIMINGS.up.cardLockMs);
     }
   }, [applyLock]);
@@ -157,6 +196,7 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
     setScrollDirection(dir);
     setActiveCardIndex(targetCardIdx);
     setActiveCheckpoint(0);
+    isFinalArmedRef.current = false;
     applyLock(dir === 'down' ? TIMINGS.down.cardLockMs : TIMINGS.up.cardLockMs);
   }, [applyLock]);
 
@@ -176,16 +216,21 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
       if (!isSectionActive()) return;
 
       const { cardIndex, checkpoint } = stateRef.current;
-      const isAtEnd = cardIndex === NEXT_GEN_TECH.length - 1 && checkpoint === 3;
+      const isAtFinalState = cardIndex === 3 && checkpoint === 4;
       const isAtStart = cardIndex === 0 && checkpoint === 0;
 
-      // Natural release boundaries:
-      if (e.deltaY > 0 && isAtEnd) {
-        // At the very end, allow normal downward scroll to the next section
+      // Release boundaries:
+      // At the start, upward scroll returns to introduction section
+      if (e.deltaY < 0 && isAtStart) {
         return;
       }
-      if (e.deltaY < 0 && isAtStart) {
-        // At the very start, allow normal upward scroll back to intro
+
+      // At the final state, release only when ALL final content is revealed and armed
+      if (e.deltaY > 0 && isAtFinalState) {
+        if (isFinalArmedRef.current && !isLockedRef.current) {
+          releaseToNextSection();
+        }
+        e.preventDefault();
         return;
       }
 
@@ -198,9 +243,9 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
       // Filter micro-trackpad noise
       if (Math.abs(e.deltaY) < 14) return;
 
-      // Ensure stable docking to viewport top (ZERO vertical drift)
+      // Ensure stable docking to viewport top if slightly displaced
       const rect = container.getBoundingClientRect();
-      if (Math.abs(rect.top) > 2) {
+      if (Math.abs(rect.top) > 2 && Math.abs(rect.top) < 60) {
         window.scrollTo({
           top: window.scrollY + rect.top,
           behavior: 'instant' as ScrollBehavior,
@@ -230,12 +275,20 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
       const deltaX = touchStartX.current - currentX;
 
       const { cardIndex, checkpoint } = stateRef.current;
-      const isAtEnd = cardIndex === NEXT_GEN_TECH.length - 1 && checkpoint === 3;
+      const isAtFinalState = cardIndex === 3 && checkpoint === 4;
       const isAtStart = cardIndex === 0 && checkpoint === 0;
 
-      // Release boundaries: allow normal mobile scroll past the section
-      if (deltaY > 0 && isAtEnd) return;
+      // Release boundary: upward swipe when at start returns naturally to introduction
       if (deltaY < 0 && isAtStart) return;
+
+      // Release boundary: downward swipe when at final state and armed
+      if (deltaY > 0 && isAtFinalState) {
+        if (isFinalArmedRef.current && !isLockedRef.current) {
+          releaseToNextSection();
+        }
+        e.preventDefault();
+        return;
+      }
 
       // Prevent native page scroll while actively interacting anywhere on screen
       e.preventDefault();
@@ -246,9 +299,9 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
       if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 24) {
         touchHandled.current = true; // Consume this swipe gesture
 
-        // Snap dock alignment on touch
+        // Snap dock alignment on touch if slightly off
         const rect = container.getBoundingClientRect();
-        if (Math.abs(rect.top) > 2) {
+        if (Math.abs(rect.top) > 2 && Math.abs(rect.top) < 60) {
           window.scrollTo({
             top: window.scrollY + rect.top,
             behavior: 'instant' as ScrollBehavior,
@@ -272,11 +325,16 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
       if (!isSectionActive()) return;
 
       const { cardIndex, checkpoint } = stateRef.current;
-      const isAtEnd = cardIndex === NEXT_GEN_TECH.length - 1 && checkpoint === 3;
+      const isAtFinalState = cardIndex === 3 && checkpoint === 4;
       const isAtStart = cardIndex === 0 && checkpoint === 0;
 
       if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ' || e.key === 'ArrowRight') {
-        if (isAtEnd) return;
+        if (isAtFinalState) {
+          if (isFinalArmedRef.current && !isLockedRef.current) {
+            releaseToNextSection();
+          }
+          return;
+        }
         e.preventDefault();
         advanceCheckpoint();
       } else if (e.key === 'ArrowUp' || e.key === 'PageUp' || e.key === 'ArrowLeft') {
@@ -286,11 +344,25 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
       }
     };
 
+    // 4. Reverse Scroll Re-engagement Watcher
+    // When user scrolls back up from ClosingSection, reactivate the final checkpoint
+    const handleWindowScroll = () => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      // If container re-enters viewport from below (scrolling up from ClosingSection)
+      if (rect.top >= -50 && rect.top <= 50 && stateRef.current.cardIndex === 3 && stateRef.current.checkpoint < 4) {
+        stateRef.current.checkpoint = 4;
+        setActiveCheckpoint(4);
+        isFinalArmedRef.current = true;
+      }
+    };
+
     window.addEventListener('wheel', handleWheel, { passive: false });
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('touchstart', handleTouchStart, { passive: true });
     window.addEventListener('touchmove', handleTouchMove, { passive: false });
     window.addEventListener('touchend', handleTouchEnd, { passive: true });
+    window.addEventListener('scroll', handleWindowScroll, { passive: true });
 
     return () => {
       window.removeEventListener('wheel', handleWheel);
@@ -298,9 +370,11 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
       window.removeEventListener('touchstart', handleTouchStart);
       window.removeEventListener('touchmove', handleTouchMove);
       window.removeEventListener('touchend', handleTouchEnd);
+      window.removeEventListener('scroll', handleWindowScroll);
       if (lockTimerRef.current) clearTimeout(lockTimerRef.current);
+      if (armTimerRef.current) clearTimeout(armTimerRef.current);
     };
-  }, [advanceCheckpoint, previousCheckpoint, isSectionActive, shouldReduceMotion]);
+  }, [advanceCheckpoint, previousCheckpoint, isSectionActive, shouldReduceMotion, releaseToNextSection]);
 
   // Reduced motion accessible fallback (clean vertical layout)
   if (shouldReduceMotion) {
@@ -389,9 +463,12 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
     }),
   };
 
-  // Progress Calculations (16 discrete checkpoints)
+  // Progress Calculations (17 discrete checkpoints: 4 + 4 + 4 + 5)
   const currentStepNumber = activeCardIndex * 4 + activeCheckpoint + 1;
-  const progressPercentage = (currentStepNumber / 16) * 100;
+  const progressPercentage = Math.min(100, (currentStepNumber / 17) * 100);
+
+  // Micro Checkpoint Dots: Cards 0–2 have 4 stages (A–D); Card 3 has 5 stages (A–E)
+  const dotsForCurrentCard = activeCardIndex === 3 ? [0, 1, 2, 3, 4] : [0, 1, 2, 3];
 
   return (
     <div className="bg-earth-ivory text-earth-black selection:bg-earth-forest selection:text-white">
@@ -435,23 +512,19 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
 
       {/* ============================================================ */}
       {/* 2. PINNED HORIZONTAL STORYTELLING CANVAS                     */}
-      {/* 1 Gesture = 1 Checkpoint; Slower Forward, Snappy Backward    */}
+      {/* 1 Gesture = 1 Checkpoint; Final Checkpoint Gating & Lock     */}
       {/* ============================================================ */}
       <div
         ref={containerRef}
         style={{
-          touchAction:
-            (activeCardIndex === NEXT_GEN_TECH.length - 1 && activeCheckpoint === 3) ||
-            (activeCardIndex === 0 && activeCheckpoint === 0)
-              ? 'auto'
-              : 'none',
+          touchAction: 'none',
         }}
         className="relative h-screen h-[100dvh] w-full overflow-hidden flex flex-col justify-between bg-earth-ivory border-b border-earth-border select-none z-20"
       >
         {/* -------------------------------------------------------- */}
         {/* TOP STAGE & CHECKPOINT PROGRESS BAR                      */}
         {/* -------------------------------------------------------- */}
-        <header className="pt-4 sm:pt-6 lg:pt-8 px-4 sm:px-8 md:px-14 lg:px-20 flex items-center justify-between border-b border-earth-border/40 pb-3 sm:pb-4 shrink-0 bg-earth-ivory/95 backdrop-blur-md z-30">
+        <header className="pt-3 sm:pt-5 lg:pt-6 px-4 sm:px-8 md:px-14 lg:px-20 flex items-center justify-between border-b border-earth-border/40 pb-2.5 sm:pb-3.5 shrink-0 bg-earth-ivory/95 backdrop-blur-md z-30">
           {/* Left: Section Sub-eyebrow & Active Checkpoint Badge */}
           <div className="flex items-center space-x-3 sm:space-x-4">
             <div className="flex items-center space-x-2">
@@ -476,9 +549,12 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
               0{activeCardIndex + 1} <span className="text-earth-muted font-normal">/ 04</span>
             </div>
 
-            {/* Micro Checkpoint Dots (A, B, C, D) */}
-            <div className="flex items-center space-x-1 sm:space-x-1.5" title={`Current Stage: Checkpoint ${activeCheckpoint + 1} of 4`}>
-              {[0, 1, 2, 3].map((cp) => (
+            {/* Micro Checkpoint Dots (A, B, C, D, and E on final card) */}
+            <div
+              className="flex items-center space-x-1 sm:space-x-1.5"
+              title={`Current Stage: Checkpoint ${activeCheckpoint + 1} of ${dotsForCurrentCard.length}`}
+            >
+              {dotsForCurrentCard.map((cp) => (
                 <span
                   key={cp}
                   className={`h-1.5 rounded-full transition-all duration-300 ${
@@ -525,7 +601,7 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
         {/* -------------------------------------------------------- */}
         {/* CENTER VIEWPORT: ACTIVE CARD DISPLAY                     */}
         {/* -------------------------------------------------------- */}
-        <main className="flex-1 min-h-0 relative overflow-hidden flex items-center justify-center px-4 sm:px-8 md:px-14 lg:px-20 py-2 sm:py-4">
+        <main className="flex-1 min-h-0 relative overflow-hidden flex items-center justify-center px-4 sm:px-8 md:px-14 lg:px-20 py-2 sm:py-3">
           <AnimatePresence mode="wait" custom={scrollDirection}>
             <motion.div
               key={currentTech.number}
@@ -543,14 +619,14 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
               >
                 <span
                   className="font-editorial font-light text-earth-forest/[0.05] block leading-none"
-                  style={{ fontSize: 'clamp(7rem, 22vw, 20rem)' }}
+                  style={{ fontSize: 'clamp(6rem, 18vw, 18rem)' }}
                 >
                   {currentTech.number}
                 </span>
               </div>
 
-              {/* CARD CONTENT COMPOSITION */}
-              <div className="relative z-10 space-y-3.5 sm:space-y-5 md:space-y-6 max-w-4xl">
+              {/* CARD CONTENT COMPOSITION (Fitted within usable viewport) */}
+              <div className="relative z-10 space-y-2.5 sm:space-y-4 md:space-y-5 max-w-4xl max-h-[calc(100dvh-130px)] overflow-y-auto scrollbar-none py-1">
                 {/* ================================================== */}
                 {/* CHECKPOINT A: ARRIVAL — CLASSIFICATION & HEADING   */}
                 {/* ================================================== */}
@@ -561,19 +637,19 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
                     duration: activeTimings.textDuration,
                     ease: activeTimings.easing,
                   }}
-                  className="space-y-2 sm:space-y-3"
+                  className="space-y-1.5 sm:space-y-2.5"
                 >
                   {/* Classification Tag & Field Status Lockup */}
-                  <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                     <span className="font-mono text-[10px] sm:text-[11px] tracking-[0.25em] text-earth-sage uppercase font-semibold">
                       {currentTech.classification}
                     </span>
-                    <span className="inline-flex items-center space-x-1.5 px-3 py-1 bg-earth-forest/5 border border-earth-forest/15 rounded-full text-[9px] sm:text-[10px] font-mono tracking-widest text-earth-forest font-semibold uppercase">
+                    <span className="inline-flex items-center space-x-1.5 px-3 py-0.5 sm:py-1 bg-earth-forest/5 border border-earth-forest/15 rounded-full text-[9px] sm:text-[10px] font-mono tracking-widest text-earth-forest font-semibold uppercase">
                       <span className="w-1.5 h-1.5 rounded-full bg-earth-sage" />
                       <span>{currentTech.status}</span>
                     </span>
                     {activeCardIndex === 2 && (
-                      <span className="font-mono text-[9px] sm:text-[10px] tracking-[0.2em] text-earth-forest bg-earth-forest/10 px-2.5 py-1 border border-earth-forest/20 uppercase font-semibold rounded-full">
+                      <span className="font-mono text-[9px] sm:text-[10px] tracking-[0.2em] text-earth-forest bg-earth-forest/10 px-2.5 py-0.5 sm:py-1 border border-earth-forest/20 uppercase font-semibold rounded-full">
                         &gt;400°C CRITICAL ENTHALPY
                       </span>
                     )}
@@ -582,7 +658,7 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
                   {/* Main Editorial Heading */}
                   <h3
                     className="font-editorial font-medium tracking-tight text-earth-forest leading-[1.06]"
-                    style={{ fontSize: 'clamp(2.2rem, 5.2vw, 4.8rem)' }}
+                    style={{ fontSize: 'clamp(2rem, 4.6vw, 4.4rem)' }}
                   >
                     {currentTech.title}
                   </h3>
@@ -591,12 +667,12 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
                 {/* ================================================== */}
                 {/* CHECKPOINT B: SUBHEADING — ITALIC STATEMENT       */}
                 {/* ================================================== */}
-                <div className="min-h-[2.5rem] sm:min-h-[3.5rem] flex items-center">
+                <div className="min-h-[2.2rem] sm:min-h-[3rem] flex items-center">
                   <motion.div
                     initial={false}
                     animate={{
                       opacity: activeCheckpoint >= 1 ? 1 : 0,
-                      y: activeCheckpoint >= 1 ? 0 : 18,
+                      y: activeCheckpoint >= 1 ? 0 : 16,
                       filter: activeCheckpoint >= 1 ? 'blur(0px)' : 'blur(4px)',
                     }}
                     transition={{
@@ -605,7 +681,7 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
                     }}
                     className={activeCheckpoint >= 1 ? 'pointer-events-auto' : 'pointer-events-none select-none'}
                   >
-                    <p className="font-editorial italic text-lg sm:text-2xl md:text-3xl text-earth-forest/85 leading-snug">
+                    <p className="font-editorial italic text-base sm:text-xl md:text-2xl text-earth-forest/85 leading-snug">
                       &ldquo;{currentTech.subtitle}&rdquo;
                     </p>
                   </motion.div>
@@ -614,12 +690,12 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
                 {/* ================================================== */}
                 {/* CHECKPOINT C: DESCRIPTION — MAIN EXPLANATORY BODY  */}
                 {/* ================================================== */}
-                <div className="min-h-[4rem] sm:min-h-[5.5rem] flex items-center">
+                <div className="min-h-[3.5rem] sm:min-h-[4.5rem] flex items-center">
                   <motion.div
                     initial={false}
                     animate={{
                       opacity: activeCheckpoint >= 2 ? 1 : 0,
-                      y: activeCheckpoint >= 2 ? 0 : 18,
+                      y: activeCheckpoint >= 2 ? 0 : 16,
                       filter: activeCheckpoint >= 2 ? 'blur(0px)' : 'blur(4px)',
                     }}
                     transition={{
@@ -631,7 +707,7 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
                   >
                     <p
                       className="font-sans text-earth-black/80 max-w-3xl leading-relaxed border-l-2 border-earth-forest/30 pl-4 sm:pl-6"
-                      style={{ fontSize: 'clamp(0.95rem, 1.25vw, 1.2rem)' }}
+                      style={{ fontSize: 'clamp(0.9rem, 1.15vw, 1.15rem)' }}
                     >
                       {currentTech.description}
                     </p>
@@ -641,12 +717,12 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
                 {/* ================================================== */}
                 {/* CHECKPOINT D: SUPPORTING INFORMATION & TECHNICAL   */}
                 {/* ================================================== */}
-                <div className="min-h-[3rem] sm:min-h-[4rem] flex items-center pt-1">
+                <div className="min-h-[2.5rem] sm:min-h-[3rem] flex items-center pt-1">
                   <motion.div
                     initial={false}
                     animate={{
                       opacity: activeCheckpoint >= 3 ? 1 : 0,
-                      y: activeCheckpoint >= 3 ? 0 : 18,
+                      y: activeCheckpoint >= 3 ? 0 : 16,
                       filter: activeCheckpoint >= 3 ? 'blur(0px)' : 'blur(4px)',
                     }}
                     transition={{
@@ -657,7 +733,7 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
                       activeCheckpoint >= 3 ? 'pointer-events-auto' : 'pointer-events-none select-none'
                     }`}
                   >
-                    <div className="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-earth-border/40">
+                    <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-earth-border/40">
                       {/* Technical Specs Callout */}
                       <div className="flex items-center space-x-2 text-[10px] sm:text-[11px] font-mono text-earth-muted uppercase tracking-wider">
                         <span className="font-semibold text-earth-forest">FIELD METRICS:</span>
@@ -668,23 +744,50 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
                           {activeCardIndex === 3 && 'GYROTRON MILLIMETER-WAVE BEAM · 10–20 KM BASAL DRILLING'}
                         </span>
                       </div>
-
-                      {/* Card 04 Dedicated References CTA */}
-                      {activeCardIndex === 3 && (
-                        <div className="shrink-0">
-                          <MagneticButton
-                            as="button"
-                            onClick={onOpenReferences}
-                            className="space-x-2 px-5 py-2 sm:px-6 sm:py-2.5 border border-earth-forest bg-earth-forest text-earth-ivory hover:bg-earth-black text-[11px] font-semibold tracking-[0.2em] uppercase transition-all duration-300 shadow-sm"
-                          >
-                            <span>DOE ROADMAP & CITATIONS</span>
-                            <ArrowRight className="w-3.5 h-3.5" />
-                          </MagneticButton>
-                        </div>
-                      )}
                     </div>
                   </motion.div>
                 </div>
+
+                {/* ================================================== */}
+                {/* CHECKPOINT E (CARD 04 ONLY): DEDICATED FINAL CTA   */}
+                {/* ================================================== */}
+                {activeCardIndex === 3 && (
+                  <div className="min-h-[3.25rem] sm:min-h-[3.75rem] flex items-center pt-1">
+                    <motion.div
+                      initial={false}
+                      animate={{
+                        opacity: activeCheckpoint >= 4 ? 1 : 0,
+                        y: activeCheckpoint >= 4 ? 0 : 16,
+                        filter: activeCheckpoint >= 4 ? 'blur(0px)' : 'blur(4px)',
+                      }}
+                      transition={{
+                        duration: activeTimings.textDuration,
+                        ease: activeTimings.easing,
+                      }}
+                      className={`w-full flex flex-wrap items-center justify-between gap-3 p-3 bg-earth-forest/[0.04] border border-earth-forest/15 rounded-xl ${
+                        activeCheckpoint >= 4 ? 'pointer-events-auto' : 'pointer-events-none select-none'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-2 text-[10px] sm:text-[11px] font-mono text-earth-forest">
+                        <Sparkles className="w-3.5 h-3.5 text-earth-sage shrink-0" />
+                        <span className="font-semibold uppercase tracking-wider">
+                          FRONTIER SYNTHESIS &amp; TECHNICAL SOURCES
+                        </span>
+                      </div>
+
+                      <div className="shrink-0">
+                        <MagneticButton
+                          as="button"
+                          onClick={onOpenReferences}
+                          className="space-x-2 px-4 py-2 sm:px-5 sm:py-2 border border-earth-forest bg-earth-forest text-earth-ivory hover:bg-earth-black text-[10px] sm:text-[11px] font-semibold tracking-[0.2em] uppercase transition-all duration-300 shadow-sm rounded-lg"
+                        >
+                          <span>DOE ROADMAP &amp; CITATIONS</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </MagneticButton>
+                      </div>
+                    </motion.div>
+                  </div>
+                )}
               </div>
             </motion.div>
           </AnimatePresence>
@@ -693,7 +796,7 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
         {/* -------------------------------------------------------- */}
         {/* BOTTOM STAGE FOOTER & STEP CONTROLS                      */}
         {/* -------------------------------------------------------- */}
-        <footer className="pb-3 sm:pb-5 px-4 sm:px-8 md:px-14 lg:px-20 flex items-center justify-between border-t border-earth-border/40 pt-2.5 sm:pt-3.5 shrink-0 bg-earth-ivory/95 backdrop-blur-md z-30">
+        <footer className="pb-3 sm:pb-4 px-4 sm:px-8 md:px-14 lg:px-20 flex items-center justify-between border-t border-earth-border/40 pt-2 sm:pt-3 shrink-0 bg-earth-ivory/95 backdrop-blur-md z-30">
           {/* Left: Dynamic Footer Classification Label */}
           <div className="flex items-center space-x-3 truncate mr-4">
             <span className="font-mono text-[9px] sm:text-[10px] tracking-[0.22em] text-earth-muted uppercase truncate">
@@ -716,10 +819,18 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
               </button>
               <button
                 onClick={advanceCheckpoint}
-                disabled={(activeCardIndex === NEXT_GEN_TECH.length - 1 && activeCheckpoint === 3) || isLocked}
+                disabled={isLocked}
                 className="p-1.5 rounded-full border border-earth-border text-earth-forest hover:bg-earth-forest/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                title="Next Checkpoint"
-                aria-label="Next Checkpoint"
+                title={
+                  activeCardIndex === 3 && activeCheckpoint === 4
+                    ? 'Continue to Next Section'
+                    : 'Next Checkpoint'
+                }
+                aria-label={
+                  activeCardIndex === 3 && activeCheckpoint === 4
+                    ? 'Continue to Next Section'
+                    : 'Next Checkpoint'
+                }
               >
                 <ChevronRight className="w-3.5 h-3.5" />
               </button>
@@ -728,14 +839,16 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
             {/* Directional Prompt Text */}
             <div className="flex items-center space-x-2 text-[9px] sm:text-[10px] font-mono tracking-widest text-earth-forest font-medium">
               <span>
-                {activeCardIndex === NEXT_GEN_TECH.length - 1 && activeCheckpoint === 3
-                  ? 'FINAL CHECKPOINT REACHED · SCROLL DOWN TO CONTINUE'
+                {activeCardIndex === 3 && activeCheckpoint === 4
+                  ? 'ALL CONTENT REVEALED · SCROLL DOWN TO CONTINUE'
+                  : activeCardIndex === 3 && activeCheckpoint === 3
+                  ? 'SCROLL DOWN TO UNLOCK FINAL ROADMAP & CITATIONS'
                   : `SCROLL DOWN TO ADVANCE · ${CHECKPOINT_NAMES[activeCheckpoint]}`}
               </span>
               <ArrowDown
                 className={`w-3 h-3 text-earth-sage ${
-                  activeCardIndex === NEXT_GEN_TECH.length - 1 && activeCheckpoint === 3
-                    ? 'animate-bounce'
+                  activeCardIndex === 3 && activeCheckpoint === 4
+                    ? 'animate-bounce text-earth-forest'
                     : ''
                 }`}
               />

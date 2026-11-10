@@ -28,6 +28,7 @@ export const ClosingSection: React.FC = () => {
 
   return (
     <section 
+      id="closing-section"
       ref={containerRef}
       className="relative bg-earth-forest text-[#EAE5D9] overflow-hidden py-16 sm:py-24 md:py-32 border-b border-[#203D32]"
     >
