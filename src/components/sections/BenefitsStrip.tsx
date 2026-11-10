@@ -106,7 +106,8 @@ interface MetricTimelineItemProps {
   index: number;
   shouldReduceMotion: boolean;
   contentRefCallback?: (el: HTMLDivElement | null) => void;
-  mobileMarkerPos?: { x: number; y: number } | null;
+  labelRefCallback?: (el: HTMLSpanElement | null) => void;
+  onInViewChange?: (inView: boolean) => void;
 }
 
 const MetricTimelineItem: React.FC<MetricTimelineItemProps> = ({
@@ -114,10 +115,17 @@ const MetricTimelineItem: React.FC<MetricTimelineItemProps> = ({
   index,
   shouldReduceMotion,
   contentRefCallback,
-  mobileMarkerPos,
+  labelRefCallback,
+  onInViewChange,
 }) => {
   const localRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(localRef, { once: true, margin: '-70px' });
+
+  useEffect(() => {
+    if (isInView && onInViewChange) {
+      onInViewChange(true);
+    }
+  }, [isInView, onInViewChange]);
 
   // 01 (Left), 02 (Right), 03 (Left), 04 (Right)
   const isLeft = index % 2 === 0;
@@ -142,8 +150,8 @@ const MetricTimelineItem: React.FC<MetricTimelineItemProps> = ({
       className="relative scroll-mt-24"
     >
       {/* ------------------------------------------------------------------ */}
-      {/* 1. DESKTOP & TABLET: Central Marker on Straight Vertical Line      */}
-      {/* Active on md: (768px+); exactly centered between columns           */}
+      {/* DESKTOP & TABLET: Central Marker on Straight Vertical Line (>=768px)*/}
+      {/* Exactly centered between columns                                    */}
       {/* ------------------------------------------------------------------ */}
       <div 
         className="hidden md:flex absolute left-1/2 -translate-x-1/2 top-2 z-20 items-center justify-center pointer-events-none"
@@ -158,30 +166,6 @@ const MetricTimelineItem: React.FC<MetricTimelineItemProps> = ({
           0{index + 1}
         </div>
       </div>
-
-      {/* ------------------------------------------------------------------ */}
-      {/* 2. MOBILE: Marker Placed Exactly on the S-Curve Timeline (<768px)  */}
-      {/* ------------------------------------------------------------------ */}
-      {mobileMarkerPos && (
-        <div 
-          className="md:hidden flex absolute z-20 items-center justify-center pointer-events-none transition-transform duration-700"
-          style={{
-            left: `${mobileMarkerPos.x}px`,
-            top: `${mobileMarkerPos.y}px`,
-            transform: 'translate(-50%, -50%)',
-          }}
-        >
-          <div 
-            className={`w-7 h-7 rounded-full font-mono text-[10px] font-bold flex items-center justify-center transition-all duration-700 ${
-              isInView
-                ? 'bg-earth-forest text-earth-ivory border-2 border-earth-forest shadow-sm scale-110'
-                : 'bg-earth-ivory text-earth-muted border border-earth-border scale-100'
-            }`}
-          >
-            0{index + 1}
-          </div>
-        </div>
-      )}
 
       {/* ------------------------------------------------------------------ */}
       {/* Alternating Content Grid Row                                      */}
@@ -204,8 +188,11 @@ const MetricTimelineItem: React.FC<MetricTimelineItemProps> = ({
                 ref={contentRefCallback}
                 className={`relative z-10 flex flex-col w-[72%] sm:w-[68%] md:w-full max-w-[270px] sm:max-w-[290px] md:max-w-xl ${mobileAlignClass} ${desktopAlignClass}`}
               >
-                {/* Category Eyebrow */}
-                <span className="font-mono text-[10px] sm:text-[11px] tracking-[0.25em] text-earth-muted uppercase block mb-1.5 w-full">
+                {/* Category Eyebrow - Stable Reference for Marker Vertical Alignment */}
+                <span 
+                  ref={labelRefCallback}
+                  className="font-mono text-[10px] sm:text-[11px] tracking-[0.25em] text-earth-muted uppercase block mb-1.5 w-full"
+                >
                   {stat.category || `0${index + 1} / METRIC`}
                 </span>
 
@@ -267,8 +254,11 @@ const MetricTimelineItem: React.FC<MetricTimelineItemProps> = ({
                 ref={contentRefCallback}
                 className={`relative z-10 flex flex-col w-[72%] sm:w-[68%] md:w-full max-w-[270px] sm:max-w-[290px] md:max-w-xl ${mobileAlignClass} ${desktopAlignClass}`}
               >
-                {/* Category Eyebrow */}
-                <span className="font-mono text-[10px] sm:text-[11px] tracking-[0.25em] text-earth-muted uppercase block mb-1.5 w-full">
+                {/* Category Eyebrow - Stable Reference for Marker Vertical Alignment */}
+                <span 
+                  ref={labelRefCallback}
+                  className="font-mono text-[10px] sm:text-[11px] tracking-[0.25em] text-earth-muted uppercase block mb-1.5 w-full"
+                >
                   {stat.category || `0${index + 1} / METRIC`}
                 </span>
 
@@ -334,11 +324,13 @@ export const BenefitsStrip: React.FC = () => {
   const containerRef = useRef<HTMLElement>(null);
   const metricsListRef = useRef<HTMLDivElement>(null);
   const contentRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const labelRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const shouldReduceMotion = useReducedMotionPreference();
 
   const [pathD, setPathD] = useState<string>('');
   const [dimensions, setDimensions] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
   const [mobileMarkers, setMobileMarkers] = useState<{ x: number; y: number }[]>([]);
+  const [inViewStates, setInViewStates] = useState<boolean[]>([false, false, false, false]);
 
   // Scroll tracking for both straight desktop line and mobile S-curve path
   const { scrollYProgress } = useScroll({
@@ -352,8 +344,17 @@ export const BenefitsStrip: React.FC = () => {
     restDelta: 0.001,
   });
 
+  const handleInViewChange = useCallback((idx: number, inView: boolean) => {
+    setInViewStates((prev) => {
+      if (prev[idx] === inView) return prev;
+      const next = [...prev];
+      next[idx] = inView;
+      return next;
+    });
+  }, []);
+
   // Calculate the smooth S-curve timeline on mobile screens (<768px)
-  // Ensures the curve hugs the inner boundary of the text with ~2mm (12-14px) clearance
+  // Ensures the curve passes through the exact center coordinates of markers 01, 02, 03, 04
   const calculateMobilePath = useCallback(() => {
     if (!metricsListRef.current) return;
     const container = metricsListRef.current;
@@ -371,103 +372,98 @@ export const BenefitsStrip: React.FC = () => {
 
     setDimensions({ width, height });
 
-    // Measure actual rendered content boundaries for all 4 metrics
-    const contentBounds: { left: number; right: number; top: number; bottom: number }[] = [];
-    for (let i = 0; i < BENEFIT_STATS.length; i++) {
-      const el = contentRefs.current[i];
-      if (el) {
-        const elRect = el.getBoundingClientRect();
-        contentBounds.push({
-          left: elRect.left - containerRect.left,
-          right: elRect.right - containerRect.left,
-          top: elRect.top - containerRect.top,
-          bottom: elRect.bottom - containerRect.top,
-        });
-      }
-    }
-
-    if (contentBounds.length < 4) return;
-
-    // Visual clearance: 14px (~3.7mm, guaranteeing >= 2mm visual breathing room at all mobile densities)
-    const clearance = 14;
-
-    // Calculate marker and boundary points for each metric
+    // Measure actual rendered category-label positions and content boundaries
     const markers: { x: number; y: number }[] = [];
-    const apexes: { x: number; yTop: number; yMid: number; yBot: number }[] = [];
+    const bounds: { left: number; right: number; top: number; bottom: number }[] = [];
 
-    for (let i = 0; i < contentBounds.length; i++) {
-      const b = contentBounds[i];
+    for (let i = 0; i < BENEFIT_STATS.length; i++) {
+      const labelEl = labelRefs.current[i];
+      const contentEl = contentRefs.current[i];
+      if (!labelEl || !contentEl) return;
+
+      const lRect = labelEl.getBoundingClientRect();
+      const cRect = contentEl.getBoundingClientRect();
+
+      // Explicit marker center calculated directly from its corresponding category label
+      const labelCenterY = (lRect.top + lRect.bottom) / 2 - containerRect.top;
       const isLeft = i % 2 === 0;
 
-      let apexX: number;
+      // Clearance of 22px ensures:
+      // Marker circle (radius 14px) has 8px (~2.1mm) of clear space from the text boundary
+      // Timeline path (width 1.75px) has 22px (~5.8mm) of clear space from all content
+      const clearance = 22;
+
+      let markerX: number;
       if (isLeft) {
-        // Left-side metric: curve runs to the RIGHT of the text
-        apexX = Math.min(width - 16, b.right + clearance);
+        // Left-side metric: marker and curve run to the RIGHT of the text
+        markerX = Math.min(width - 16, cRect.right - containerRect.left + clearance);
       } else {
-        // Right-side metric: curve runs to the LEFT of the text
-        apexX = Math.max(16, b.left - clearance);
+        // Right-side metric: marker and curve run to the LEFT of the text
+        markerX = Math.max(16, cRect.left - containerRect.left - clearance);
       }
 
-      const markerY = b.top + 14;
-      markers.push({ x: apexX, y: markerY });
-
-      apexes.push({
-        x: apexX,
-        yTop: b.top,
-        yMid: (b.top + b.bottom) / 2,
-        yBot: b.bottom,
+      markers.push({ x: markerX, y: labelCenterY });
+      bounds.push({
+        left: cRect.left - containerRect.left,
+        right: cRect.right - containerRect.left,
+        top: cRect.top - containerRect.top,
+        bottom: cRect.bottom - containerRect.top,
       });
     }
 
+    if (markers.length < 4 || bounds.length < 4) return;
+
+    // Single source of truth: Markers and SVG path share the exact same coordinates
     setMobileMarkers(markers);
 
     // Build the continuous, smooth cubic Bezier S-curve
-    // 1. Lead-in into Marker 01 vertically
-    let d = `M ${markers[0].x.toFixed(1)} ${Math.max(0, markers[0].y - 24).toFixed(1)} L ${markers[0].x.toFixed(1)} ${markers[0].y.toFixed(1)}`;
+    // 1. Lead-in: enters Marker 01 vertically
+    let d = `M ${markers[0].x.toFixed(1)} ${(markers[0].y - 20).toFixed(1)} L ${markers[0].x.toFixed(1)} ${markers[0].y.toFixed(1)}`;
 
-    // 2. Continuous S-curve flowing around each metric composition
+    // 2. Continuous S-curve flowing around each metric composition and through each marker
     for (let i = 0; i < 4; i++) {
-      const ap = apexes[i];
+      const b = bounds[i];
+      const m = markers[i];
 
-      // Segment along current metric's inner boundary (from marker down to metric bottom)
-      d += ` L ${ap.x.toFixed(1)} ${ap.yBot.toFixed(1)}`;
+      // Down along the inner boundary of the current metric to its bottom
+      d += ` L ${m.x.toFixed(1)} ${b.bottom.toFixed(1)}`;
 
-      // Transition S-curve across to the next metric (for i < 3)
+      // S-curve transition across to the next marker (for i < 3)
       if (i < 3) {
-        const nextMarker = markers[i + 1];
-        const deltaY = nextMarker.y - ap.yBot;
+        const nextM = markers[i + 1];
+        const deltaY = nextM.y - b.bottom;
         
-        // Two control points with vertical tangents at both endpoints guarantee C1 smooth curvature
-        const cp1x = ap.x;
-        const cp1y = ap.yBot + deltaY * 0.52;
-        const cp2x = nextMarker.x;
-        const cp2y = nextMarker.y - deltaY * 0.48;
+        // Vertical control point tangents guarantee C1 smooth transitions
+        const cp1x = m.x;
+        const cp1y = b.bottom + deltaY * 0.52;
+        const cp2x = nextM.x;
+        const cp2y = nextM.y - deltaY * 0.48;
 
-        d += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${nextMarker.x.toFixed(1)} ${nextMarker.y.toFixed(1)}`;
+        d += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${nextM.x.toFixed(1)} ${nextM.y.toFixed(1)}`;
       }
     }
 
-    // 3. Gentle lead-out below Metric 04
-    const lastApex = apexes[3];
-    const outY = lastApex.yBot + 36;
-    d += ` L ${lastApex.x.toFixed(1)} ${outY.toFixed(1)}`;
+    // 3. Timeline ends gracefully at Metric 04 — zero drift into footer
+    d += ` L ${markers[3].x.toFixed(1)} ${(bounds[3].bottom + 16).toFixed(1)}`;
 
     setPathD(d);
   }, []);
 
   // Recalculate path responsively on resize, orientation, DOM updates, and font loading
   useLayoutEffect(() => {
-    calculateMobilePath();
-
-    const handleResize = () => {
-      calculateMobilePath();
+    let rafId: number;
+    const scheduleUpdate = () => {
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(calculateMobilePath);
     };
 
-    window.addEventListener('resize', handleResize);
-    window.addEventListener('orientationchange', handleResize);
+    scheduleUpdate();
+
+    window.addEventListener('resize', scheduleUpdate);
+    window.addEventListener('orientationchange', scheduleUpdate);
 
     const observer = new ResizeObserver(() => {
-      calculateMobilePath();
+      scheduleUpdate();
     });
 
     if (metricsListRef.current) {
@@ -478,19 +474,24 @@ export const BenefitsStrip: React.FC = () => {
       if (el) observer.observe(el);
     });
 
+    labelRefs.current.forEach((el) => {
+      if (el) observer.observe(el);
+    });
+
     // Recalculate once webfonts have settled to ensure typography metrics are final
     if (typeof document !== 'undefined' && 'fonts' in document) {
-      document.fonts.ready.then(() => {
-        calculateMobilePath();
-      });
+      document.fonts.ready.then(scheduleUpdate);
     }
 
-    const timer = setTimeout(calculateMobilePath, 150);
+    const t1 = setTimeout(scheduleUpdate, 100);
+    const t2 = setTimeout(scheduleUpdate, 350);
 
     return () => {
-      clearTimeout(timer);
-      window.removeEventListener('resize', handleResize);
-      window.removeEventListener('orientationchange', handleResize);
+      cancelAnimationFrame(rafId);
+      clearTimeout(t1);
+      clearTimeout(t2);
+      window.removeEventListener('resize', scheduleUpdate);
+      window.removeEventListener('orientationchange', scheduleUpdate);
       observer.disconnect();
     };
   }, [calculateMobilePath]);
@@ -562,7 +563,7 @@ export const BenefitsStrip: React.FC = () => {
 
           {/* ============================================================ */}
           {/* 2. MOBILE TIMELINE (< 768px): Continuous S-Shaped Bezier Path */}
-          {/* Hugs outer text boundaries with ~2mm clearance               */}
+          {/* Synchronized directly with mobileMarkers                     */}
           {/* ============================================================ */}
           {pathD && (
             <svg
@@ -596,6 +597,33 @@ export const BenefitsStrip: React.FC = () => {
           )}
 
           {/* ============================================================ */}
+          {/* 3. MOBILE NUMBERED MARKERS (< 768px)                         */}
+          {/* Direct children of metricsListRef: Shared coordinate origin  */}
+          {/* Explicit 1-to-1 mapping: 01, 02, 03, 04 beside category tag  */}
+          {/* ============================================================ */}
+          {mobileMarkers.map((marker, idx) => (
+            <div 
+              key={idx}
+              className="md:hidden flex absolute z-20 items-center justify-center pointer-events-none transition-transform duration-700"
+              style={{
+                left: `${marker.x}px`,
+                top: `${marker.y}px`,
+                transform: 'translate(-50%, -50%)',
+              }}
+            >
+              <div 
+                className={`w-7 h-7 rounded-full font-mono text-[10px] font-bold flex items-center justify-center transition-all duration-700 ${
+                  inViewStates[idx]
+                    ? 'bg-earth-forest text-earth-ivory border-2 border-earth-forest shadow-sm scale-110'
+                    : 'bg-earth-ivory text-earth-muted border border-earth-border scale-100'
+                }`}
+              >
+                0{idx + 1}
+              </div>
+            </div>
+          ))}
+
+          {/* ============================================================ */}
           {/* FOUR METRIC CHAPTERS WITH GENEROUS VERTICAL SEPARATION       */}
           {/* ============================================================ */}
           <div className="space-y-24 sm:space-y-32 md:space-y-40 lg:space-y-48">
@@ -608,7 +636,10 @@ export const BenefitsStrip: React.FC = () => {
                 contentRefCallback={(el) => {
                   contentRefs.current[idx] = el;
                 }}
-                mobileMarkerPos={mobileMarkers[idx] || null}
+                labelRefCallback={(el) => {
+                  labelRefs.current[idx] = el;
+                }}
+                onInViewChange={(inView) => handleInViewChange(idx, inView)}
               />
             ))}
           </div>
@@ -617,6 +648,7 @@ export const BenefitsStrip: React.FC = () => {
 
         {/* ============================================================== */}
         {/* Section Bottom Synthesis Note                                  */}
+        {/* Footer is completely isolated and independent of the timeline  */}
         {/* ============================================================== */}
         <div className="mt-24 sm:mt-32 md:mt-40 pt-8 border-t border-earth-border/60 flex flex-col sm:flex-row items-center justify-between text-[10px] font-mono tracking-widest text-earth-muted uppercase space-y-3 sm:space-y-0">
           <div className="flex items-center space-x-2">
