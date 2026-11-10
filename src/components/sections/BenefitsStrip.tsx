@@ -18,6 +18,7 @@ interface EditorialCounterProps {
   duration?: number;
   isInView: boolean;
   shouldReduceMotion: boolean;
+  align?: 'left' | 'right';
 }
 
 const EditorialCounter: React.FC<EditorialCounterProps> = ({
@@ -27,10 +28,13 @@ const EditorialCounter: React.FC<EditorialCounterProps> = ({
   duration = 1600,
   isInView,
   shouldReduceMotion,
+  align = 'left',
 }) => {
   const [count, setCount] = useState(shouldReduceMotion ? value : 0);
   const [subCount, setSubCount] = useState(shouldReduceMotion && subNumber !== undefined ? subNumber : 0);
   const hasAnimated = useRef(false);
+
+  const justifyClass = align === 'right' ? 'justify-end' : 'justify-start';
 
   useEffect(() => {
     if (shouldReduceMotion) {
@@ -74,7 +78,7 @@ const EditorialCounter: React.FC<EditorialCounterProps> = ({
   // Special layout for 24/7 continuous baseload
   if (subNumber !== undefined) {
     return (
-      <div className="font-editorial text-[clamp(3.5rem,9vw,8.5rem)] font-bold text-earth-forest leading-[0.88] tracking-tight select-none inline-flex items-baseline">
+      <div className={`font-editorial text-[clamp(2.75rem,7.5vw,7.5rem)] font-bold text-earth-forest leading-[0.88] tracking-tight select-none inline-flex items-baseline w-full ${justifyClass}`}>
         <span>{count}</span>
         <span className="text-earth-sage mx-1 sm:mx-1.5 font-normal text-[0.85em]">/</span>
         <span>{subCount}</span>
@@ -83,7 +87,7 @@ const EditorialCounter: React.FC<EditorialCounterProps> = ({
   }
 
   return (
-    <div className="font-editorial text-[clamp(3.5rem,9vw,8.5rem)] font-bold text-earth-forest leading-[0.88] tracking-tight select-none inline-flex items-baseline">
+    <div className={`font-editorial text-[clamp(2.75rem,7.5vw,7.5rem)] font-bold text-earth-forest leading-[0.88] tracking-tight select-none inline-flex items-baseline w-full ${justifyClass}`}>
       <span>{count}</span>
       <span className="text-earth-sage font-editorial font-normal text-[0.55em] ml-1.5 sm:ml-2 align-baseline tracking-normal">
         {suffix.trim()}
@@ -94,20 +98,23 @@ const EditorialCounter: React.FC<EditorialCounterProps> = ({
 
 // ============================================================================
 // INDIVIDUAL EDITORIAL METRIC CHAPTER
-// Strict Alternating Left-Right Composition Around Central Timeline
+// Desktop/Laptop: Symmetrical alternating 2-column layout
+// Mobile (<768px): Outer-edge aligned with clear inner margin for S-curve
 // ============================================================================
 interface MetricTimelineItemProps {
   stat: BenefitStat;
   index: number;
   shouldReduceMotion: boolean;
-  itemRefCallback?: (el: HTMLDivElement | null) => void;
+  contentRefCallback?: (el: HTMLDivElement | null) => void;
+  mobileMarkerPos?: { x: number; y: number } | null;
 }
 
 const MetricTimelineItem: React.FC<MetricTimelineItemProps> = ({
   stat,
   index,
   shouldReduceMotion,
-  itemRefCallback,
+  contentRefCallback,
+  mobileMarkerPos,
 }) => {
   const localRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(localRef, { once: true, margin: '-70px' });
@@ -118,81 +125,28 @@ const MetricTimelineItem: React.FC<MetricTimelineItemProps> = ({
   // Directional entrance: 01 & 03 from Left, 02 & 04 from Right
   const initialX = shouldReduceMotion ? 0 : isLeft ? -28 : 28;
 
-  // Metric Composition Block
-  const metricContent = (
-    <div 
-      className={`relative z-10 flex flex-col ${
-        isLeft 
-          ? 'items-start text-left md:items-end md:text-right mr-auto md:mr-0 md:ml-auto max-w-[80%] sm:max-w-[82%] md:max-w-xl md:pr-10 lg:pr-16' 
-          : 'items-end text-right md:items-start md:text-left ml-auto md:ml-0 md:mr-auto max-w-[80%] sm:max-w-[82%] md:max-w-xl md:pl-10 lg:pl-16'
-      }`}
-    >
-      {/* Category Eyebrow */}
-      <span className="font-mono text-[10px] sm:text-[11px] tracking-[0.25em] text-earth-muted uppercase block mb-1.5">
-        {stat.category || `0${index + 1} / METRIC`}
-      </span>
+  // Content alignment:
+  // Left metrics (01, 03): text-left items-start on mobile, text-right items-end on desktop
+  // Right metrics (02, 04): text-right items-end on mobile, text-left items-start on desktop
+  const mobileAlignClass = isLeft 
+    ? 'items-start text-left mr-auto' 
+    : 'items-end text-right ml-auto';
 
-      {/* Oversized Numerical Value */}
-      <div className="my-1 sm:my-2">
-        <EditorialCounter
-          value={stat.value}
-          suffix={stat.suffix}
-          subNumber={stat.subNumber}
-          isInView={isInView}
-          shouldReduceMotion={shouldReduceMotion}
-        />
-      </div>
-
-      {/* Unit Classification Label if present */}
-      {stat.unitLabel && (
-        <span className="font-mono text-[9px] sm:text-[10px] tracking-[0.2em] text-earth-sage uppercase block mb-3 font-medium">
-          {stat.unitLabel}
-        </span>
-      )}
-
-      {/* Metric Title in High-Contrast Serif */}
-      <h3 className="font-editorial text-2xl sm:text-3xl lg:text-4xl text-earth-forest font-medium tracking-tight uppercase mb-3">
-        {stat.title}
-      </h3>
-
-      {/* Core Explanatory Description */}
-      <p className="font-sans text-sm sm:text-base text-earth-black/80 leading-relaxed max-w-md mb-4">
-        {stat.description}
-      </p>
-
-      {/* Fine Hairline Rule */}
-      <div 
-        className={`w-16 h-[1px] bg-earth-border/80 my-3 ${
-          isLeft ? 'ml-0 md:ml-auto' : 'ml-auto md:ml-0'
-        }`} 
-      />
-
-      {/* Methodological Context & Source Footnote */}
-      <div className="space-y-1.5 max-w-md">
-        <p className="font-sans text-xs text-earth-muted/90 leading-relaxed italic">
-          {stat.qualification}
-        </p>
-        <div className="font-mono text-[10px] tracking-widest text-earth-forest font-semibold uppercase pt-1">
-          SOURCE: {stat.source}
-        </div>
-      </div>
-    </div>
-  );
+  const desktopAlignClass = isLeft 
+    ? 'md:items-end md:text-right md:mr-0 md:ml-auto md:pr-10 lg:pr-16' 
+    : 'md:items-start md:text-left md:ml-0 md:mr-auto md:pl-10 lg:pl-16';
 
   return (
     <div 
-      ref={(el) => {
-        localRef.current = el;
-        if (itemRefCallback) itemRefCallback(el);
-      }} 
+      ref={localRef} 
       className="relative scroll-mt-24"
     >
       {/* ------------------------------------------------------------------ */}
-      {/* Numbered Progress Node Marker on the Central Timeline              */}
-      {/* Fixed in their exact positions on desktop, tablet, and mobile      */}
+      {/* 1. DESKTOP & TABLET: Central Marker on Straight Vertical Line      */}
+      {/* Active on md: (768px+); exactly centered between columns           */}
       {/* ------------------------------------------------------------------ */}
       <div 
-        className="absolute left-1/2 -translate-x-1/2 top-0 md:top-2 z-20 flex items-center justify-center pointer-events-none"
+        className="hidden md:flex absolute left-1/2 -translate-x-1/2 top-2 z-20 items-center justify-center pointer-events-none"
       >
         <div 
           className={`w-8 h-8 rounded-full font-mono text-[11px] font-bold flex items-center justify-center transition-all duration-700 ${
@@ -206,7 +160,32 @@ const MetricTimelineItem: React.FC<MetricTimelineItemProps> = ({
       </div>
 
       {/* ------------------------------------------------------------------ */}
-      {/* Alternating Grid Row (Desktop & Tablet: 2-Col | Mobile: Single Col)*/}
+      {/* 2. MOBILE: Marker Placed Exactly on the S-Curve Timeline (<768px)  */}
+      {/* ------------------------------------------------------------------ */}
+      {mobileMarkerPos && (
+        <div 
+          className="md:hidden flex absolute z-20 items-center justify-center pointer-events-none transition-transform duration-700"
+          style={{
+            left: `${mobileMarkerPos.x}px`,
+            top: `${mobileMarkerPos.y}px`,
+            transform: 'translate(-50%, -50%)',
+          }}
+        >
+          <div 
+            className={`w-7 h-7 rounded-full font-mono text-[10px] font-bold flex items-center justify-center transition-all duration-700 ${
+              isInView
+                ? 'bg-earth-forest text-earth-ivory border-2 border-earth-forest shadow-sm scale-110'
+                : 'bg-earth-ivory text-earth-muted border border-earth-border scale-100'
+            }`}
+          >
+            0{index + 1}
+          </div>
+        </div>
+      )}
+
+      {/* ------------------------------------------------------------------ */}
+      {/* Alternating Content Grid Row                                      */}
+      {/* Desktop: 2-column alternating grid | Mobile: Outer-edge single col*/}
       {/* ------------------------------------------------------------------ */}
       <motion.div
         initial={{ opacity: 0, x: initialX, y: 16 }}
@@ -215,22 +194,130 @@ const MetricTimelineItem: React.FC<MetricTimelineItemProps> = ({
           duration: 0.75,
           ease: MOTION_EASINGS.editorial,
         }}
-        className="grid grid-cols-1 md:grid-cols-2 gap-y-6 md:gap-x-16 lg:gap-x-24 items-start pt-11 md:pt-0"
+        className="grid grid-cols-1 md:grid-cols-2 md:gap-x-16 lg:gap-x-24 items-start pt-2 md:pt-0"
       >
         {isLeft ? (
-          // Metric 01, 03: Placed in the LEFT column; Right column is empty spacer
+          // Metric 01, 03: Placed in the LEFT column; Right column is open spacer on desktop
           <>
             <div className="w-full">
-              {metricContent}
+              <div 
+                ref={contentRefCallback}
+                className={`relative z-10 flex flex-col w-[72%] sm:w-[68%] md:w-full max-w-[270px] sm:max-w-[290px] md:max-w-xl ${mobileAlignClass} ${desktopAlignClass}`}
+              >
+                {/* Category Eyebrow */}
+                <span className="font-mono text-[10px] sm:text-[11px] tracking-[0.25em] text-earth-muted uppercase block mb-1.5 w-full">
+                  {stat.category || `0${index + 1} / METRIC`}
+                </span>
+
+                {/* Oversized Numerical Value */}
+                <div className="my-1 sm:my-2 w-full">
+                  <EditorialCounter
+                    value={stat.value}
+                    suffix={stat.suffix}
+                    subNumber={stat.subNumber}
+                    isInView={isInView}
+                    shouldReduceMotion={shouldReduceMotion}
+                    align={isLeft ? 'left' : 'right'}
+                  />
+                </div>
+
+                {/* Unit Classification Label */}
+                {stat.unitLabel && (
+                  <span className="font-mono text-[9px] sm:text-[10px] tracking-[0.2em] text-earth-sage uppercase block mb-2 sm:mb-3 font-medium w-full">
+                    {stat.unitLabel}
+                  </span>
+                )}
+
+                {/* Metric Title in High-Contrast Serif */}
+                <h3 className="font-editorial text-xl sm:text-2xl md:text-3xl lg:text-4xl text-earth-forest font-medium tracking-tight uppercase mb-2.5 sm:mb-3 w-full">
+                  {stat.title}
+                </h3>
+
+                {/* Core Explanatory Description */}
+                <p className="font-sans text-xs sm:text-sm md:text-base text-earth-black/80 leading-relaxed max-w-md mb-3.5 sm:mb-4 w-full">
+                  {stat.description}
+                </p>
+
+                {/* Fine Hairline Rule */}
+                <div 
+                  className={`w-14 sm:w-16 h-[1px] bg-earth-border/80 my-2.5 sm:my-3 ${
+                    isLeft ? 'ml-0 md:ml-auto' : 'ml-auto md:ml-0'
+                  }`} 
+                />
+
+                {/* Methodological Context & Source Footnote */}
+                <div className="space-y-1 sm:space-y-1.5 max-w-md w-full">
+                  <p className="font-sans text-[11px] sm:text-xs text-earth-muted/90 leading-relaxed italic">
+                    {stat.qualification}
+                  </p>
+                  <div className="font-mono text-[9px] sm:text-[10px] tracking-widest text-earth-forest font-semibold uppercase pt-1">
+                    SOURCE: {stat.source}
+                  </div>
+                </div>
+              </div>
             </div>
             <div className="hidden md:block w-full" aria-hidden="true" />
           </>
         ) : (
-          // Metric 02, 04: Placed in the RIGHT column; Left column is empty spacer
+          // Metric 02, 04: Placed in the RIGHT column; Left column is open spacer on desktop
           <>
             <div className="hidden md:block w-full" aria-hidden="true" />
             <div className="w-full">
-              {metricContent}
+              <div 
+                ref={contentRefCallback}
+                className={`relative z-10 flex flex-col w-[72%] sm:w-[68%] md:w-full max-w-[270px] sm:max-w-[290px] md:max-w-xl ${mobileAlignClass} ${desktopAlignClass}`}
+              >
+                {/* Category Eyebrow */}
+                <span className="font-mono text-[10px] sm:text-[11px] tracking-[0.25em] text-earth-muted uppercase block mb-1.5 w-full">
+                  {stat.category || `0${index + 1} / METRIC`}
+                </span>
+
+                {/* Oversized Numerical Value */}
+                <div className="my-1 sm:my-2 w-full">
+                  <EditorialCounter
+                    value={stat.value}
+                    suffix={stat.suffix}
+                    subNumber={stat.subNumber}
+                    isInView={isInView}
+                    shouldReduceMotion={shouldReduceMotion}
+                    align={isLeft ? 'left' : 'right'}
+                  />
+                </div>
+
+                {/* Unit Classification Label */}
+                {stat.unitLabel && (
+                  <span className="font-mono text-[9px] sm:text-[10px] tracking-[0.2em] text-earth-sage uppercase block mb-2 sm:mb-3 font-medium w-full">
+                    {stat.unitLabel}
+                  </span>
+                )}
+
+                {/* Metric Title in High-Contrast Serif */}
+                <h3 className="font-editorial text-xl sm:text-2xl md:text-3xl lg:text-4xl text-earth-forest font-medium tracking-tight uppercase mb-2.5 sm:mb-3 w-full">
+                  {stat.title}
+                </h3>
+
+                {/* Core Explanatory Description */}
+                <p className="font-sans text-xs sm:text-sm md:text-base text-earth-black/80 leading-relaxed max-w-md mb-3.5 sm:mb-4 w-full">
+                  {stat.description}
+                </p>
+
+                {/* Fine Hairline Rule */}
+                <div 
+                  className={`w-14 sm:w-16 h-[1px] bg-earth-border/80 my-2.5 sm:my-3 ${
+                    isLeft ? 'ml-0 md:ml-auto' : 'ml-auto md:ml-0'
+                  }`} 
+                />
+
+                {/* Methodological Context & Source Footnote */}
+                <div className="space-y-1 sm:space-y-1.5 max-w-md w-full">
+                  <p className="font-sans text-[11px] sm:text-xs text-earth-muted/90 leading-relaxed italic">
+                    {stat.qualification}
+                  </p>
+                  <div className="font-mono text-[9px] sm:text-[10px] tracking-widest text-earth-forest font-semibold uppercase pt-1">
+                    SOURCE: {stat.source}
+                  </div>
+                </div>
+              </div>
             </div>
           </>
         )}
@@ -241,16 +328,17 @@ const MetricTimelineItem: React.FC<MetricTimelineItemProps> = ({
 
 // ============================================================================
 // MAIN PEER-REVIEWED OPERATIONAL METRICS SECTION
-// Desktop: Perfectly Straight Vertical Line | Mobile: Refined S-Shaped Curve
+// Desktop: Perfectly Straight Central Timeline | Mobile: Smooth S-Curve Timeline
 // ============================================================================
 export const BenefitsStrip: React.FC = () => {
   const containerRef = useRef<HTMLElement>(null);
   const metricsListRef = useRef<HTMLDivElement>(null);
-  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const contentRefs = useRef<(HTMLDivElement | null)[]>([]);
   const shouldReduceMotion = useReducedMotionPreference();
 
   const [pathD, setPathD] = useState<string>('');
   const [dimensions, setDimensions] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
+  const [mobileMarkers, setMobileMarkers] = useState<{ x: number; y: number }[]>([]);
 
   // Scroll tracking for both straight desktop line and mobile S-curve path
   const { scrollYProgress } = useScroll({
@@ -264,7 +352,8 @@ export const BenefitsStrip: React.FC = () => {
     restDelta: 0.001,
   });
 
-  // Calculate the smooth, continuous cubic Bezier S-path for Mobile screens
+  // Calculate the smooth S-curve timeline on mobile screens (<768px)
+  // Ensures the curve hugs the inner boundary of the text with ~2mm (12-14px) clearance
   const calculateMobilePath = useCallback(() => {
     if (!metricsListRef.current) return;
     const container = metricsListRef.current;
@@ -273,91 +362,100 @@ export const BenefitsStrip: React.FC = () => {
     const height = containerRect.height;
     if (width === 0 || height === 0) return;
 
-    // Only compute curved path if below tablet breakpoint (desktop uses straight line)
+    // Desktop/Laptop: straight central line is handled via CSS, no SVG path required
     if (width >= 768) {
       setPathD('');
+      setMobileMarkers([]);
       return;
     }
 
     setDimensions({ width, height });
 
-    const centerX = width / 2;
-    const markers: { x: number; y: number }[] = [];
-
+    // Measure actual rendered content boundaries for all 4 metrics
+    const contentBounds: { left: number; right: number; top: number; bottom: number }[] = [];
     for (let i = 0; i < BENEFIT_STATS.length; i++) {
-      const el = itemRefs.current[i];
+      const el = contentRefs.current[i];
       if (el) {
         const elRect = el.getBoundingClientRect();
-        const relativeTop = elRect.top - containerRect.top;
-        // On mobile (<768px), marker is at top-0 (height 32px, vertical center is +16px)
-        const markerY = relativeTop + 16;
-        markers.push({
-          x: centerX,
-          y: markerY,
+        contentBounds.push({
+          left: elRect.left - containerRect.left,
+          right: elRect.right - containerRect.left,
+          top: elRect.top - containerRect.top,
+          bottom: elRect.bottom - containerRect.top,
         });
       }
     }
 
-    if (markers.length < 4) return;
+    if (contentBounds.length < 4) return;
 
-    // Outward apex lateral bounds:
-    // Safe clearance: 20px from container edges (which already has px-4 = 36px viewport clearance)
-    const rightApexX = Math.min(width - 20, width * 0.93);
-    const leftApexX = Math.max(20, width * 0.07);
+    // Visual clearance: 14px (~3.7mm, guaranteeing >= 2mm visual breathing room at all mobile densities)
+    const clearance = 14;
 
-    // Initial lead-in entering Marker 01 vertically
-    let d = `M ${centerX.toFixed(1)} ${Math.max(0, markers[0].y - 32).toFixed(1)} L ${centerX.toFixed(1)} ${markers[0].y.toFixed(1)}`;
+    // Calculate marker and boundary points for each metric
+    const markers: { x: number; y: number }[] = [];
+    const apexes: { x: number; yTop: number; yMid: number; yBot: number }[] = [];
 
-    // Generate smooth, continuous C1-continuous cubic Bezier S-curves
-    for (let i = 0; i < markers.length - 1; i++) {
-      const start = markers[i];
-      const end = markers[i + 1];
-      const isLeft = i % 2 === 0; // i=0: Metric 01 (Left), i=1: Metric 02 (Right), i=2: Metric 03 (Left)
-      const apexX = isLeft ? rightApexX : leftApexX;
+    for (let i = 0; i < contentBounds.length; i++) {
+      const b = contentBounds[i];
+      const isLeft = i % 2 === 0;
 
-      const deltaY = end.y - start.y;
-      
-      // Apex point placed naturally at 48% down between start and end markers
-      const midY = start.y + deltaY * 0.48;
+      let apexX: number;
+      if (isLeft) {
+        // Left-side metric: curve runs to the RIGHT of the text
+        apexX = Math.min(width - 16, b.right + clearance);
+      } else {
+        // Right-side metric: curve runs to the LEFT of the text
+        apexX = Math.max(16, b.left - clearance);
+      }
 
-      // Generous, controlled Bezier handle lengths (no jagged bends, no straight segments)
-      const h1 = (midY - start.y) * 0.52;
-      const h2 = (midY - start.y) * 0.48;
-      const h3 = (end.y - midY) * 0.48;
-      const h4 = (end.y - midY) * 0.52;
+      const markerY = b.top + 14;
+      markers.push({ x: apexX, y: markerY });
 
-      // Arc 1: From (centerX, start.y) to (apexX, midY)
-      // Pure vertical tangents at both endpoints guarantee seamless C1 continuity
-      const cp1x = centerX;
-      const cp1y = start.y + h1;
-      const cp2x = apexX;
-      const cp2y = midY - h2;
-      d += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${apexX.toFixed(1)} ${midY.toFixed(1)}`;
-
-      // Arc 2: From (apexX, midY) to (centerX, end.y)
-      // Pure vertical tangents guarantee zero angular cusps at the marker
-      const cp3x = apexX;
-      const cp3y = midY + h3;
-      const cp4x = centerX;
-      const cp4y = end.y - h4;
-      d += ` C ${cp3x.toFixed(1)} ${cp3y.toFixed(1)}, ${cp4x.toFixed(1)} ${cp4y.toFixed(1)}, ${centerX.toFixed(1)} ${end.y.toFixed(1)}`;
+      apexes.push({
+        x: apexX,
+        yTop: b.top,
+        yMid: (b.top + b.bottom) / 2,
+        yBot: b.bottom,
+      });
     }
 
-    // Lead-out flourish after Marker 04 (leaves Marker 04 vertically, curves gently left)
-    const m4 = markers[3];
-    const outApexX = leftApexX;
-    const outY = m4.y + 65;
-    const outH = 65;
-    const cpOut1x = centerX;
-    const cpOut1y = m4.y + outH * 0.5;
-    const cpOut2x = outApexX;
-    const cpOut2y = outY - outH * 0.4;
-    d += ` C ${cpOut1x.toFixed(1)} ${cpOut1y.toFixed(1)}, ${cpOut2x.toFixed(1)} ${cpOut2y.toFixed(1)}, ${outApexX.toFixed(1)} ${outY.toFixed(1)}`;
+    setMobileMarkers(markers);
+
+    // Build the continuous, smooth cubic Bezier S-curve
+    // 1. Lead-in into Marker 01 vertically
+    let d = `M ${markers[0].x.toFixed(1)} ${Math.max(0, markers[0].y - 24).toFixed(1)} L ${markers[0].x.toFixed(1)} ${markers[0].y.toFixed(1)}`;
+
+    // 2. Continuous S-curve flowing around each metric composition
+    for (let i = 0; i < 4; i++) {
+      const ap = apexes[i];
+
+      // Segment along current metric's inner boundary (from marker down to metric bottom)
+      d += ` L ${ap.x.toFixed(1)} ${ap.yBot.toFixed(1)}`;
+
+      // Transition S-curve across to the next metric (for i < 3)
+      if (i < 3) {
+        const nextMarker = markers[i + 1];
+        const deltaY = nextMarker.y - ap.yBot;
+        
+        // Two control points with vertical tangents at both endpoints guarantee C1 smooth curvature
+        const cp1x = ap.x;
+        const cp1y = ap.yBot + deltaY * 0.52;
+        const cp2x = nextMarker.x;
+        const cp2y = nextMarker.y - deltaY * 0.48;
+
+        d += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${nextMarker.x.toFixed(1)} ${nextMarker.y.toFixed(1)}`;
+      }
+    }
+
+    // 3. Gentle lead-out below Metric 04
+    const lastApex = apexes[3];
+    const outY = lastApex.yBot + 36;
+    d += ` L ${lastApex.x.toFixed(1)} ${outY.toFixed(1)}`;
 
     setPathD(d);
   }, []);
 
-  // Recalculate path responsively on resize and layout changes (never during scrolling)
+  // Recalculate path responsively on resize, orientation, DOM updates, and font loading
   useLayoutEffect(() => {
     calculateMobilePath();
 
@@ -366,6 +464,7 @@ export const BenefitsStrip: React.FC = () => {
     };
 
     window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
 
     const observer = new ResizeObserver(() => {
       calculateMobilePath();
@@ -375,16 +474,23 @@ export const BenefitsStrip: React.FC = () => {
       observer.observe(metricsListRef.current);
     }
 
-    itemRefs.current.forEach((el) => {
+    contentRefs.current.forEach((el) => {
       if (el) observer.observe(el);
     });
 
-    // Account for potential late webfont shifts
+    // Recalculate once webfonts have settled to ensure typography metrics are final
+    if (typeof document !== 'undefined' && 'fonts' in document) {
+      document.fonts.ready.then(() => {
+        calculateMobilePath();
+      });
+    }
+
     const timer = setTimeout(calculateMobilePath, 150);
 
     return () => {
       clearTimeout(timer);
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
       observer.disconnect();
     };
   }, [calculateMobilePath]);
@@ -398,10 +504,10 @@ export const BenefitsStrip: React.FC = () => {
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12">
         
         {/* ============================================================== */}
-        {/* 2. SECTION INTRODUCTION                                        */}
-        {/* Centered, oversized editorial serif heading, prominent hierarchy*/}
+        {/* SECTION INTRODUCTION                                           */}
+        {/* Centered, oversized editorial serif heading                    */}
         {/* ============================================================== */}
-        <div className="text-center max-w-3xl mx-auto mb-24 sm:mb-32 md:mb-40 lg:mb-48">
+        <div className="text-center max-w-3xl mx-auto mb-20 sm:mb-28 md:mb-36 lg:mb-44">
           <Reveal variant="fadeUp" delay={0.05}>
             <span className="font-mono text-[10px] sm:text-[11px] tracking-[0.28em] sm:tracking-[0.32em] font-semibold text-earth-sage uppercase block mb-3 sm:mb-4">
               PROVEN BENCHMARKS
@@ -432,15 +538,13 @@ export const BenefitsStrip: React.FC = () => {
         </div>
 
         {/* ============================================================== */}
-        {/* 1, 2, 3. ALTERNATING METRICS TIMELINE                           */}
-        {/* Desktop: Straight Line | Mobile: Refined S-Shaped Bezier Path   */}
-        {/* 01 LEFT → 02 RIGHT → 03 LEFT → 04 RIGHT                         */}
+        {/* DUAL-MODE TIMELINE CONTAINER                                   */}
+        {/* Desktop: Straight Central Line | Mobile: Smooth S-Curve Path    */}
         {/* ============================================================== */}
         <div ref={metricsListRef} className="relative">
           
           {/* ============================================================ */}
-          {/* 1. DESKTOP & TABLET: Perfectly Straight Central Timeline     */}
-          {/* Active on md: (768px+) screens; completely straight & clean  */}
+          {/* 1. DESKTOP/LAPTOP TIMELINE (>= 768px): Straight Central Line */}
           {/* ============================================================ */}
           <div 
             className="hidden md:block absolute top-2 bottom-8 pointer-events-none z-10 left-1/2 -translate-x-1/2 w-[1px] bg-earth-border/60"
@@ -457,8 +561,8 @@ export const BenefitsStrip: React.FC = () => {
           </div>
 
           {/* ============================================================ */}
-          {/* 2. MOBILE: Smooth, Flowing Cubic Bezier S-Curve (< 768px)    */}
-          {/* Active on mobile; seamlessly travels around compositions     */}
+          {/* 2. MOBILE TIMELINE (< 768px): Continuous S-Shaped Bezier Path */}
+          {/* Hugs outer text boundaries with ~2mm clearance               */}
           {/* ============================================================ */}
           {pathD && (
             <svg
@@ -472,11 +576,11 @@ export const BenefitsStrip: React.FC = () => {
                 fill="none"
                 stroke="#DDD7C8"
                 strokeWidth="1.25"
-                strokeDasharray="4 4"
-                opacity="0.5"
+                strokeDasharray="3 3"
+                opacity="0.55"
               />
 
-              {/* Progressively animated smooth flowing muted-sage stroke */}
+              {/* Progressively revealed smooth sage stroke */}
               <motion.path
                 d={pathD}
                 fill="none"
@@ -491,17 +595,20 @@ export const BenefitsStrip: React.FC = () => {
             </svg>
           )}
 
-          {/* Four Alternating Metric Compositions with Generous Vertical Separation */}
-          <div className="space-y-28 sm:space-y-36 md:space-y-44 lg:space-y-52">
+          {/* ============================================================ */}
+          {/* FOUR METRIC CHAPTERS WITH GENEROUS VERTICAL SEPARATION       */}
+          {/* ============================================================ */}
+          <div className="space-y-24 sm:space-y-32 md:space-y-40 lg:space-y-48">
             {BENEFIT_STATS.map((stat, idx) => (
               <MetricTimelineItem
                 key={stat.title}
                 stat={stat}
                 index={idx}
                 shouldReduceMotion={shouldReduceMotion}
-                itemRefCallback={(el) => {
-                  itemRefs.current[idx] = el;
+                contentRefCallback={(el) => {
+                  contentRefs.current[idx] = el;
                 }}
+                mobileMarkerPos={mobileMarkers[idx] || null}
               />
             ))}
           </div>
