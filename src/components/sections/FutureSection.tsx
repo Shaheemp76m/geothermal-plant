@@ -626,7 +626,7 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
               </div>
 
               {/* CARD CONTENT COMPOSITION (Fitted within usable viewport) */}
-              <div className="relative z-10 space-y-2.5 sm:space-y-4 md:space-y-5 max-w-4xl max-h-[calc(100dvh-130px)] overflow-y-auto scrollbar-none py-1">
+              <div className="relative z-10 space-y-2 sm:space-y-3.5 md:space-y-4 max-w-4xl py-1">
                 {/* ================================================== */}
                 {/* CHECKPOINT A: ARRIVAL — CLASSIFICATION & HEADING   */}
                 {/* ================================================== */}
