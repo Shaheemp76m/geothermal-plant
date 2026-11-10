@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MotionProvider } from './components/motion/MotionProvider';
 import { ScrollProgress } from './components/motion/ScrollProgress';
 import { AnnouncementBar } from './components/navigation/AnnouncementBar';
@@ -18,6 +18,13 @@ import { ReferencesModal } from './components/sections/ReferencesModal';
 
 export function App() {
   const [referencesOpen, setReferencesOpen] = useState(false);
+
+  useEffect(() => {
+    // When opening without an anchor hash, guarantee the page initializes at the top
+    if (!window.location.hash || window.location.hash === '#top') {
+      window.scrollTo(0, 0);
+    }
+  }, []);
 
   return (
     <MotionProvider>

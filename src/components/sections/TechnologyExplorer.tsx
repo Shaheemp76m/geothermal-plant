@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronRight, Thermometer } from 'lucide-react';
 import { TECHNOLOGY_EXPLORER_DATA, TechnologyExplorerItem } from '../../data/technologyExplorer';
@@ -13,14 +13,22 @@ export const TechnologyExplorer: React.FC = () => {
   const activeTech: TechnologyExplorerItem = TECHNOLOGY_EXPLORER_DATA[activeIdx];
   const tabsContainerRef = useRef<HTMLDivElement>(null);
 
-  // Smoothly scroll active tab into view on mobile when tab changes
-  useEffect(() => {
-    if (!tabsContainerRef.current) return;
-    const activeBtn = tabsContainerRef.current.querySelector<HTMLButtonElement>(`[data-tech-idx="${activeIdx}"]`);
-    if (activeBtn) {
-      activeBtn.scrollIntoView({ behavior: shouldReduceMotion ? 'auto' : 'smooth', block: 'nearest', inline: 'center' });
+  // Smoothly center active tab horizontally within its local container ONLY on user click.
+  // Never uses scrollIntoView (which scrolls window/ancestors) and never runs on initial mount.
+  const handleTabClick = (idx: number) => {
+    setActiveIdx(idx);
+    if (tabsContainerRef.current) {
+      const container = tabsContainerRef.current;
+      const btn = container.querySelector<HTMLButtonElement>(`[data-tech-idx="${idx}"]`);
+      if (btn) {
+        const scrollLeft = btn.offsetLeft - container.clientWidth / 2 + btn.clientWidth / 2;
+        container.scrollTo({
+          left: scrollLeft,
+          behavior: shouldReduceMotion ? 'auto' : 'smooth',
+        });
+      }
     }
-  }, [activeIdx, shouldReduceMotion]);
+  };
 
   // Motion variants for active content transition with restrained blur and vertical glide
   const contentVariants = {
@@ -155,7 +163,7 @@ export const TechnologyExplorer: React.FC = () => {
                   id={`tech-tab-${tech.id}`}
                   aria-selected={isActive}
                   aria-controls={`tech-panel-${tech.id}`}
-                  onClick={() => setActiveIdx(idx)}
+                  onClick={() => handleTabClick(idx)}
                   className={`group relative text-left p-4 sm:p-5 border transition-all duration-300 min-w-[230px] sm:min-w-[260px] md:min-w-0 shrink-0 md:shrink snap-start flex flex-col justify-between ${
                     isActive
                       ? 'bg-[#151B17] border-earth-sage text-white shadow-lg'
