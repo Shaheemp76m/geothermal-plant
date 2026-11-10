@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Menu, X, ArrowUpRight } from 'lucide-react';
+import { Menu, X, ArrowUpRight, Compass } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { NAV_LINKS } from '../../data/content';
 import { MagneticButton } from '../motion/MagneticButton';
 import { MOTION_DURATIONS, MOTION_EASINGS } from '../../lib/motionTokens';
 
-export const Navbar: React.FC = () => {
+interface NavbarProps {
+  onOpenObservatory?: () => void;
+}
+
+export const Navbar: React.FC<NavbarProps> = ({ onOpenObservatory }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [hoveredNav, setHoveredNav] = useState<string | null>(null);
@@ -124,7 +128,18 @@ export const Navbar: React.FC = () => {
           </nav>
 
           {/* Right: Action CTA & Mobile Toggle */}
-          <div className="flex items-center space-x-2 sm:space-x-4 shrink-0">
+          <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
+            {onOpenObservatory && (
+              <button
+                onClick={onOpenObservatory}
+                className="inline-flex items-center space-x-1.5 text-[10px] sm:text-[11px] font-semibold tracking-[0.16em] uppercase px-3 sm:px-4 py-2 border border-earth-forest bg-earth-forest text-earth-ivory hover:bg-earth-sage hover:border-earth-sage hover:text-earth-black transition-all duration-300 rounded-full shadow-sm"
+                title="Launch Single-Viewport Interactive Subsurface Observatory"
+              >
+                <Compass className="w-3.5 h-3.5 text-earth-sage group-hover:text-earth-black" />
+                <span className="hidden xs:inline">OBSERVATORY</span>
+              </button>
+            )}
+
             <div className="hidden sm:block">
               <MagneticButton
                 as="a"
@@ -229,10 +244,22 @@ export const Navbar: React.FC = () => {
                       Dedicated to factual educational literacy regarding deep subterranean thermodynamics and clean continuous baseload power.
                     </p>
                   </div>
+                  {onOpenObservatory && (
+                    <button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        onOpenObservatory();
+                      }}
+                      className="w-full text-center flex items-center justify-center space-x-2 text-xs font-semibold tracking-[0.2em] uppercase py-3.5 bg-earth-forest text-earth-ivory border border-earth-forest hover:bg-earth-sage hover:text-earth-black transition-all mb-2"
+                    >
+                      <Compass className="w-4 h-4 text-earth-sage" />
+                      <span>SUBSURFACE OBSERVATORY</span>
+                    </button>
+                  )}
                   <a
                     href="#origins"
                     onClick={(e) => handleNavClick(e, '#origins')}
-                    className="w-full text-center block text-xs font-semibold tracking-[0.22em] uppercase py-3 sm:py-3.5 bg-earth-forest text-earth-ivory hover:bg-earth-black transition-colors"
+                    className="w-full text-center block text-xs font-semibold tracking-[0.22em] uppercase py-3 sm:py-3.5 bg-earth-ivory border border-earth-forest text-earth-forest hover:bg-earth-forest hover:text-earth-ivory transition-colors"
                   >
                     EXPLORE THE ENERGY
                   </a>

@@ -4,10 +4,10 @@ import {
   Flame,
   HelpCircle,
   BarChart3,
-  BookOpen,
   Info,
   Layers,
   ChevronUp,
+  ArrowLeft,
 } from 'lucide-react';
 import { useReducedMotionPreference } from '../../hooks/useReducedMotionPreference';
 import {
@@ -106,11 +106,11 @@ export const ObservatoryShell: React.FC<ObservatoryShellProps> = ({ onOpenArchiv
           {onOpenArchive && (
             <button
               onClick={onOpenArchive}
-              className="px-2.5 py-1 rounded bg-[#16201A] border border-[#26352B] hover:border-earth-sage/50 text-[#8DA194] hover:text-white font-mono text-[9px] sm:text-[10px] tracking-wider transition-all hidden sm:inline-flex items-center space-x-1.5"
-              title="View full editorial article archive"
+              className="px-2.5 sm:px-3 py-1 rounded bg-[#16201A] border border-earth-sage/50 hover:bg-earth-forest text-earth-ivory font-mono text-[9px] sm:text-[10px] tracking-wider transition-all flex items-center space-x-1.5 shadow-sm active:scale-95"
+              title="Return to full scrolling website"
             >
-              <BookOpen className="w-3 h-3 text-earth-sage" />
-              <span>EDITORIAL ARCHIVE</span>
+              <ArrowLeft className="w-3 h-3 text-earth-sage" />
+              <span className="font-semibold uppercase">FULL WEBSITE</span>
             </button>
           )}
 

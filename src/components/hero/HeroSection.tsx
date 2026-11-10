@@ -1,13 +1,17 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, Compass } from 'lucide-react';
 import { GeothermalExplorerPanel } from './GeothermalExplorerPanel';
 import { BottomInformationComposition } from './BottomInformationComposition';
 import { MagneticButton } from '../motion/MagneticButton';
 import { useReducedMotionPreference } from '../../hooks/useReducedMotionPreference';
 import { MOTION_EASINGS } from '../../lib/motionTokens';
 
-export const HeroSection: React.FC = () => {
+interface HeroSectionProps {
+  onOpenObservatory?: () => void;
+}
+
+export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenObservatory }) => {
   const shouldReduceMotion = useReducedMotionPreference();
 
   const handleScrollClick = (e: React.MouseEvent<any>, href: string) => {
@@ -109,12 +113,12 @@ export const HeroSection: React.FC = () => {
                   "Harnessing Earth's natural heat for a new energy future."
                 </motion.p>
 
-                {/* Small Dark Rounded CTA: EXPLORE */}
+                {/* Action CTAs: EXPLORE & OBSERVATORY */}
                 <motion.div
                   initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 15 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.6, ease: MOTION_EASINGS.editorial }}
-                  className="pt-1 sm:pt-2"
+                  className="pt-1 sm:pt-2 flex flex-wrap items-center gap-3"
                 >
                   <MagneticButton
                     as="a"
@@ -125,6 +129,17 @@ export const HeroSection: React.FC = () => {
                     <span>EXPLORE</span>
                     <ArrowUpRight className="w-3.5 h-3.5 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                   </MagneticButton>
+
+                  {onOpenObservatory && (
+                    <button
+                      onClick={onOpenObservatory}
+                      className="inline-flex items-center space-x-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-white/80 border border-earth-forest/40 text-earth-forest text-xs font-semibold tracking-[0.18em] uppercase rounded-full hover:bg-earth-forest hover:text-white transition-all duration-300 shadow-md backdrop-blur-sm group"
+                      title="Launch Single-Viewport Interactive Subsurface Observatory"
+                    >
+                      <Compass className="w-3.5 h-3.5 text-earth-forest group-hover:text-earth-sage transition-colors" />
+                      <span>OBSERVATORY APP</span>
+                    </button>
+                  )}
                 </motion.div>
               </div>
 

@@ -1,7 +1,12 @@
 import React from 'react';
 import { ANNOUNCEMENT_TEXT } from '../../data/content';
+import { Compass } from 'lucide-react';
 
-export const AnnouncementBar: React.FC = () => {
+interface AnnouncementBarProps {
+  onOpenObservatory?: () => void;
+}
+
+export const AnnouncementBar: React.FC<AnnouncementBarProps> = ({ onOpenObservatory }) => {
   return (
     <aside 
       aria-label="Announcement" 
@@ -9,6 +14,18 @@ export const AnnouncementBar: React.FC = () => {
     >
       <span className="inline-block w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-earth-sage animate-pulse shrink-0" />
       <span className="truncate">{ANNOUNCEMENT_TEXT}</span>
+      {onOpenObservatory && (
+        <>
+          <span className="hidden md:inline text-earth-sage/60">·</span>
+          <button
+            onClick={onOpenObservatory}
+            className="hidden md:inline-flex items-center space-x-1 text-earth-sage hover:text-white underline underline-offset-4 decoration-earth-sage/50 transition-colors font-semibold"
+          >
+            <Compass className="w-3 h-3 text-earth-sage inline" />
+            <span>OPEN SUBSURFACE OBSERVATORY →</span>
+          </button>
+        </>
+      )}
       <span className="inline-block w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-earth-sage animate-pulse shrink-0" />
     </aside>
   );

@@ -7,6 +7,7 @@ import { Navbar } from './components/navigation/Navbar';
 import { HeroSection } from './components/hero/HeroSection';
 import { IntroductionSection } from './components/sections/IntroductionSection';
 import { HowItWorksSection } from './components/sections/HowItWorksSection';
+import { ObservatoryFeatureBanner } from './components/sections/ObservatoryFeatureBanner';
 import { DarkFeatureStrip } from './components/hero/DarkFeatureStrip';
 import { EditorialFeatureBanner } from './components/sections/EditorialFeatureBanner';
 import { BenefitsStrip } from './components/sections/BenefitsStrip';
@@ -16,69 +17,98 @@ import { FutureSection } from './components/sections/FutureSection';
 import { ClosingSection } from './components/sections/ClosingSection';
 import { Footer } from './components/footer/Footer';
 import { ReferencesModal } from './components/sections/ReferencesModal';
-import { Compass } from 'lucide-react';
 
 export function App() {
-  const [viewMode, setViewMode] = useState<'observatory' | 'archive'>('observatory');
+  // Default to full website on standard loads
+  const [viewMode, setViewMode] = useState<'website' | 'observatory'>('website');
   const [referencesOpen, setReferencesOpen] = useState(false);
 
+  // Sync hash state with viewMode and ensure proper scroll behavior
   useEffect(() => {
-    // When opening without an anchor hash, guarantee the page initializes at the top
-    if (!window.location.hash || window.location.hash === '#top') {
-      window.scrollTo(0, 0);
-    }
-  }, [viewMode]);
+    const handleHash = () => {
+      if (window.location.hash === '#observatory') {
+        setViewMode('observatory');
+      } else {
+        setViewMode('website');
+        if (!window.location.hash || window.location.hash === '#top') {
+          window.scrollTo(0, 0);
+        }
+      }
+    };
+
+    handleHash();
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, []);
+
+  const handleOpenObservatory = () => {
+    window.location.hash = '#observatory';
+    setViewMode('observatory');
+  };
+
+  const handleReturnToWebsite = () => {
+    window.location.hash = '#top';
+    setViewMode('website');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <MotionProvider>
       {viewMode === 'observatory' ? (
         /* SINGLE-SCREEN APPLICATION: SUBSURFACE OBSERVATORY */
-        <ObservatoryShell onOpenArchive={() => setViewMode('archive')} />
+        <ObservatoryShell onOpenArchive={handleReturnToWebsite} />
       ) : (
-        /* EDITORIAL ARCHIVE MODE (ACCESSIBLE VIA ARCHIVE BUTTON) */
+        /* FULL EDITORIAL WEBSITE (DEFAULT EXPERIENCE) */
         <div id="top" className="min-h-screen bg-earth-ivory text-earth-black flex flex-col selection:bg-earth-forest selection:text-white relative">
-          {/* Sticky Return Bar to Observatory */}
-          <div className="sticky top-0 z-50 bg-[#0E1310] text-earth-ivory border-b border-[#222B24] px-4 py-2 flex items-center justify-between text-xs font-mono shadow-md">
-            <div className="flex items-center space-x-2">
-              <span className="w-2 h-2 rounded-full bg-earth-sage" />
-              <span className="text-[#A2B3A8]">EDITORIAL ARCHIVE VIEW</span>
-            </div>
-            <button
-              onClick={() => setViewMode('observatory')}
-              className="px-3 py-1 rounded bg-earth-forest border border-earth-sage/50 text-white hover:bg-earth-forest/80 transition-all flex items-center space-x-1.5 uppercase tracking-wider font-semibold"
-            >
-              <Compass className="w-3.5 h-3.5 text-earth-sage" />
-              <span>RETURN TO SUBSURFACE OBSERVATORY</span>
-            </button>
-          </div>
-
           {/* Cinematic Scroll Progress Bar */}
           <ScrollProgress colorClass="bg-earth-sage" />
 
-          {/* 1. Thin Announcement Bar */}
-          <AnnouncementBar />
+          {/* 1. Thin Announcement Bar with Observatory Link */}
+          <AnnouncementBar onOpenObservatory={handleOpenObservatory} />
 
-          {/* 2. Minimal Navigation Bar with Centered Wordmark */}
-          <Navbar />
+          {/* 2. Navigation Bar with Centered Wordmark & Observatory CTA */}
+          <Navbar onOpenObservatory={handleOpenObservatory} />
 
           {/* Main Landing Page Stream */}
           <main className="flex-grow">
-            <HeroSection />
+            {/* 3. Hero Section with Oversized Serif Background Word & Central Visual */}
+            <HeroSection onOpenObservatory={handleOpenObservatory} />
+
+            {/* 4. Introduction: Origin of Earth's Subterranean Heat */}
             <IntroductionSection />
+
+            {/* 5. How It Works: Interactive 4-Phase Thermodynamic Diagram & Technology Spectrum */}
             <HowItWorksSection />
+
+            {/* 6. Subsurface Observatory Feature Showcase Banner */}
+            <ObservatoryFeatureBanner onOpenObservatory={handleOpenObservatory} />
+
+            {/* 7. Dark Feature Strip: 3 Category Groups with Hairline Dividers */}
             <DarkFeatureStrip />
+
+            {/* 8. Editorial Feature Banner: Wide Photographic Split Section */}
             <EditorialFeatureBanner />
+
+            {/* 9. Benefits Strip: Verified Stats with Viewport Count-up Animation */}
             <BenefitsStrip />
+
+            {/* 10. Applications Section: More Than Electricity Editorial Cards */}
             <ExploreGeothermal />
+
+            {/* 11. Environmental Impact: Scientifically Grounded Strengths & Qualifications */}
             <EnvironmentalImpact onOpenReferences={() => setReferencesOpen(true)} />
+
+            {/* 12. The Future: Next-Gen EGS, Advanced Drilling & Closed Loops */}
             <FutureSection onOpenReferences={() => setReferencesOpen(true)} />
+
+            {/* 13. Powerful Closing Manifesto Banner */}
             <ClosingSection />
           </main>
 
-          {/* 13. Restrained Editorial Footer */}
+          {/* 14. Restrained Editorial Footer */}
           <Footer onOpenReferences={() => setReferencesOpen(true)} />
 
-          {/* 14. Peer-Reviewed Scientific Archive Modal */}
+          {/* 15. Peer-Reviewed Scientific Archive Modal */}
           <ReferencesModal
             isOpen={referencesOpen}
             onClose={() => setReferencesOpen(false)}
