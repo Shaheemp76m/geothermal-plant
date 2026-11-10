@@ -34,10 +34,19 @@ export interface BenefitStat {
   value: number;
   suffix: string;
   title: string;
+  category?: string;
+  displayValue?: string;
+  unitLabel?: string;
+  subNumber?: number;
   highlight: string;
   description: string;
   qualification: string;
   source: string;
+  editorialNote?: {
+    tag: string;
+    headline: string;
+    detail: string;
+  };
 }
 
 export interface ApplicationCard {

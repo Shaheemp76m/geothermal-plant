@@ -167,40 +167,69 @@ export const EDITORIAL_BANNER = {
 
 export const BENEFIT_STATS: BenefitStat[] = [
   {
+    category: "01 / ENERGY AVAILABILITY",
     value: 92,
     suffix: "%",
+    unitLabel: "CAPACITY FACTOR",
     title: "CAPACITY FACTOR",
     highlight: "Highest among clean energies",
-    description: "Operates near-continuously without downtime caused by nightfall, cloud cover, or calm wind.",
-    qualification: "Exceeds solar PV (20–25%) and onshore wind (30–45%) according to US DOE GeoVision data.",
-    source: "US Department of Energy (DOE)"
+    description: "Geothermal power plants can operate consistently, providing dependable electricity independent of daily weather conditions.",
+    qualification: "Operating capacity factor varies by facility design and scheduled maintenance. Modern geothermal power stations routinely achieve 90–95%, contrasted with meteorological intermittency across solar PV (20–25%) and onshore wind (30–45%).",
+    source: "US Department of Energy (DOE).",
+    editorialNote: {
+      tag: "BASELOAD DISPATCH",
+      headline: "Continuous Grid Injection",
+      detail: "Unlike intermittent weather sources that depend on chemical battery reserves, geothermal maintains steady thermal output 24 hours a day."
+    }
   },
   {
+    category: "02 / ENVIRONMENTAL IMPACT",
     value: 38,
     suffix: " g",
+    unitLabel: "g CO₂-eq / kWh (MEDIAN)",
     title: "LIFECYCLE EMISSIONS",
-    highlight: "g CO₂-eq / kWh (Median)",
-    description: "Closed-loop binary systems vent negligible gases, with total lifecycle footprint comparable to offshore wind.",
-    qualification: "NREL Life Cycle Analysis of operational binary and flash power facilities.",
-    source: "National Renewable Energy Laboratory (NREL)"
+    highlight: "Median lifecycle intensity",
+    description: "Geothermal energy can offer a comparatively low lifecycle greenhouse gas footprint, depending on the technology and site.",
+    qualification: "Median lifecycle emissions for closed-loop binary power facilities. Emissions depend on conversion cycle design, reservoir fluid chemistry, and non-condensable gas reinjection practices.",
+    source: "National Renewable Energy Laboratory (NREL).",
+    editorialNote: {
+      tag: "CLOSED-LOOP CYCLE",
+      headline: "Near-Zero Operational Venting",
+      detail: "Modern binary facilities circulate hot brine through heat exchangers in sealed loops, reinjecting 100% of fluids back into subterranean reservoirs."
+    }
   },
   {
+    category: "03 / ENERGY RELIABILITY",
     value: 24,
-    suffix: " / 7",
+    subNumber: 7,
+    suffix: "/7",
+    unitLabel: "CONTINUOUS ANNUAL DISPATCH",
     title: "CONTINUOUS BASELOAD",
-    highlight: "Uninterrupted 8,760 hrs/year",
-    description: "Provides stable spinning inertia, frequency regulation, and dispatchable heat on demand.",
-    qualification: "Independent of seasonal meteorological volatility or fossil fuel imports.",
-    source: "International Energy Agency (IEA)"
+    highlight: "8,760 hours annual dispatch",
+    description: "Geothermal resources can provide electricity and useful heat around the clock, helping support reliable energy systems.",
+    qualification: "Refers to continuous thermal dispatchability and rotating mechanical inertia, independent of seasonal droughts, winter calms, or cloudy periods, subject to planned annual maintenance.",
+    source: "International Energy Agency (IEA).",
+    editorialNote: {
+      tag: "ROTATIONAL INERTIA",
+      headline: "Essential Grid Frequency Support",
+      detail: "Heavy spinning turbines deliver physical inertia that stabilizes regional transmission grids against rapid demand fluctuations."
+    }
   },
   {
+    category: "04 / LAND EFFICIENCY",
     value: 400,
     suffix: " m²",
+    unitLabel: "m² / GWh (30-YR LIFECYCLE)",
     title: "LAND FOOTPRINT",
-    highlight: "Per GWh over 30 years",
-    description: "Compact surface footprint allows coexistence with wildlife, agriculture, and forestry.",
-    qualification: "Surface infrastructure only; subsurface reservoir footprint extends wider underground.",
-    source: "US DOE GeoVision Land-Use Studies"
+    highlight: "Compact surface installation",
+    description: "Geothermal facilities can use relatively compact surface areas, allowing other land uses to coexist where conditions permit.",
+    qualification: "Surface installation footprint per gigawatt-hour generated over a 30-year lifecycle. Subterranean fluid reservoir boundaries extend below ground without preventing surface agricultural or forest coexistence.",
+    source: "US DOE GeoVision land-use research.",
+    editorialNote: {
+      tag: "SURFACE COEXISTENCE",
+      headline: "Minimal Environmental Footprint",
+      detail: "Directional multi-well drilling clusters surface equipment onto compact wellpads, leaving surrounding habitats, grazing land, and forests undisturbed."
+    }
   }
 ];
 
