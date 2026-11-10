@@ -80,9 +80,9 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
     if (!containerRef.current) return false;
     const rect = containerRef.current.getBoundingClientRect();
     const vh = window.innerHeight;
-    // Section is active when its top has reached the viewport top (<= 50px)
-    // and its bottom hasn't scrolled completely off the screen (>= half viewport)
-    return rect.top <= 50 && rect.bottom >= vh * 0.4;
+    // Section is active when its top is at or near the viewport top (within 100px)
+    // and its canvas occupies the viewport
+    return rect.top <= 100 && rect.bottom >= vh * 0.35;
   }, []);
 
   // =========================================================================
@@ -171,7 +171,7 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
     const container = containerRef.current;
     if (!container || shouldReduceMotion) return;
 
-    // 1. Mouse Wheel & Trackpad
+    // 1. Mouse Wheel & Trackpad (Global Viewport Capture)
     const handleWheel = (e: WheelEvent) => {
       if (!isSectionActive()) return;
 
@@ -189,20 +189,20 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
         return;
       }
 
-      // Intercept scroll within the section
+      // Intercept scroll within the section regardless of cursor position
       e.preventDefault();
 
       // If locked during animation, ignore subsequent wheel events
       if (isLockedRef.current) return;
 
       // Filter micro-trackpad noise
-      if (Math.abs(e.deltaY) < 15) return;
+      if (Math.abs(e.deltaY) < 14) return;
 
-      // Snap alignment to top if slightly offset
+      // Ensure stable docking to viewport top (ZERO vertical drift)
       const rect = container.getBoundingClientRect();
-      if (Math.abs(rect.top) > 4) {
+      if (Math.abs(rect.top) > 2) {
         window.scrollTo({
-          top: container.offsetTop,
+          top: window.scrollY + rect.top,
           behavior: 'instant' as ScrollBehavior,
         });
       }
@@ -214,7 +214,7 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
       }
     };
 
-    // 2. Mobile Touch (One Swipe = Exactly One Checkpoint)
+    // 2. Mobile Touch (Global Swipe Capture across the Viewport)
     const handleTouchStart = (e: TouchEvent) => {
       touchStartY.current = e.touches[0].clientY;
       touchStartX.current = e.touches[0].clientX;
@@ -233,18 +233,28 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
       const isAtEnd = cardIndex === NEXT_GEN_TECH.length - 1 && checkpoint === 3;
       const isAtStart = cardIndex === 0 && checkpoint === 0;
 
-      // Release boundaries
+      // Release boundaries: allow normal mobile scroll past the section
       if (deltaY > 0 && isAtEnd) return;
       if (deltaY < 0 && isAtStart) return;
 
-      // Prevent native page scroll while actively interacting
+      // Prevent native page scroll while actively interacting anywhere on screen
       e.preventDefault();
 
       if (isLockedRef.current || touchHandled.current) return;
 
-      // Vertical swipe threshold (28px)
-      if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 28) {
+      // Vertical swipe threshold (24px)
+      if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 24) {
         touchHandled.current = true; // Consume this swipe gesture
+
+        // Snap dock alignment on touch
+        const rect = container.getBoundingClientRect();
+        if (Math.abs(rect.top) > 2) {
+          window.scrollTo({
+            top: window.scrollY + rect.top,
+            behavior: 'instant' as ScrollBehavior,
+          });
+        }
+
         if (deltaY > 0) {
           advanceCheckpoint();
         } else {
@@ -278,16 +288,16 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
 
     window.addEventListener('wheel', handleWheel, { passive: false });
     window.addEventListener('keydown', handleKeyDown);
-    container.addEventListener('touchstart', handleTouchStart, { passive: true });
-    container.addEventListener('touchmove', handleTouchMove, { passive: false });
-    container.addEventListener('touchend', handleTouchEnd, { passive: true });
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    window.addEventListener('touchend', handleTouchEnd, { passive: true });
 
     return () => {
       window.removeEventListener('wheel', handleWheel);
       window.removeEventListener('keydown', handleKeyDown);
-      container.removeEventListener('touchstart', handleTouchStart);
-      container.removeEventListener('touchmove', handleTouchMove);
-      container.removeEventListener('touchend', handleTouchEnd);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
       if (lockTimerRef.current) clearTimeout(lockTimerRef.current);
     };
   }, [advanceCheckpoint, previousCheckpoint, isSectionActive, shouldReduceMotion]);
@@ -429,6 +439,13 @@ export const FutureSection: React.FC<FutureSectionProps> = ({ onOpenReferences }
       {/* ============================================================ */}
       <div
         ref={containerRef}
+        style={{
+          touchAction:
+            (activeCardIndex === NEXT_GEN_TECH.length - 1 && activeCheckpoint === 3) ||
+            (activeCardIndex === 0 && activeCheckpoint === 0)
+              ? 'auto'
+              : 'none',
+        }}
         className="relative h-screen h-[100dvh] w-full overflow-hidden flex flex-col justify-between bg-earth-ivory border-b border-earth-border select-none z-20"
       >
         {/* -------------------------------------------------------- */}
