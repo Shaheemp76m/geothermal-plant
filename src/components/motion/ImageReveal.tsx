@@ -43,6 +43,7 @@ export const ImageReveal: React.FC<ImageRevealProps> = ({
           src={src}
           alt={alt}
           loading={priority ? 'eager' : 'lazy'}
+          decoding="async"
           className={cn('w-full h-full object-cover', imgClassName)}
         />
         {children}
@@ -96,6 +97,7 @@ export const ImageReveal: React.FC<ImageRevealProps> = ({
         src={src}
         alt={alt}
         loading={priority ? 'eager' : 'lazy'}
+        decoding="async"
         className={cn(
           'w-full h-full object-cover',
           enableHoverZoom ? 'group-hover:scale-105 transition-transform duration-700 ease-out' : '',

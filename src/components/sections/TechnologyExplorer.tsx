@@ -378,6 +378,9 @@ export const TechnologyExplorer: React.FC = () => {
                   src={activeTech.image}
                   alt={activeTech.imageAlt}
                   loading="lazy"
+                  decoding="async"
+                  width={1400}
+                  height={1050}
                   className="w-full h-full object-cover filter saturate-[0.92] contrast-[1.05] transition-transform duration-700 group-hover:scale-105"
                 />
 

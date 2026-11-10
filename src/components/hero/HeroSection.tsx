@@ -45,10 +45,16 @@ export const HeroSection: React.FC = () => {
               initial={{ scale: shouldReduceMotion ? 1 : 1.08, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 1.1, ease: MOTION_EASINGS.editorial }}
-              src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=2000&q=85"
+              src="/images/hero/geothermal-hero.webp"
+              srcSet="/images/hero/geothermal-hero-480.webp 480w, /images/hero/geothermal-hero-768.webp 768w, /images/hero/geothermal-hero-1280.webp 1280w, /images/hero/geothermal-hero-1920.webp 1920w"
+              sizes="(max-width: 640px) 480px, (max-width: 1024px) 768px, (max-width: 1536px) 1280px, 1920px"
               alt="Hellisheiði Geothermal Power Station nestled in the dramatic Hengill volcanic mountains with rising steam plumes"
               className="w-full h-full object-cover object-[center_right] filter saturate-[0.96] contrast-[1.04]"
               loading="eager"
+              fetchPriority="high"
+              decoding="sync"
+              width={1920}
+              height={1080}
             />
 
             {/* Soft daylight mist wash on upper-left to give the deep forest headline maximum editorial contrast */}

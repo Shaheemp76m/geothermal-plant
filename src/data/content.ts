@@ -33,7 +33,7 @@ export const HERO_CONTENT = {
   },
   ctaText: "EXPLORE THE ENERGY",
   ctaTarget: "#origins",
-  heroImage: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=1800&q=85",
+  heroImage: "/images/hero/geothermal-landscape.webp",
   heroImageAlt: "Dramatic geothermal landscape with steam rising from volcanic fissures in Iceland",
 };
 
@@ -51,7 +51,7 @@ export const INTRODUCTION_CONTENT = {
     { label: "THERMAL GRADIENT", value: "~25–30°C / km" },
     { label: "HEAT DECAY PERIOD", value: "Billions of Years" }
   ],
-  image: "https://images.unsplash.com/photo-1542332213-9b5a5a3fad35?auto=format&fit=crop&w=1200&q=80",
+  image: "/images/geothermal-systems/volcanic-crust.webp",
   imageAlt: "Volcanic ridge steam demonstrating the Earth's active thermal crust"
 };
 
@@ -61,7 +61,7 @@ export const FEATURE_STRIP_ITEMS: FeatureStripItem[] = [
     tag: "01 / FOUNDATION",
     title: "HOW IT WORKS",
     subtitle: "Heat from deep within Earth is captured by fluid circulation and converted into mechanical, electrical, or thermal energy.",
-    image: "https://images.unsplash.com/photo-1527489377706-5bf97e608852?auto=format&fit=crop&w=800&q=80",
+    image: "/images/geothermal-systems/thermal-reservoir.webp",
     imageAlt: "Vibrant thermal mineral pool demonstrating hot subterranean fluid reservoirs",
     linkText: "LEARN THE MECHANISM",
     targetId: "#how-it-works"
@@ -71,7 +71,7 @@ export const FEATURE_STRIP_ITEMS: FeatureStripItem[] = [
     tag: "02 / GEOGRAPHY",
     title: "WHERE IT WORKS",
     subtitle: "Naturally accessible along plate boundaries and tectonic rift zones, with next-generation EGS opening continental access.",
-    image: "https://images.unsplash.com/photo-1516655855035-d5215bcb5604?auto=format&fit=crop&w=800&q=80",
+    image: "/images/geothermal-systems/tectonic-boundary.webp",
     imageAlt: "Icelandic volcanic landscape along the Mid-Atlantic tectonic rift",
     linkText: "EXPLORE SITES & TECH",
     targetId: "#applications"
@@ -81,7 +81,7 @@ export const FEATURE_STRIP_ITEMS: FeatureStripItem[] = [
     tag: "03 / ADVANTAGE",
     title: "WHY IT MATTERS",
     subtitle: "Delivers reliable 24/7 baseload power with high capacity factors and among the lowest lifetime surface footprints of any energy source.",
-    image: "https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?auto=format&fit=crop&w=800&q=80",
+    image: "/images/geothermal-systems/reinjection-facility.webp",
     imageAlt: "Modern clean geothermal energy generation facility",
     linkText: "REVIEW THE DATA",
     targetId: "#impact"
@@ -160,7 +160,7 @@ export const EDITORIAL_BANNER = {
   ],
   ctaText: "EXPLORE THE PROCESS",
   ctaTarget: "#how-it-works",
-  image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1400&q=85",
+  image: "/images/geothermal-systems/hellisheidi-station.webp",
   imageAlt: "Hellisheiði geothermal field in the Hengill volcanic system",
   caption: "Hellisheiði Geothermal Power Station · Hengill Volcanic System · Baseload Power & District Heating"
 };
@@ -240,7 +240,7 @@ export const APPLICATION_CARDS: ApplicationCard[] = [
     title: "Electricity Generation",
     description: "High-enthalpy reservoirs (>150°C) produce high-pressure steam to spin turbines in flash steam or binary-cycle facilities.",
     operatingTemp: "150°C – 370°C",
-    image: "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=900&q=80",
+    image: "/images/applications/electricity-generation.webp",
     imageAlt: "Geothermal electricity generation turbine infrastructure",
     details: [
       "Binary Cycle: Closed organic Rankine loops with zero emissions",
@@ -254,7 +254,7 @@ export const APPLICATION_CARDS: ApplicationCard[] = [
     title: "Residential Heating & Cooling",
     description: "Ground-source heat pumps (geo-exchange) capitalize on the stable 10°C–15°C temperature of shallow ground to heat and cool homes worldwide.",
     operatingTemp: "8°C – 25°C",
-    image: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=900&q=80",
+    image: "/images/applications/ground-source-cooling.webp",
     imageAlt: "Sustainable urban architecture utilizing ground source heat pumps",
     details: [
       "High Efficiency: 300%–500% coefficient of performance (COP)",
@@ -268,7 +268,7 @@ export const APPLICATION_CARDS: ApplicationCard[] = [
     title: "District Heating",
     description: "Insulated pipeline networks pump naturally warm subsurface water directly under city streets to heat entire neighborhoods, hospitals, and universities.",
     operatingTemp: "60°C – 120°C",
-    image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=900&q=80",
+    image: "/images/applications/district-heating.webp",
     imageAlt: "Modern city buildings supported by municipal district thermal heating",
     details: [
       "Iceland Model: Over 90% of all space heating is geothermal",
@@ -282,7 +282,7 @@ export const APPLICATION_CARDS: ApplicationCard[] = [
     title: "Industry & Agriculture",
     description: "Mid-temperature thermal brine supplies industrial process heat directly, replacing coal and fossil gas in crop drying, timber processing, and greenhouses.",
     operatingTemp: "30°C – 130°C",
-    image: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=900&q=80",
+    image: "/images/applications/geothermal-agriculture.webp",
     imageAlt: "Lush botanical greenhouse warmed year-round by natural geothermal heat",
     details: [
       "Subarctic Food Security: Enables tomato, banana, and microalgae farming in cold climates",
@@ -374,7 +374,7 @@ export const CLOSING_CONTENT = {
   body: "The thermal energy contained within the top 10 kilometers of the Earth's crust exceeds all known fossil fuel reserves by a factor of fifty thousand. By uniting century-old hydrothermal engineering with advanced deep drilling and closed loops, humanity has the opportunity to unlock an omnipresent, clean, baseload energy foundation for generations to come.",
   ctaText: "BEGIN THE EXPLORATION",
   ctaTarget: "#top",
-  image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1800&q=85",
+  image: "/images/misc/future-geothermal-frontier.webp",
   imageAlt: "Vast rolling green landscapes powered by clean subterranean energy"
 };
 

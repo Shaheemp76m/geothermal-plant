@@ -37,7 +37,7 @@ const PHASES: PhaseDetail[] = [
       { label: 'FORMATION DEPTH', value: '1.5 – 5.0 Kilometers' },
       { label: 'ENERGY SOURCE', value: 'Primordial & Radiogenic Heat' },
     ],
-    image: 'https://images.unsplash.com/photo-1542332213-9b5a5a3fad35?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/technology/phase-subterranean-heat.webp',
     imageAlt: 'Geothermal volcanic fissure and subterranean thermal formation',
     caption: 'Deep Crustal Strata · High-Enthalpy Hydrothermal Bedrock',
     icon: Flame,
@@ -55,7 +55,7 @@ const PHASES: PhaseDetail[] = [
       { label: 'BOREHOLE CASING', value: 'Multi-Barrier Steel Isolated' },
       { label: 'FLUID MEDIUM', value: 'Mineralized Hydrothermal Brine' },
     ],
-    image: 'https://images.unsplash.com/photo-1527489377706-5bf97e608852?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/technology/phase-extraction-wellhead.webp',
     imageAlt: 'Geothermal production wellhead and mineral extraction infrastructure',
     caption: 'Production Wellhead · High-Pressure Hydrodynamic Transport',
     icon: Droplets,
@@ -73,7 +73,7 @@ const PHASES: PhaseDetail[] = [
       { label: 'BINARY FLUID', value: 'Hermetic Closed Organic Loop' },
       { label: 'TURBINE OUTPUT', value: 'Synchronous Alternating Current' },
     ],
-    image: 'https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/technology/phase-turbine-conversion.webp',
     imageAlt: 'Geothermal power generation steam turbine and electrical generators',
     caption: 'Turbine Hall · High-Pressure Thermodynamic Expansion',
     icon: Cpu,
@@ -91,7 +91,7 @@ const PHASES: PhaseDetail[] = [
       { label: 'CAPACITY FACTOR', value: '>90% Dispatchable Baseload' },
       { label: 'ENVIRONMENTAL IMPACT', value: 'Aquifer Protected & Zero Combustion' },
     ],
-    image: 'https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/technology/phase-reinjection-loop.webp',
     imageAlt: 'Modern clean geothermal energy generation facility with reinjection loop',
     caption: 'Reinjection Array · Full Closed-Loop Mass Balance',
     icon: Zap,
@@ -296,6 +296,9 @@ export const HowItWorksSection: React.FC = () => {
                           src={phase.image}
                           alt={phase.imageAlt}
                           loading="lazy"
+                          decoding="async"
+                          width={1200}
+                          height={825}
                           className="w-full h-full object-cover img-editorial-zoom filter saturate-[0.9] contrast-[1.05]"
                         />
                       </div>

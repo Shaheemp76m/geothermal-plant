@@ -130,7 +130,7 @@ export const EnvironmentalImpact: React.FC<EnvironmentalImpactProps> = ({ onOpen
             <div className="lg:col-span-6">
               <div className="relative group overflow-hidden bg-[#141A17] border border-[#202E27] shadow-[0_20px_50px_rgba(0,0,0,0.4)]">
                 <ImageReveal
-                  src="https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?auto=format&fit=crop&w=1200&q=80"
+                  src="/images/environment/closed-loop-binary.webp"
                   alt="Geothermal energy power facility delivering reliable baseload power"
                   aspectRatio="aspect-[4/3] sm:aspect-[16/11]"
                   duration={MOTION_DURATIONS.image}
@@ -153,7 +153,7 @@ export const EnvironmentalImpact: React.FC<EnvironmentalImpactProps> = ({ onOpen
             <div className="lg:col-span-6 order-2 lg:order-1">
               <div className="relative group overflow-hidden bg-[#141A17] border border-[#202E27] shadow-[0_20px_50px_rgba(0,0,0,0.4)]">
                 <ImageReveal
-                  src="https://images.unsplash.com/photo-1542332213-9b5a5a3fad35?auto=format&fit=crop&w=1200&q=80"
+                  src="/images/environment/surface-footprint-coexistence.webp"
                   alt="Deep geothermal volcanic fissures and geological rock strata"
                   aspectRatio="aspect-[4/3] sm:aspect-[16/11]"
                   duration={MOTION_DURATIONS.image}
@@ -377,7 +377,7 @@ export const EnvironmentalImpact: React.FC<EnvironmentalImpactProps> = ({ onOpen
             <div className="lg:col-span-6">
               <div className="relative group overflow-hidden bg-[#141A17] border border-[#202E27] shadow-[0_20px_50px_rgba(0,0,0,0.4)]">
                 <ImageReveal
-                  src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80"
+                  src="/images/environment/advanced-drilling-rig.webp"
                   alt="Precision subsurface monitoring and geothermal wellhead engineering"
                   aspectRatio="aspect-[4/3] sm:aspect-[16/11]"
                   duration={MOTION_DURATIONS.image}

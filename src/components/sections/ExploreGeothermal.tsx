@@ -104,6 +104,9 @@ export const ExploreGeothermal: React.FC = () => {
                       src={card.image}
                       alt={card.imageAlt}
                       loading="lazy"
+                      decoding="async"
+                      width={900}
+                      height={562}
                       className="w-full h-full object-cover img-editorial-zoom filter saturate-[0.92] contrast-[1.03]"
                     />
                     

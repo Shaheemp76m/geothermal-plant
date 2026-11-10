@@ -38,6 +38,9 @@ export const ClosingSection: React.FC = () => {
           src={CLOSING_CONTENT.image}
           alt={CLOSING_CONTENT.imageAlt}
           loading="lazy"
+          decoding="async"
+          width={1800}
+          height={1200}
           className="w-full h-full object-cover filter brightness-[0.38] contrast-[1.1] will-change-transform"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-earth-forest via-earth-forest/70 to-earth-forest/40" />
