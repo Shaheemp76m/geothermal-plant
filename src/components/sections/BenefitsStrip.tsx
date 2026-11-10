@@ -74,7 +74,7 @@ const EditorialCounter: React.FC<EditorialCounterProps> = ({
   // Special layout for 24/7 continuous baseload
   if (subNumber !== undefined) {
     return (
-      <div className="font-editorial text-[clamp(3.75rem,9.5vw,8.5rem)] font-bold text-earth-forest leading-[0.88] tracking-tight select-none inline-flex items-baseline">
+      <div className="font-editorial text-[clamp(3.5rem,9vw,8.5rem)] font-bold text-earth-forest leading-[0.88] tracking-tight select-none inline-flex items-baseline">
         <span>{count}</span>
         <span className="text-earth-sage mx-1 sm:mx-1.5 font-normal text-[0.85em]">/</span>
         <span>{subCount}</span>
@@ -83,7 +83,7 @@ const EditorialCounter: React.FC<EditorialCounterProps> = ({
   }
 
   return (
-    <div className="font-editorial text-[clamp(3.75rem,9.5vw,8.5rem)] font-bold text-earth-forest leading-[0.88] tracking-tight select-none inline-flex items-baseline">
+    <div className="font-editorial text-[clamp(3.5rem,9vw,8.5rem)] font-bold text-earth-forest leading-[0.88] tracking-tight select-none inline-flex items-baseline">
       <span>{count}</span>
       <span className="text-earth-sage font-editorial font-normal text-[0.55em] ml-1.5 sm:ml-2 align-baseline tracking-normal">
         {suffix.trim()}
@@ -116,15 +116,15 @@ const MetricTimelineItem: React.FC<MetricTimelineItemProps> = ({
   const isLeft = index % 2 === 0;
 
   // Directional entrance: 01 & 03 from Left, 02 & 04 from Right
-  const initialX = shouldReduceMotion ? 0 : isLeft ? -32 : 32;
+  const initialX = shouldReduceMotion ? 0 : isLeft ? -28 : 28;
 
   // Metric Composition Block
   const metricContent = (
     <div 
       className={`relative z-10 flex flex-col ${
         isLeft 
-          ? 'items-start text-left md:items-end md:text-right mr-auto md:mr-0 md:ml-auto max-w-[88%] sm:max-w-[90%] md:max-w-xl md:pr-10 lg:pr-16 -translate-x-1.5 md:translate-x-0' 
-          : 'items-end text-right md:items-start md:text-left ml-auto md:ml-0 md:mr-auto max-w-[88%] sm:max-w-[90%] md:max-w-xl md:pl-10 lg:pl-16 translate-x-1.5 md:translate-x-0'
+          ? 'items-start text-left md:items-end md:text-right mr-auto md:mr-0 md:ml-auto max-w-[80%] sm:max-w-[82%] md:max-w-xl md:pr-10 lg:pr-16' 
+          : 'items-end text-right md:items-start md:text-left ml-auto md:ml-0 md:mr-auto max-w-[80%] sm:max-w-[82%] md:max-w-xl md:pl-10 lg:pl-16'
       }`}
     >
       {/* Category Eyebrow */}
@@ -241,7 +241,7 @@ const MetricTimelineItem: React.FC<MetricTimelineItemProps> = ({
 
 // ============================================================================
 // MAIN PEER-REVIEWED OPERATIONAL METRICS SECTION
-// Smooth Flowing S-Shaped Curved Timeline Connector
+// Desktop: Perfectly Straight Vertical Line | Mobile: Refined S-Shaped Curve
 // ============================================================================
 export const BenefitsStrip: React.FC = () => {
   const containerRef = useRef<HTMLElement>(null);
@@ -252,7 +252,7 @@ export const BenefitsStrip: React.FC = () => {
   const [pathD, setPathD] = useState<string>('');
   const [dimensions, setDimensions] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
 
-  // Scroll tracking for the continuous flowing S-curved line
+  // Scroll tracking for both straight desktop line and mobile S-curve path
   const { scrollYProgress } = useScroll({
     target: metricsListRef,
     offset: ['start 65%', 'end 80%'],
@@ -264,8 +264,8 @@ export const BenefitsStrip: React.FC = () => {
     restDelta: 0.001,
   });
 
-  // Calculate the smooth, flowing S-shaped Bezier path dynamically
-  const calculatePath = useCallback(() => {
+  // Calculate the smooth, continuous cubic Bezier S-path for Mobile screens
+  const calculateMobilePath = useCallback(() => {
     if (!metricsListRef.current) return;
     const container = metricsListRef.current;
     const containerRect = container.getBoundingClientRect();
@@ -273,103 +273,102 @@ export const BenefitsStrip: React.FC = () => {
     const height = containerRect.height;
     if (width === 0 || height === 0) return;
 
+    // Only compute curved path if below tablet breakpoint (desktop uses straight line)
+    if (width >= 768) {
+      setPathD('');
+      return;
+    }
+
     setDimensions({ width, height });
 
     const centerX = width / 2;
-    const isMobile = width < 768;
-
-    const markers: { x: number; y: number; itemBottom: number }[] = [];
+    const markers: { x: number; y: number }[] = [];
 
     for (let i = 0; i < BENEFIT_STATS.length; i++) {
       const el = itemRefs.current[i];
       if (el) {
         const elRect = el.getBoundingClientRect();
         const relativeTop = elRect.top - containerRect.top;
-        const relativeBottom = elRect.bottom - containerRect.top;
-        // Marker center: top-0 (or top-2 on md+), marker height is 32px (half is 16px)
-        const markerY = relativeTop + (isMobile ? 16 : 22);
+        // On mobile (<768px), marker is at top-0 (height 32px, vertical center is +16px)
+        const markerY = relativeTop + 16;
         markers.push({
           x: centerX,
           y: markerY,
-          itemBottom: relativeBottom,
         });
       }
     }
 
     if (markers.length < 4) return;
 
-    // Outward apex lateral coordinates
-    // Mobile: hugs opposite edge with safe 24px clearance from container boundary
-    // Desktop: reaches 35% of container width from center (in middle of empty column)
-    const rightApexX = isMobile 
-      ? Math.min(width - 24, width * 0.94) 
-      : Math.min(centerX + (width * 0.35), width - 48);
+    // Outward apex lateral bounds:
+    // Safe clearance: 20px from container edges (which already has px-4 = 36px viewport clearance)
+    const rightApexX = Math.min(width - 20, width * 0.93);
+    const leftApexX = Math.max(20, width * 0.07);
 
-    const leftApexX = isMobile 
-      ? Math.max(24, width * 0.06) 
-      : Math.max(centerX - (width * 0.35), 48);
+    // Initial lead-in entering Marker 01 vertically
+    let d = `M ${centerX.toFixed(1)} ${Math.max(0, markers[0].y - 32).toFixed(1)} L ${centerX.toFixed(1)} ${markers[0].y.toFixed(1)}`;
 
-    // Initial lead-in above Marker 01
-    let d = `M ${centerX.toFixed(1)} ${Math.max(0, markers[0].y - 36).toFixed(1)} L ${centerX.toFixed(1)} ${markers[0].y.toFixed(1)}`;
-
-    // Generate smooth S-curve segments wrapping around each metric
+    // Generate smooth, continuous C1-continuous cubic Bezier S-curves
     for (let i = 0; i < markers.length - 1; i++) {
       const start = markers[i];
       const end = markers[i + 1];
       const isLeft = i % 2 === 0; // i=0: Metric 01 (Left), i=1: Metric 02 (Right), i=2: Metric 03 (Left)
       const apexX = isLeft ? rightApexX : leftApexX;
 
-      const totalH = end.y - start.y;
-      const contentH = Math.max(start.itemBottom - start.y, totalH * 0.55);
+      const deltaY = end.y - start.y;
       
-      const yReachApex = start.y + Math.max(45, contentH * 0.32);
-      const yLeaveApex = Math.min(Math.max(yReachApex + 30, start.itemBottom - 10), end.y - 45);
+      // Apex point placed naturally at 48% down between start and end markers
+      const midY = start.y + deltaY * 0.48;
 
-      // 1. Outward curve from start marker into lateral apex
-      const cp1x = start.x + (apexX - start.x) * 0.45;
-      const cp1y = start.y + (yReachApex - start.y) * 0.15;
+      // Generous, controlled Bezier handle lengths (no jagged bends, no straight segments)
+      const h1 = (midY - start.y) * 0.52;
+      const h2 = (midY - start.y) * 0.48;
+      const h3 = (end.y - midY) * 0.48;
+      const h4 = (end.y - midY) * 0.52;
+
+      // Arc 1: From (centerX, start.y) to (apexX, midY)
+      // Pure vertical tangents at both endpoints guarantee seamless C1 continuity
+      const cp1x = centerX;
+      const cp1y = start.y + h1;
       const cp2x = apexX;
-      const cp2y = start.y + (yReachApex - start.y) * 0.65;
-      d += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${apexX.toFixed(1)} ${yReachApex.toFixed(1)}`;
+      const cp2y = midY - h2;
+      d += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${apexX.toFixed(1)} ${midY.toFixed(1)}`;
 
-      // 2. Travel along outer perimeter (wrapping completely around descriptions & citations)
-      if (yLeaveApex > yReachApex + 4) {
-        d += ` L ${apexX.toFixed(1)} ${yLeaveApex.toFixed(1)}`;
-      }
-
-      // 3. Inward curve from lateral apex wrapping under content into next marker
+      // Arc 2: From (apexX, midY) to (centerX, end.y)
+      // Pure vertical tangents guarantee zero angular cusps at the marker
       const cp3x = apexX;
-      const cp3y = yLeaveApex + (end.y - yLeaveApex) * 0.35;
-      const cp4x = end.x + (apexX - end.x) * 0.35;
-      const cp4y = yLeaveApex + (end.y - yLeaveApex) * 0.85;
-      d += ` C ${cp3x.toFixed(1)} ${cp3y.toFixed(1)}, ${cp4x.toFixed(1)} ${cp4y.toFixed(1)}, ${end.x.toFixed(1)} ${end.y.toFixed(1)}`;
+      const cp3y = midY + h3;
+      const cp4x = centerX;
+      const cp4y = end.y - h4;
+      d += ` C ${cp3x.toFixed(1)} ${cp3y.toFixed(1)}, ${cp4x.toFixed(1)} ${cp4y.toFixed(1)}, ${centerX.toFixed(1)} ${end.y.toFixed(1)}`;
     }
 
-    // Lead-out flourish after Marker 04 (curves left as Metric 04 is on the right)
+    // Lead-out flourish after Marker 04 (leaves Marker 04 vertically, curves gently left)
     const m4 = markers[3];
     const outApexX = leftApexX;
-    const outY = m4.y + 70;
-    const cpOut1x = m4.x + (outApexX - m4.x) * 0.45;
-    const cpOut1y = m4.y + 25;
+    const outY = m4.y + 65;
+    const outH = 65;
+    const cpOut1x = centerX;
+    const cpOut1y = m4.y + outH * 0.5;
     const cpOut2x = outApexX;
-    const cpOut2y = m4.y + 50;
+    const cpOut2y = outY - outH * 0.4;
     d += ` C ${cpOut1x.toFixed(1)} ${cpOut1y.toFixed(1)}, ${cpOut2x.toFixed(1)} ${cpOut2y.toFixed(1)}, ${outApexX.toFixed(1)} ${outY.toFixed(1)}`;
 
     setPathD(d);
   }, []);
 
-  // Recalculate path responsively on resize and layout changes
+  // Recalculate path responsively on resize and layout changes (never during scrolling)
   useLayoutEffect(() => {
-    calculatePath();
+    calculateMobilePath();
 
     const handleResize = () => {
-      calculatePath();
+      calculateMobilePath();
     };
 
     window.addEventListener('resize', handleResize);
 
     const observer = new ResizeObserver(() => {
-      calculatePath();
+      calculateMobilePath();
     });
 
     if (metricsListRef.current) {
@@ -381,14 +380,14 @@ export const BenefitsStrip: React.FC = () => {
     });
 
     // Account for potential late webfont shifts
-    const timer = setTimeout(calculatePath, 150);
+    const timer = setTimeout(calculateMobilePath, 150);
 
     return () => {
       clearTimeout(timer);
       window.removeEventListener('resize', handleResize);
       observer.disconnect();
     };
-  }, [calculatePath]);
+  }, [calculateMobilePath]);
 
   return (
     <section 
@@ -433,16 +432,37 @@ export const BenefitsStrip: React.FC = () => {
         </div>
 
         {/* ============================================================== */}
-        {/* 1, 2, 3. ALTERNATING METRICS TIMELINE WITH S-SHAPED CURVE       */}
-        {/* Smooth Flowing Bezier Path Wrapping Around Each Metric          */}
+        {/* 1, 2, 3. ALTERNATING METRICS TIMELINE                           */}
+        {/* Desktop: Straight Line | Mobile: Refined S-Shaped Bezier Path   */}
         {/* 01 LEFT → 02 RIGHT → 03 LEFT → 04 RIGHT                         */}
         {/* ============================================================== */}
         <div ref={metricsListRef} className="relative">
           
-          {/* Dynamic SVG Flowing S-Curve Connecting Timeline Path */}
+          {/* ============================================================ */}
+          {/* 1. DESKTOP & TABLET: Perfectly Straight Central Timeline     */}
+          {/* Active on md: (768px+) screens; completely straight & clean  */}
+          {/* ============================================================ */}
+          <div 
+            className="hidden md:block absolute top-2 bottom-8 pointer-events-none z-10 left-1/2 -translate-x-1/2 w-[1px] bg-earth-border/60"
+            aria-hidden="true"
+          >
+            {/* Scroll-driven Progress Indicator Fill */}
+            <motion.div
+              style={{
+                scaleY: shouldReduceMotion ? 1 : smoothProgress,
+                transformOrigin: 'top',
+              }}
+              className="w-full h-full bg-gradient-to-b from-earth-forest via-earth-sage to-earth-forest/50"
+            />
+          </div>
+
+          {/* ============================================================ */}
+          {/* 2. MOBILE: Smooth, Flowing Cubic Bezier S-Curve (< 768px)    */}
+          {/* Active on mobile; seamlessly travels around compositions     */}
+          {/* ============================================================ */}
           {pathD && (
             <svg
-              className="absolute inset-0 w-full h-full pointer-events-none z-10 overflow-visible"
+              className="md:hidden block absolute inset-0 w-full h-full pointer-events-none z-10 overflow-visible"
               viewBox={`0 0 ${dimensions.width || 100} ${dimensions.height || 100}`}
               aria-hidden="true"
             >
@@ -453,7 +473,7 @@ export const BenefitsStrip: React.FC = () => {
                 stroke="#DDD7C8"
                 strokeWidth="1.25"
                 strokeDasharray="4 4"
-                opacity="0.6"
+                opacity="0.5"
               />
 
               {/* Progressively animated smooth flowing muted-sage stroke */}
